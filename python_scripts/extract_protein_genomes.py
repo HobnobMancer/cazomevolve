@@ -85,7 +85,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         compile_fasta(assembly_path, args)
 
 
-def genomic_assembly_paths(args):
+def get_genomic_assembly_paths(args):
     """Retrieve the path to every genomic assembly in the input dir.
 
     :param args: cmd-line args parser

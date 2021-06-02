@@ -52,6 +52,9 @@ import pandas as pd
 from Bio import SeqIO
 from tqdm import tqdm
 
+from python_scripts.utilities import config_logger
+from python_scripts.utilities.file_io import make_output_directory
+from python_scripts.utilities.parsers import parse_extract_protein_genomes
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -60,10 +63,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     Return dataframe of protein data.
     """
     if argv is None:
-        parser = build_parser()
+        parser = parse_extract_protein_genomes.build_parser()
         args = parser.parse_args()
     else:
-        parser = build_parser(argv)
+        parser = parse_extract_protein_genomes.build_parser(argv)
         args = parser.parse_args()
 
     if logger is None:
@@ -72,26 +75,39 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     # If specified output directory, create output directory to write FASTA files too
     if args.output is not sys.stdout:
-        make_output_directory(args.output, args.force, args.nodelete)
+        make_output_directory(args.output_dir, args.force, args.nodelete)
 
-    # Open input dataframe
-    logger.info("Opening input dataframe %s", args.input_df)
-    input_df = pd.read_csv(args.input_df, header=0, index_col=0)
+    # get paths to genomic assemblies
+    genomic_assembly_paths = get_genomic_assembly_paths(args)
 
-    # Build dataframe
-    protein_annotation_df = create_dataframe(input_df, args)
 
-    # Write out dataframe
-    if args.output_df is not None:
-        write_out_dataframe(protein_annotation_df, args.output_df, args.force)
 
-    # Write out FASTA files
-    index = 0
-    for index in tqdm(
-        range(len(protein_annotation_df["Genus"])), desc="Writing protein to FASTA"
-    ):
-        df_row = protein_annotation_df.iloc[index]
-        write_fasta(df_row, logger, args)
-        index += 1
+def genomic_assembly_paths(args):
+    """Retrieve the path to every genomic assembly in the input dir.
 
-    logger.info("Programme finsihed. Terminating.")
+    :param args: cmd-line args parser
+
+    Return list of path to genomic assemblies.
+    """
+    logger = logging.getLogger(__name__)
+
+    # retrieve all files from directory
+    files_in_entries = (
+        entry for entry in Path(args.genbank).iterdir() if entry.is_file()
+    )
+
+    gbk_files = []
+
+    # retrieve only gbk_files
+    for entry in files_in_entries:
+        if entry.name.endswith("genomic.gbff.gz")
+        gbk_files.append(entry)
+
+    if len(gbk_files) == 0:
+        logger.error(
+            f"Found 0 assemblies in {args.input_dir}\n"
+            "Check the path is correct. Terminating program"
+        )
+        sys.exit(1)
+    
+    return gbk_files

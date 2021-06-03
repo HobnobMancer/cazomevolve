@@ -174,7 +174,7 @@ def compile_fasta(assembly_path, args):
                             continue
 
                         seq = "\n".join([seq[i : i + 60] for i in range(0, len(seq), 60)])
-                        file_content = f">{data_line}\n{seq}\n"
+                        file_content = f"{data_line}\n{seq}\n"
                         fh.write(file_content)
 
                         protein_count += 1

@@ -120,6 +120,12 @@ The script was invoked using the command:
 python3 scripts/extract_proteins_genomes.py dickeya_genomes_flat/ dickeya_proteins -f 
 ```
 
+The output is writen to `dickeya_proteins`, and each output fasta file is named `<species>_<genbank_accession>.fasta`, allowing for 
+multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single 
+fasta file.
+
+37 of the Dickeya genomic assemblies contained no CDS features.
+
 ## Predicting CDS
 
 Some of the retrieved genomic assemblies contained no CDS features. Therefore, the genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).

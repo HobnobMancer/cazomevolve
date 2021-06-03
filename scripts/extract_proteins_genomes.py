@@ -41,7 +41,6 @@
 
 import gzip
 import logging
-import re
 import sys
 
 from pathlib import Path
@@ -52,9 +51,9 @@ import pandas as pd
 from Bio import SeqIO
 from tqdm import tqdm
 
-from python_scripts.utilities import config_logger
-from python_scripts.utilities.file_io import make_output_directory
-from python_scripts.utilities.parsers import parse_extract_protein_genomes
+from scripts.utilities import config_logger, build_logger
+from scripts.utilities.file_io import make_output_directory
+from scripts.utilities.parsers import parse_extract_protein_genomes
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -73,9 +72,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         config_logger(args)
     logger = logging.getLogger(__name__)
 
-    # If specified output directory, create output directory to write FASTA files too
-    if args.output is not sys.stdout:
-        make_output_directory(args.output_dir, args.force, args.nodelete)
+    make_output_directory(args.output_dir, args.force, args.nodelete)
 
     # get paths to genomic assemblies
     genomic_assembly_paths = get_genomic_assembly_paths(args)
@@ -96,7 +93,7 @@ def get_genomic_assembly_paths(args):
 
     # retrieve all files from directory
     files_in_entries = (
-        entry for entry in Path(args.genbank).iterdir() if entry.is_file()
+        entry for entry in Path(args.input_dir).iterdir() if entry.is_file()
     )
 
     gbk_files = []
@@ -126,6 +123,8 @@ def compile_fasta(assembly_path, args):
     """
     logger = logging.getLogger(__name__)
 
+    no_proteins_logger = build_logger(args.output_dir, "genomes_with_no_proteins.log")
+
     # compile fasta name species.fasta
     name_fragments = (assembly_path.name).split("_")
     genomic_accession = name_fragments[0] + name_fragments[1]
@@ -136,13 +135,14 @@ def compile_fasta(assembly_path, args):
         for gb_record in SeqIO.parse(handle, "genbank"):
             for (index, feature) in enumerate(gb_record.features):
                 if feature.type == "source":
-                    species = get_record_feature(feature, "organism", genomic_accession)
+                    species = get_record_feature(feature, "organism", "", genomic_accession)
                     if species != "":
                         break
             if species != "":
                 break
 
-    fasta_path = f"{species}.fasta"
+    fasta_species = species.replace(" ", "_")
+    fasta_path = f"{fasta_species}_{genomic_accession}.fasta"
 
     output_path = args.output_dir / fasta_path
 
@@ -154,15 +154,18 @@ def compile_fasta(assembly_path, args):
                 for (index, feature) in enumerate(gb_record.features):
                     # Parse over only protein encoding features (type = 'CDS')
                     if feature.type == "CDS":
-                        protein_accession = get_record_feature(feature, "protein_id", "")
+                        protein_accession = get_record_feature(feature, "protein_id", "", genomic_accession)
 
-                        product = get_record_feature(feature, "product", protein_accession)
+                        product = get_record_feature(feature, "product", protein_accession, genomic_accession)
 
-                        gene_id = get_record_feature(feature, "protein_id", protein_accession)
+                        gene_id = get_record_feature(feature, "protein_id", protein_accession, genomic_accession)
+
+                        if protein_accession == "":
+                            protein_accession = gene_id
 
                         data_line = f">gi|{gene_id}|gbk|{protein_accession}| {product} [{species}]"
 
-                        seq = get_record_feature(feature, "translation", protein_accession)
+                        seq = get_record_feature(feature, "translation", protein_accession, genomic_accession)
                         if seq == "":
                             continue
 
@@ -174,10 +177,13 @@ def compile_fasta(assembly_path, args):
     
     logger.warning(f"{protein_count} proteins in genomic assembly {genomic_accession}")
 
+    if protein_count == 0:
+        no_proteins_logger.warning(f"{genomic_accession}")
+
     return
 
 
-def get_record_feature(feature, qualifier, accession):
+def get_record_feature(feature, qualifier, accession, genomic_accession):
     """Retrieve data from BioPython feature object.
 
     :param feature: BioPython feature object representing the curernt working protein
@@ -193,7 +199,10 @@ def get_record_feature(feature, qualifier, accession):
         return data
     except KeyError:
         logger.warning(
-            f"Failed to retrieve feature {qualifier}, for protein {accession}\n"
-            "Returning an empty string it its place"
+            f"Failed to retrieve feature {qualifier}, for protein {accession} in {genomic_accession}\n"
+            "Returning an empty string it its place. If a protein_id, gene_id will be written in its place"
         )
-        return ""
+
+
+if __name__ == "__main__":
+    main()

@@ -29,7 +29,7 @@ Carbohydrate Active enZymes are a subset of proteins that generate, modify and/o
 ## Installation
 
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.8 prodigal -c bioconda`   
+`conda create -n <venv_name> python=3.8 prodigal orthofinder -c bioconda`   
 `conda activate <venv_name>`
 
 2. Clone the repository
@@ -150,12 +150,16 @@ Orthologues present in each of the input genomes were identified using the packa
 > Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y).
 
 For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
-from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used.
+from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used. All fasta parsed by `orthofinder` where 
+gathered into a single directory by using the Python script `gather_fasta_for_Orthofinder.py`.
+```bash
+python3 scripts/gather_fasta_for_Orthofinder.py dickeya_proteins/ orthofinder_dickerya_input_fastas -f -p predicted_cds_dickeya/ 
+```
 
 The output from this analysis can be found in the `dickeya_orthologues` directory.
 
 This analysis was performed using the command:
 ```bash
-scripts/find_orthologues.sh
+orthofinder -f orthofinder_dickerya_input_fastas
 ```
 

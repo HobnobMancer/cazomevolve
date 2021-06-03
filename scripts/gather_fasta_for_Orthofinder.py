@@ -117,10 +117,7 @@ def get_proteins_from_genomes_paths(args):
         )
         sys.exit(1)
 
-
-    gbk_fasta_filesnames = [f.name for f in gbk_fasta_files]
-
-    return gbk_fasta_filesnames, empty_fasta_files
+    return gbk_fasta_files, empty_fasta_files
 
 
 def get_predicted_cds(empty_fastas, args):

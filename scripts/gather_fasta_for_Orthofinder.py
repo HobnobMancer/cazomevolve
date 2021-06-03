@@ -82,7 +82,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         predicted_fasta_data = None
 
     # move the necessary fasta files to a single output directory
-    move_fasta_to_outdir(genomic_proteins, predicted_fasta_data)
+    move_fasta_to_outdir(genomic_proteins, predicted_fasta_data, args)
 
 
 def get_proteins_from_genomes_paths(args):
@@ -156,12 +156,10 @@ def get_predicted_cds(empty_fastas, args):
     for entry in files_in_entries:
         if entry.name.endswith(".faa"):
             genomic_accession = str(entry.name).split("_")[0] + "_" + str(entry.name).split("_")[1]
-            print(genomic_accession)
+
             if genomic_accession in list(fasta_data.keys()):
                 fasta_files.append(entry)
                 fasta_data[genomic_accession]["predicted_fasta"] = entry
-
-    print(fasta_data.keys())
 
     if (len(fasta_files) == 0):
         logger.error(

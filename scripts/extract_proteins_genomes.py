@@ -110,6 +110,9 @@ def get_genomic_assembly_paths(args):
         )
         sys.exit(1)
     
+    else:
+        logger.warning(f"Retrieved {len(gbk_files)} from {args.input_dir}")
+    
     return gbk_files
 
 
@@ -128,6 +131,7 @@ def compile_fasta(assembly_path, args):
     # compile fasta name species.fasta
     name_fragments = (assembly_path.name).split("_")
     genomic_accession = name_fragments[0] + name_fragments[1]
+    genomic_accession = genomic_accession.replace("GCA", "GCA_")
 
     species = ""
 

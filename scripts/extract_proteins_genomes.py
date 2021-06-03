@@ -202,6 +202,7 @@ def get_record_feature(feature, qualifier, accession, genomic_accession):
             f"Failed to retrieve feature {qualifier}, for protein {accession} in {genomic_accession}\n"
             "Returning an empty string it its place. If a protein_id, gene_id will be written in its place"
         )
+        return ""
 
 
 if __name__ == "__main__":

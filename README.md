@@ -28,10 +28,8 @@ Carbohydrate Active enZymes are a subset of proteins that generate, modify and/o
 
 ## Installation
 
-The easiest method is to use pip to install `pyrewton` and all requirements.
-
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.8`   
+`conda create -n <venv_name> python=3.8 prodigal -c bioconda`   
 `conda activate <venv_name>`
 
 2. Clone the repository
@@ -48,7 +46,10 @@ Do not forget to use the **-e** option when install using pip3, otherwise each t
 POISx or Mac OS, or linux emulator   
 Python version 3.8+   
 Miniconda3 or Anaconda managed microenvironment, incorporated code checkers are included in list form in 'requirements.txt'.   
-Miniconda3 environment file is also available in the GitHub repository: 'environment.yml'.   
+Miniconda3 environment file is also available in the GitHub repository: 'environment.yml'.
+ncbi-genome-download
+Prodigal
+Orthofinder
 For all required Python libraries please read 'requirements.txt'.   
 
 <p>&nbsp;</p>
@@ -56,8 +57,6 @@ For all required Python libraries please read 'requirements.txt'.
 ## Current Developments
 
 This section of the README lists the areas that are currently being worked upon and expanded:
-- Retrieval of genomic accessions from which proteins catalogued within CAZy are derived from, and the associated taxonomic data of the source organism
-    - Working on batch quering NCBI to minimise the number of calls made to NCBI.Entrez
 
 <p>&nbsp;</p>
 
@@ -65,13 +64,9 @@ This section of the README lists the areas that are currently being worked upon 
 
 Below is a directory plan of this repository, followed by a brief overview of each directories role , to facilitate navigation through the repository.
 
-### **assets**
+### **scripts**
 
-Directory containing all files needed for the GitHub page, created for easy access to accompanying Jupyter notebooks.
-
-### **docs**
-
-Directory containing files to build documentation hosted at ReadTheDocs.
+Contains all Bash and Python scripts used in the analysis.
 
 ### **notebooks**
 
@@ -81,28 +76,24 @@ Directory containing all Jupyter notebooks, and html copies used for easier in-b
 
 Directory containing all `pytest` files for testing `pyrewton`, including subdirectories for test inputs and targets. Each module/submodule has its own specific test input and target subdirectory.
 
-### **cfv_investigator**
-
-Directory containing all `pyrewton` program modules (including all submodules and Python scripts).
 <p>&nbsp;</p>
 
-## Modules
+## Modules and Scripts
 
-_Please find more detailed documentation at for operation and troubleshooting at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)_
-
-This is an overview of the functionalities of each module within `pyrewton`, as well as basics of operation. For more detailed documentation on the operation of each module and indiviudal Python scripts please see the documentation at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)
+This section describes the overall function of each Python module and script found in the `scripts` directory.
 
 ### **utilities**
 
-Contains all functions that are called from other Python scripts for building command-line parsers and loggers. Includes the submodule **file_io**, which contains functions that are called from other Python scripts for handling directories and files in `pyrewton`, including retrieving program inputs and creating output directories.
+Contains all functions that are called from other Python scripts for building command-line parsers and loggers. Includes the submodule **file_io**, which contains functions that are called from other Python scripts for handling directories and files.
 
-### **ncbi**
+### **extract_proteins_genomes.py**
 
-Modules that are involved in retrieving handling data from NCBI. This includes retrieval of genomic accession numbers and source organism taxonomic data.
+Extract protein sequences from GenBank genomic assemblies, in preparation for single ortholog searches using `Orthofinder`.
 
-### **covariance**
+### **predict_CDS.sh**
 
-Modules that build the data set required for calculating the covariance, calculate the covariance of CAZy family annotations for all genomic accessions retrieved and taxonomic specific groups.
+Invoke `prodigal` for all GenBank assemblies in a directory, to predict CDS features.
+
 
 # Planning and method
 
@@ -123,40 +114,42 @@ ncbi-genome-download --section genbank --assembly-levels complete,chromosome,sca
 
 ## Extract protein sequences
 
-Need one fasta file per species/per genome for suing Orthofinder.
-
-Ideal structure:
->gi|gene_id|gbk|protein_accession| protein name [source_organism]
-protein sequence....
-
-Used the Python script `extract_proteins_genomes.py` to create the necessary fasta files.
+Orthofinder requires one fasta file per species/genome. The Python script `extract_proteins_genomes.py` was used to create the necessary fasta files.
 The script was invoked using the command:
 ```bash
-python3 python_scripts/extract_proteins_genomes.py dickeya_genomes_flat/ dickeya_proteins -f 
+python3 scripts/extract_proteins_genomes.py dickeya_genomes_flat/ dickeya_proteins -f 
 ```
 
 ## Predicting CDS
 
-Some of the retrieved genomic assemblies contained not CDS features. Therefore, the genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
+Some of the retrieved genomic assemblies contained no CDS features. Therefore, the genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
 
 > Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
 
 The output was placed in `predicted_cds`.
 
-The general format of the `prodigal` command is:
-```bash
-prodigal -i input_file -o output_file_name -a output_fasta_file.faa
+Invoking `prodigal` was invoked using the `bash` script `predict_CDS.sh`, using the command
 ```
+bash scripts/predict_CDS.sh dickeya_genomes_flat dickeya | tee predicted_cds_dickeya/dickeya_cds_prediction.log
+```
+This command writes the output to the terminal and creates a log file. The script `predict_CDS.sh` also decompresses the files 
+in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. Both the decompressed and compressed 
+versions of the genomic assemblies are retained.
 
 
 ## Identification of Single-Copy Orthologues
 
 Orthologues present in each of the input genomes were identified using the package [`orthofinder`](https://github.com/davidemms/OrthoFinder)
 
-> Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y)
+> Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y).
 
-The output from this analysis can be found in the `orthologues` directory. To reproduce this analysis, execute the `find_orthologues.sh` script from this directory.
+For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
+from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used.
 
+The output from this analysis can be found in the `dickeya_orthologues` directory.
+
+This analysis was performed using the command:
 ```bash
 scripts/find_orthologues.sh
 ```
+

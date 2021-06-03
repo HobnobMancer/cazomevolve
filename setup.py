@@ -71,7 +71,7 @@ setuptools.setup(
     platforms="Posix, MacOS X",
     entry_points={
         "console_scripts": [
-            "extract_protein_genomes.py = python_scripts.extract_proteins_genomes:main",
+            "extract_protein_genomes.py = scripts.extract_proteins_genomes:main",
         ]
     },
     install_requires=[

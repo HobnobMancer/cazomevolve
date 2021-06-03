@@ -76,7 +76,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # get paths to proteins extracted from genomic assemblies
     genomic_proteins, empty_genomic_proteins = get_proteins_from_genomes_paths(args)
 
-    predicted_fasta_data = get_predicted_cds(empty_genomic_proteins, args)
+    if len(empty_genomic_proteins) != 0:
+        predicted_fasta_data = get_predicted_cds(empty_genomic_proteins, args)
+    else:
+        predicted_fasta_data = None
 
     # move the necessary fasta files to a single output directory
     move_fasta_to_outdir(genomic_proteins, predicted_fasta_data)
@@ -181,9 +184,10 @@ def move_fasta_to_outdir(genomic_proteins_fastas, predicted_fasta_data, args):
         output_path = args.output_dir / fasta_path.name
         shutil.copy(fasta_path, output_path)
     
-    for genomic_accession in tqdm(predicted_fasta_data, desc="Copying predicted CDS to out dir"):
-        output_path = args.output_dir / predicted_fasta_data[genomic_accession]["empty_fasta"].name
-        shutil.copy(predicted_fasta_data[genomic_accession]["predicted_fasta"], output_path)
+    if predicted_fasta_data is not None:
+        for genomic_accession in tqdm(predicted_fasta_data, desc="Copying predicted CDS to out dir"):
+            output_path = args.output_dir / predicted_fasta_data[genomic_accession]["empty_fasta"].name
+            shutil.copy(predicted_fasta_data[genomic_accession]["predicted_fasta"], output_path)
     
     return
 

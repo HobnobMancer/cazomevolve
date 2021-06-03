@@ -38,9 +38,8 @@
 # SOFTWARE.
 """Gather all FASTAs for orthofinder, rename as appropriate and write to a single output dir"""
 
-
-import gzip
 import logging
+import shutil
 import sys
 
 from pathlib import Path
@@ -77,8 +76,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # get paths to proteins extracted from genomic assemblies
     genomic_proteins, empty_genomic_proteins = get_proteins_from_genomes_paths(args)
 
-    print(genomic_proteins)
-    print(empty_genomic_proteins)
+    predicted_fasta_data = get_predicted_cds(empty_genomic_proteins, args)
+
+    # move the necessary fasta files to a single output directory
+    move_fasta_to_outdir(genomic_proteins, predicted_fasta_data)
 
 
 def get_proteins_from_genomes_paths(args):
@@ -113,7 +114,79 @@ def get_proteins_from_genomes_paths(args):
         )
         sys.exit(1)
 
-    return gbk_fasta_files, empty_fasta_files
+
+    gbk_fasta_filesnames = [f.name for f in gbk_fasta_files]
+
+    return gbk_fasta_filesnames, empty_fasta_files
+
+
+def get_predicted_cds(empty_fastas, args):
+    """Retrieve paths to fasta files containing predicted CDS features for empty gbk fastas.
+
+    :param empty_fasta: list of paths to empty FASTA file
+    :param args: cmd-line args parser
+
+    Return dict, keyed by path to fasta file containing predicted CDS, and valued by name
+    designed for Orthofinder.
+    """
+    logger = logging.getLogger(__name__)
+
+    # retrieve genbank accessions from path names
+    fasta_data = {}  # {genomic_acc : {"empty_fasta": path, "predicted_fasta": path}}
+
+    for fasta_path in empty_fastas:
+        genomic_accession = str(fasta_path.name).split("_")[-2] + "_" + str(fasta_path.name).split("_")[-1]
+        genomic_accession = genomic_accession.replace(".fasta", "")
+        fasta_data[genomic_accession] = {
+            "empty_fasta": fasta_path,  # path to empty fasta file from the genomic assembly
+            "predicted_fasta": None,  # path to fasta file containing predicted CDS
+        }
+
+    # retrieve all files from directory
+    files_in_entries = (
+        entry for entry in Path(args.predicted_proteins).iterdir() if entry.is_file()
+    )
+
+    fasta_files = []
+
+    # retrieve only gbk_files
+    for entry in files_in_entries:
+        if entry.name.endswith(".faa"):
+            genomic_accession = str(entry.name).split("_")[0] + "_" + str(entry.name).split("_")[1]
+            if genomic_accession in list(fasta_data.keys()):
+                fasta_files.append(entry)
+                fasta_data[genomic_accession]["predicted_fasta"] = entry
+
+    if (len(fasta_files) == 0):
+        logger.error(
+            f"Found 0 fasta files in {args.predicted_proteins} for genomic assemblies\n"
+            "from which no proteins were retrieved\n"
+            "Check the path to the dir containing predicted CDS is correct. Terminating program"
+        )
+        sys.exit(1)
+
+    return fasta_data 
+
+
+def move_fasta_to_outdir(genomic_proteins_fastas, predicted_fasta_data, args):
+    """Move the FASTA files that will be parsed by Orthofinder to a single output directory.
+
+    :param genomic_proteins_fastas: list of paths to fasta files of proteins from genomic assemblies
+    :param predicted_fasta_data: dict, associating the empty fasta file and replacement predicted CDS fasta file
+    :param args: cmd-line args parser
+
+    Return nothing.
+    """
+    for fasta_path in tqdm(genomic_proteins_fastas, desc="Copying gbk protein fastas to out dir"):
+        output_path = args.output_dir / fasta_path.name
+        shutil.copy(fasta_path, output_path)
+    
+    for genomic_accession in tqdm(predicted_fasta_data, desc="Copying predicted CDS to out dir"):
+        output_path = args.output_dir / predicted_fasta_data[genomic_accession]["empty_fasta"].name
+        shutil.copy(predicted_fasta_data[genomic_accession]["predicted_fasta"], output_path)
+    
+    return
+
 
 if __name__ == "__main__":
     main()

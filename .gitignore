@@ -1,0 +1,24 @@
+# Distribution files
+build/
+dist/
+*.egg-info/
+distribute*
+
+# Compiled Python modules
+*.pyc
+
+# RTD documentation building
+docs/_build/
+docs/make.bat
+
+# MyPy cache
+.mypy_cache/
+
+# Coverage test output
+cover/
+htmlcov/
+.coverage
+.coverage.*
+
+# data files
+*.gbff*

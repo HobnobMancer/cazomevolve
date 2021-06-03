@@ -147,7 +147,7 @@ def get_predicted_cds(empty_fastas, args):
 
     # retrieve all files from directory
     files_in_entries = (
-        entry for entry in Path(args.predicted_proteins).iterdir() if entry.is_file()
+        entry for entry in Path(args.predicted_cds).iterdir() if entry.is_file()
     )
 
     fasta_files = []
@@ -156,13 +156,16 @@ def get_predicted_cds(empty_fastas, args):
     for entry in files_in_entries:
         if entry.name.endswith(".faa"):
             genomic_accession = str(entry.name).split("_")[0] + "_" + str(entry.name).split("_")[1]
+            print(genomic_accession)
             if genomic_accession in list(fasta_data.keys()):
                 fasta_files.append(entry)
                 fasta_data[genomic_accession]["predicted_fasta"] = entry
 
+    print(fasta_data.keys())
+
     if (len(fasta_files) == 0):
         logger.error(
-            f"Found 0 fasta files in {args.predicted_proteins} for genomic assemblies\n"
+            f"Found 0 fasta files in {args.predicted_cds} for genomic assemblies\n"
             "from which no proteins were retrieved\n"
             "Check the path to the dir containing predicted CDS is correct. Terminating program"
         )

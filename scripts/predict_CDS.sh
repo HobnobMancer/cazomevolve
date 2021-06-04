@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # (c) University of St Andrews 2020-2021
 # (c) University of Strathclyde 2020-2021
@@ -36,6 +36,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+#
+# predicted_CDS.sh
+#
+# Predicted CDS in all genomic assemblies contained in a directory
+
+# $1 directory containing genomic assembleis
+# $2 output directory
 
 echo "Parsing genomes in "$1
 

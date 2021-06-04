@@ -45,9 +45,6 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-import pandas as pd
-
-from Bio import SeqIO
 from tqdm import tqdm
 
 from scripts.utilities import config_logger

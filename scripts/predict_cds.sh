@@ -39,34 +39,23 @@
 #
 # predicted_CDS.sh
 #
-# Predicted CDS in all genomic assemblies contained in a directory
+# Annotate genomes: Predicted CDS in all genomic assemblies contained in a directory
 
 # $1 directory containing genomic assembleis
 # $2 output directory
+mkdir $2
+mkdir $2/proteins
+mkdir $2/cds
+mkdir $2/gbk
 
-echo "Parsing genomes in "$1
+# decompress files
+gunzip $1/*.gz
 
-# decompress all genomic assemblies, and retain the original compressed versions
-gunzip $1/*.gz --keep
-
-for FILE in $1/*.gbff
+for FILE in $1/*.fna
 do
-    echo "FILE NAME="$FILE
-	replacement_string=""
-	filename="${FILE/$1/$replacement_string}" 
-
-	# compile name of output file
-	IFS='.' read -ra file_name_fragments <<< "$filename"
-	output_file="predicted_cds_$2${file_name_fragments[0]}"
-    echo "output file = "$output_file
-
-	# compile name for output fasta file
-	fastext="faa"
-	fastaname="${filename/gbff/$fastext}"
-	fastafull="predicted_cds_$2"$fastaname
-    echo "fasta output = "$fastafull
-
-    echo "****************************************"
-	prodigal -i $FILE -o $output_file -a $fastafull
-    echo "========================================"
+    prodigal \
+      -a $2/proteins/`basename ${FILE%%fna}`faa \
+      -d $2/cds/`basename ${FILE%%fna}`fasta \
+      -i ${FILE} \
+      -o $2/gbk/`basename ${FILE%%fna}`gbk
 done

@@ -29,7 +29,7 @@ Carbohydrate Active enZymes are a subset of proteins that generate, modify and/o
 ## Installation
 
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.8 prodigal orthofinder -c bioconda`   
+`conda create -n <venv_name> python=3.8 prodigal orthofinder mafft -c bioconda`   
 `conda activate <venv_name>`
 
 2. Clone the repository
@@ -50,6 +50,7 @@ Miniconda3 environment file is also available in the GitHub repository: 'environ
 ncbi-genome-download
 Prodigal
 Orthofinder
+MAFFT
 For all required Python libraries please read 'requirements.txt'.   
 
 <p>&nbsp;</p>
@@ -163,3 +164,16 @@ This analysis was performed using the command:
 orthofinder -f orthofinder_dickerya_input_fastas
 ```
 
+## Aligning Single-Copy Orthologues
+
+Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by the path to the output directory, path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`, then the number of threads `MAFFT` can spawn.
+
+> Nakamura, Yamada, Tomii, Katoh 2018 (Bioinformatics 34:2490–2492)
+Parallelization of MAFFT for large-scale multiple sequence alignments.
+(describes MPI parallelization of accurate progressive options) 
+
+```bash
+scripts/align_scos.sh 
+```
+
+The output aligned files are placed in the `sco_proteins_aligned` directory.

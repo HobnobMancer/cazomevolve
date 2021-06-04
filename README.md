@@ -106,14 +106,82 @@ Download genomic assemblies using the tool [`ncbi-genome-download`](https://gith
 
 The download was executed using the command:  
 ```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --output-folder dickeya_genomes bacteria
-```
-The following command was used for a flat output of the genomic assemblies:
-```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --output-folder dickeya_genomes_flat --flat-output bacteria
+ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --formats genbank,fasta --output-folder dickeya_genomes --flat-output bacteria
 ```
 
-## Extract protein sequences
+## Predicting CDS
+
+To ensure consistency of nomenclature and support back-threading of nucleotide sequences onto aligned single-copy orthologues, the genomes were reannotated. For the later retrieval of CAZy family annotations this was also necessary for retrieved genomic assemblies, because they no CDS features. The genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
+
+> Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
+
+The output was placed in `dickeya_predicted_cds`.
+The output CDS predictions (nucleotide sequences) were written to `dickeya_predicted_cds/cds`
+The predicted conceptual translations (protein sequences) were written to `dickeya_predicted_cds/proteins`
+The GenBank format files were written to `dickeya_predicted_cds/gbk`
+
+The analysis can be reproduced using the `bash` script `predict_CDS.sh`,and the command
+```
+bash scripts/predict_cds.sh dickeya_genomes dickeya_predicted_cds | tee dickeya_predicted_cds/dickeya_cds_prediction.log
+```
+`predict_cds.sh` takes as input the path to the directory containing the data downloaded using `ncbi-genome-download`, followed by the path to the parent output directory. `predict_cds.sh` will add `/cds`, `/proteins`, and `/gbk` directory to the path as necessary.
+
+This command writes the output to the terminal and creates a log file. The script `predict_cds.sh` also decompresses the files 
+in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. 
+
+## Identification of Single-Copy Orthologues
+
+Orthologues present in each of the input genomes were identified using the package [`orthofinder`](https://github.com/davidemms/OrthoFinder)
+
+> Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y).
+
+The output from this analysis can be found in the `dickeya_orthologues` directory.
+
+This analysis was performed using the command:
+```bash
+orthofinder -f dickeya_predicted_cds/proteins -o dickeya_orthologues
+```
+*You may need to adjust the soft limit on simultaneously open files, this done using the command `ulimit -n <value>`*
+
+`orthofinder` identified 1743 single-copy genes. The FASTA format protein sequence files are placed in `dickeya_orthologues/Results_June06/Single_Copy_Orthologue_Sequences`
+
+## Aligning Single-Copy Orthologues
+
+Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by the path to the output directory, path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`, then the number of threads `MAFFT` can spawn.
+
+> Nakamura, Yamada, Tomii, Katoh 2018 (Bioinformatics 34:2490–2492)
+Parallelization of MAFFT for large-scale multiple sequence alignments.
+(describes MPI parallelization of accurate progressive options) 
+
+```bash
+scripts/align_sco.sh dickeya_aligned_sco dickeya_orthologues/Results_June06/Single_Copy_Orthologue_Sequences 12 
+```
+
+The output aligned files are placed in the `dickeya_aligned_sco` directory.
+
+
+## Collect Single-Copy Orthologue CDS Sequences
+
+The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_cds.py`. This can be run from the current directory with:
+
+```bash
+python scripts/extract_sco_cds.py dickeya_aligned_sco/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ orthofinder_dickerya_input_fastas/ dickeya_sco_cds
+```
+
+The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory
+
+
+## Retrieving CAZy Family Annotations
+
+### Extract protein sequences from genomes
+
+For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
+from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used. All fasta parsed by `orthofinder` where 
+gathered into a single directory by using the Python script `gather_fasta_for_Orthofinder.py`.
+
+```bash
+python3 scripts/gather_fasta_for_Orthofinder.py dickeya_proteins/ orthofinder_dickerya_input_fastas -f -p predicted_cds_dickeya/ 
+```
 
 Orthofinder requires one fasta file per species/genome. The Python script `extract_proteins_genomes.py` was used to create the necessary fasta files.
 The script was invoked using the command:
@@ -126,65 +194,3 @@ multiple genomic assemblies for each species. Otherwise, all proteins from all g
 fasta file.
 
 37 of the Dickeya genomic assemblies contained no CDS features.
-
-## Predicting CDS
-
-Some of the retrieved genomic assemblies contained no CDS features. Therefore, the genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
-
-> Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
-
-The output was placed in `predicted_cds`.
-
-Invoking `prodigal` was invoked using the `bash` script `predict_CDS.sh`, using the command
-```
-bash scripts/predict_CDS.sh dickeya_genomes_flat dickeya | tee predicted_cds_dickeya/dickeya_cds_prediction.log
-```
-This command writes the output to the terminal and creates a log file. The script `predict_CDS.sh` also decompresses the files 
-in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. Both the decompressed and compressed 
-versions of the genomic assemblies are retained.
-
-
-## Identification of Single-Copy Orthologues
-
-Orthologues present in each of the input genomes were identified using the package [`orthofinder`](https://github.com/davidemms/OrthoFinder)
-
-> Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y).
-
-For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
-from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used. All fasta parsed by `orthofinder` where 
-gathered into a single directory by using the Python script `gather_fasta_for_Orthofinder.py`.
-```bash
-python3 scripts/gather_fasta_for_Orthofinder.py dickeya_proteins/ orthofinder_dickerya_input_fastas -f -p predicted_cds_dickeya/ 
-```
-
-The output from this analysis can be found in the `dickeya_orthologues` directory.
-
-This analysis was performed using the command:
-```bash
-orthofinder -f orthofinder_dickerya_input_fastas
-```
-
-## Aligning Single-Copy Orthologues
-
-Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by the path to the output directory, path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`, then the number of threads `MAFFT` can spawn.
-
-> Nakamura, Yamada, Tomii, Katoh 2018 (Bioinformatics 34:2490–2492)
-Parallelization of MAFFT for large-scale multiple sequence alignments.
-(describes MPI parallelization of accurate progressive options) 
-
-```bash
-scripts/align_sco.sh aligned_dickeya_sco orthofinder_dickerya_input_fastas/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ 12 
-```
-
-The output aligned files are placed in the `aligned_dickeya_sco` directory.
-
-
-## Collect Single-Copy Orthologue CDS Sequences
-
-The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_cds.py`. This can be run from the current directory with:
-
-```bash
-python scripts/extract_sco_cds.py orthofinder_dickerya_input_fastas/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ orthofinder_dickerya_input_fastas/ dickeya_sco_cds
-```
-
-The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory

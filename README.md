@@ -173,7 +173,18 @@ Parallelization of MAFFT for large-scale multiple sequence alignments.
 (describes MPI parallelization of accurate progressive options) 
 
 ```bash
-scripts/align_scos.sh 
+scripts/align_sco.sh aligned_dickeya_sco orthofinder_dickerya_input_fastas/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ 12 
 ```
 
-The output aligned files are placed in the `sco_proteins_aligned` directory.
+The output aligned files are placed in the `aligned_dickeya_sco` directory.
+
+
+## Collect Single-Copy Orthologue CDS Sequences
+
+The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_cds.py`. This can be run from the current directory with:
+
+```bash
+python scripts/extract_sco_cds.py orthofinder_dickerya_input_fastas/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ orthofinder_dickerya_input_fastas/ dickeya_sco_cds
+```
+
+The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory

@@ -92,16 +92,9 @@ def get_genomic_assembly_paths(args):
     logger = logging.getLogger(__name__)
 
     # retrieve all files from directory
-    files_in_entries = (
-        entry for entry in Path(args.input_dir).iterdir() if entry.is_file()
+    gbk_files = (
+        entry for entry in Path(args.input_dir).iterdir() if (entry.is_file() and entry.name.endswith("genomic.gbff"))
     )
-
-    gbk_files = []
-
-    # retrieve only gbk_files
-    for entry in files_in_entries:
-        if entry.name.endswith("genomic.gbff.gz"):
-            gbk_files.append(entry)
 
     if len(gbk_files) == 0:
         logger.error(

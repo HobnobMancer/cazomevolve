@@ -195,7 +195,6 @@ The backtranslated CDS sequences are placed in the `dickeya_sco_cds_aligned` dir
 
 ## Concatenating CDS into a Multigene Alignment
 
-
 The threaded single-copy orthologue CDS sequences were concatenated into a single sequence per input organism using the Python script `concatenate_cds.py`. To reproduce this, execute the script from this directory, using the following command:
 
 ```bash
@@ -212,6 +211,27 @@ Two files are generated, a FASTA file with the concatenated multigene sequences,
 
 ## Phylogenetic reconstruction -- Tree construction
 
+To construct the phylogenetic tree, the bash script `build_tree.sh` was used. This script executes a series of [`raxml-ng`](https://github.com/amkozlov/raxml-ng) commands. The `raxml-ng parse` command estimated memory and processor requirements as
+```text
+* Estimated memory requirements                : 13317 MB
+* Recommended number of threads / MPI processes: 84
+```
+but, as we had limited access to computing resource at the time, we had to proceed with 6 cores.
+
+All genes were considered as separate partitions in the reconstuction, with parameters estimated  for the `GTR+FO+G4m+B` model (as recommended by `raxml-ng check`).
+
+Tree reconstructions are placed in the `dickeya_tree` directory. The best estimate tree is `03_infer.raxml.bestTree` and the midpoint-rooted, manually-annotated/coloured tree (using [`figtree`](http://tree.bio.ed.ac.uk/software/figtree/)) is `03_infer.raxml.bestTree.annotated`
+
+> Alexey M. Kozlov, Diego Darriba, Tomáš Flouri, Benoit Morel, and Alexandros Stamatakis (2019) RAxML-NG: A fast, scalable, and user-friendly tool for maximum likelihood phylogenetic inference. Bioinformatics, btz305 [doi:10.1093/bioinformatics/btz305](https://doi.org/10.1093/bioinformatics/btz305)
+
+The following command was used to invoke `build_tree.sh`:
+```bash
+bash scripts/build_tree.sh dickeya_concatenated_cds dickeya_tree
+```
+
+`build_tree.sh` takes 2 positional arguments:  
+1. Path to <genus>_concatenated_cds dir containing the concatenated.fasta and concatenated.part partition files
+2. Path to the output directory (<genus>_tree)
 
 
 ## Retrieving CAZy Family Annotations

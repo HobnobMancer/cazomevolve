@@ -116,9 +116,10 @@ To ensure consistency of nomenclature and support back-threading of nucleotide s
 > Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
 
 The output was placed in `dickeya_predicted_cds`.
-The output CDS predictions (nucleotide sequences) were written to `dickeya_predicted_cds/cds`
-The predicted conceptual translations (protein sequences) were written to `dickeya_predicted_cds/proteins`
-The GenBank format files were written to `dickeya_predicted_cds/gbk`
+
+- The output CDS predictions (nucleotide sequences) were written to `dickeya_predicted_cds/cds`
+- The predicted conceptual translations (protein sequences) were written to `dickeya_predicted_cds/proteins`
+- The GenBank format files were written to `dickeya_predicted_cds/gbk`
 
 The analysis can be reproduced using the `bash` script `predict_CDS.sh`,and the command
 ```
@@ -143,29 +144,35 @@ orthofinder -f dickeya_predicted_cds/proteins -o dickeya_orthologues
 ```
 *You may need to adjust the soft limit on simultaneously open files, this done using the command `ulimit -n <value>`*
 
-`orthofinder` identified 1743 single-copy genes. The FASTA format protein sequence files are placed in `dickeya_orthologues/Results_June06/Single_Copy_Orthologue_Sequences`
+`orthofinder` identified 1815 single-copy genes. The FASTA format protein sequence files are placed in `dickeya_orthologues/Results_June04/Single_Copy_Orthologue_Sequences`
 
 ## Aligning Single-Copy Orthologues
 
-Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by the path to the output directory, path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`, then the number of threads `MAFFT` can spawn.
+Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by:  
+1. the path to the output directory
+2. path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`
+3. the number of threads `MAFFT` can spawn.
 
 > Nakamura, Yamada, Tomii, Katoh 2018 (Bioinformatics 34:2490–2492)
 Parallelization of MAFFT for large-scale multiple sequence alignments.
 (describes MPI parallelization of accurate progressive options) 
 
 ```bash
-scripts/align_sco.sh dickeya_aligned_sco dickeya_orthologues/Results_June06/Single_Copy_Orthologue_Sequences 12 
+bash scripts/align_sco.sh dickeya_aligned_sco_proteins dickeya_orthologues/Results_Jun04/Single_Copy_Orthologue_Sequences/ 12
 ```
 
-The output aligned files are placed in the `dickeya_aligned_sco` directory.
+The output aligned files are placed in the `dickeya_aligned_sco_proteins` directory.
 
 
 ## Collect Single-Copy Orthologue CDS Sequences
 
-The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_cds.py`. This can be run from the current directory with:
+The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_sco_cds.py`. `extract_sco_cds.py` takes three positional arguments:  
+1. Path to the directory containing the MAFFT alignments
+2. Path to the directory containing the predicted CDS (nucleotide sequences) (`<species>_predicted_cds/cds`)
+3. Path to the output directory
 
 ```bash
-python scripts/extract_sco_cds.py dickeya_aligned_sco/OrthoFinder/Results_Jun03_1/Single_Copy_Orthologue_Sequences/ orthofinder_dickerya_input_fastas/ dickeya_sco_cds
+python3 scripts/extract_sco_cds.py dickeya_aligned_sco_proteins/ dickeya_predicted_cds/cds/ dickeya_sco_cds
 ```
 
 The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory

@@ -82,7 +82,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     # Iterate over the SCO protein files, and extract the corresponding CDS sequences for each,
     # then write these to OUTDIR
-    write_out_cds(args)
+    write_out_cds(args, seqdict)
 
 
 def write_out_cds(args, seqdict):

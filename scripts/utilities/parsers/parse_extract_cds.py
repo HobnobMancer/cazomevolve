@@ -56,14 +56,14 @@ def build_parser(argv: Optional[List] = None):
     # Add positional arguments to parser
 
     parser.add_argument(
-        "sco_dir",
+        "prot_dir",
         type=Path,
-        help="Path to input dir containing Orthofinder sequence output",
+        help="Path to dir containing MAFFT alignments",
     )
     parser.add_argument(
         "cds_dir",
         type=Path,
-        help="Path to input dir containing predicted CDSs for each genome",
+        help="Path to '<species>__predicted_cds/cds' dir containing predicted CDS (nucleotides seqs",
     )
     parser.add_argument(
         "output_dir",

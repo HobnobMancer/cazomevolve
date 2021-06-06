@@ -146,7 +146,7 @@ orthofinder -f dickeya_predicted_cds/proteins -o dickeya_orthologues
 
 `orthofinder` identified 1815 single-copy genes. The FASTA format protein sequence files are placed in `dickeya_orthologues/Results_June04/Single_Copy_Orthologue_Sequences`
 
-## Aligning Single-Copy Orthologues
+## (MSA) Aligning Single-Copy Orthologues
 
 Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by:  
 1. the path to the output directory
@@ -176,6 +176,42 @@ python3 scripts/extract_sco_cds.py dickeya_aligned_sco_proteins/ dickeya_predict
 ```
 
 The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory
+
+## Back-translate Aligned Single-Copy Orthologues
+
+The single-copy orthologue CDS sequences were threaded onto the corresponding aligned protein sequences using [`t-coffee`](http://www.tcoffee.org/Projects/tcoffee/).
+
+> T-Coffee: A novel method for multiple sequence alignments. Notredame, Higgins, Heringa, JMB, 302(205-217)2000
+
+The results can be reproduced by executing the `backtranslate.sh` script from this directory, using the following positional arguments:  
+1.
+
+```bash
+bash scripts/backtranslate.sh dickeya_sco_cds_aligned dickeya_aligned_sco_proteins dickeya_sco_cds
+```
+
+The backtranslated CDS sequences are placed in the `dickeya_sco_cds_aligned` directory.
+
+
+## Concatenating CDS into a Multigene Alignment
+
+
+The threaded single-copy orthologue CDS sequences were concatenated into a single sequence per input organism using the Python script `concatenate_cds.py`. To reproduce this, execute the script from this directory, using the following command:
+
+```bash
+python3 scripts/concatenate_cds.py dickeya_genomes/ dickeya_sco_cds_aligned/ dickeya_concatenated_cds
+```
+
+`concatenate_cds.py` takes 3 positional arguments:  
+1. Path to the directory containing the downloaded genomes (`<genus>_genomes/*.fna`)
+2. Path to output from `bash scripts/backtranslate.sh`, this is the directory containing threaded CDS sequences for concatenation (`<genus>_sco_cds_aligned`)
+3. Output directory (`<genus>_concatenated_cds`)
+
+Two files are generated, a FASTA file with the concatenated multigene sequences, and a partition file allowing a different set of model parameters to be fit to each gene in phylogenetic reconstruction.
+
+
+## Phylogenetic reconstruction -- Tree construction
+
 
 
 ## Retrieving CAZy Family Annotations

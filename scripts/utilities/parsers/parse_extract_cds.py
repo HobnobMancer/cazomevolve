@@ -63,7 +63,7 @@ def build_parser(argv: Optional[List] = None):
     parser.add_argument(
         "cds_dir",
         type=Path,
-        help="Path to '<species>__predicted_cds/cds' dir containing predicted CDS (nucleotides seqs",
+        help="Path to '<species>_predicted_cds/cds' dir containing predicted CDS (nucleotides seqs",
     )
     parser.add_argument(
         "output_dir",

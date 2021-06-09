@@ -115,7 +115,7 @@ The retrieval of genomes from Dickeya species was performed using the `--genera`
 To retrieve the taxonomy IDs of all genomic assemblies descendent from Pectobacteriaceae, the Python script 
 `get_taxids.py` was invoked, using the following command:
 ```bash
-python3 scripts/get_taxids.py eemh1@st-andrews.ac.uk Pectobacteriaceae pectobacteriaceae_taxids.txt
+python3 scripts/get_taxids.py <insert_email_address> Pectobacteriaceae pectobacteriaceae_taxids.txt
 ```
 `get_taxids.py` takes 3 positional arguments:
 1. User email address

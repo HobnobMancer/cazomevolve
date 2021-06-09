@@ -36,7 +36,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Retrieve taxonomy IDs of all species descendent from a taxonomy node"""
+"""Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
 
 import logging
@@ -48,7 +48,7 @@ from Bio import Entrez
 from tqdm import tqdm
 
 from scripts.utilities import config_logger
-from scripts.utilities.parsers import parse_get_taxid
+from scripts.utilities.parsers import parse_get_assemblies
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -57,10 +57,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     Return dataframe of protein data.
     """
     if argv is None:
-        parser = parse_get_taxid.build_parser()
+        parser = parse_get_assemblies.build_parser()
         args = parser.parse_args()
     else:
-        parser = parse_get_taxid.build_parser(argv)
+        parser = parse_get_assemblies.build_parser(argv)
         args = parser.parse_args()
 
     if logger is None:
@@ -133,7 +133,7 @@ def get_tax_ids(uid_list, term, args):
     
     tax_ids = set()  # add Tax Ids to set first to prevent writing out duplicate Tax IDs
     for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
-        tax_ids.add(batch_result['DocumentSummarySet']['DocumentSummary'][index]['Taxid'])
+        tax_ids.add(batch_result['DocumentSummarySet']['DocumentSummary'][index]["AssemblyAccession"])
     
     if len(tax_ids) == 0:
         logger.warning(f"Retrieved 0 Tax IDs for {term}")

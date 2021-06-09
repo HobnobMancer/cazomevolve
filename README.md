@@ -13,7 +13,8 @@
 2. [Installation](#Installation)
     - [Requirements](#Requirements)
 3. [Current Developments](#Current)
-3. [Directories](#Directories)
+4. [Directories](#Directories)
+5. [Method](#Method)
         
 ## Overview
 
@@ -29,7 +30,7 @@ Carbohydrate Active enZymes are a subset of proteins that generate, modify and/o
 ## Installation
 
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.8 prodigal orthofinder mafft -c bioconda`   
+`conda create -n <venv_name> python=3.8 prodigal orthofinder mafft coinfinder -c defaults -c bioconda -c conda-forge`   
 `conda activate <venv_name>`
 
 2. Clone the repository
@@ -51,6 +52,7 @@ ncbi-genome-download
 Prodigal
 Orthofinder
 MAFFT
+Coinfinder
 For all required Python libraries please read 'requirements.txt'.   
 
 <p>&nbsp;</p>
@@ -96,164 +98,128 @@ Extract protein sequences from GenBank genomic assemblies, in preparation for si
 Invoke `prodigal` for all GenBank assemblies in a directory, to predict CDS features.
 
 
-# Planning and method
+# Planning and Method
 
 This section tracks the work currently being conducted and work to do
 
-## Download Dickeya genomic assemblies from NCBI
+## Phylogenetic Tree Construction
+
+The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
+
+### Download genomic assemblies from NCBI
 
 Download genomic assemblies using the tool [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/).
 
-The download was executed using the command:  
+To download the genomes of Dickeya and Pectobacteriaceae genomes, the following command was executed:  
 ```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --formats genbank,fasta --output-folder dickeya_genomes --flat-output bacteria
+ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya,Pectobacteriaceae --output-folder dickeya_pectobacteriaceae_genomes --flat-output bacteria
 ```
 
-## Predicting CDS
+The Dickeya and Pectobacteriaceae genomes were stored in the directory `dickeya_pectobacteriaceae_genomes`
 
-To ensure consistency of nomenclature and support back-threading of nucleotide sequences onto aligned single-copy orthologues, the genomes were reannotated. For the later retrieval of CAZy family annotations this was also necessary for retrieved genomic assemblies, because they no CDS features. The genomes were annotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
+
+### Predicting CDS
+
+To ensure consistency of nomenclature and support back-threading of nucleotide sequences onto aligned single-copy orthologues, the genomes were reannotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
 
 > Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
 
-The output was placed in `dickeya_predicted_cds`.
+The output was placed in `dickeya_pectobacteriaceae_predicted_cds`.
 
-- The output CDS predictions (nucleotide sequences) were written to `dickeya_predicted_cds/cds`
-- The predicted conceptual translations (protein sequences) were written to `dickeya_predicted_cds/proteins`
-- The GenBank format files were written to `dickeya_predicted_cds/gbk`
+To automate invoking `prodigal` the `bash` script `predict_cds.sh` was used, which takes 2 positional arguments:  
+1. Path to the directory containing downloaded genomes (from `ncbi-genome-download`)
+2. Path to output directory (`<genus>_predicted_cds`)
 
-The analysis can be reproduced using the `bash` script `predict_CDS.sh`,and the command
+`predict_cds.sh` creates 3 subdirectories in the output directory:
+1. `cds`: Contains FASTA files of the predicted cds sequences (DNA sequences) (`*.fasta`)
+2. `protein`: Contains FASTA files of translated predicted cds sequeces (Protein sequences) (`*.faa`)
+3. `gbk`: Contains GenBank style annotation files (`*.gbk`)
+
+To invoke `prodigal` for Dickeya and Pectobacteriasea species,the `bash` script `predict_cds.sh` was invoked using the following command:
 ```
-bash scripts/predict_cds.sh dickeya_genomes dickeya_predicted_cds | tee dickeya_predicted_cds/dickeya_cds_prediction.log
+bash scripts/predict_CDS.sh dickeya_pectobacteriaceae_genomes dickeya_pectobacteriaceae_predicted_cds | tee dickeya_pectobacteriaceae_predicted_cds/cds_prediction.log
 ```
-`predict_cds.sh` takes as input the path to the directory containing the data downloaded using `ncbi-genome-download`, followed by the path to the parent output directory. `predict_cds.sh` will add `/cds`, `/proteins`, and `/gbk` directory to the path as necessary.
+This command writes the output to the terminal and creates a log file. The script `predict_CDS.sh` also decompresses the files 
+in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. Both the decompressed and compressed 
+versions of the genomic assemblies are retained.
 
-This command writes the output to the terminal and creates a log file. The script `predict_cds.sh` also decompresses the files 
-in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. 
+The output was written to the directory `dickeya_pectobacteriaceae_predicted_cds`.
 
-## Identification of Single-Copy Orthologues
+
+### Identification of Single-Copy Orthologues
 
 Orthologues present in each of the input genomes were identified using the package [`orthofinder`](https://github.com/davidemms/OrthoFinder)
 
 > Emms, D.M. and Kelly, S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. [Genome Biology 20:238](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1832-y).
 
+For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
+from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used.
+
 The output from this analysis can be found in the `dickeya_orthologues` directory.
 
 This analysis was performed using the command:
 ```bash
-orthofinder -f dickeya_predicted_cds/proteins -o dickeya_orthologues
-```
-*You may need to adjust the soft limit on simultaneously open files, this done using the command `ulimit -n <value>`*
-
-`orthofinder` identified 1815 single-copy genes. The FASTA format protein sequence files are placed in `dickeya_orthologues/Results_June04/Single_Copy_Orthologue_Sequences`
-
-## (MSA) Aligning Single-Copy Orthologues
-
-Each collection of single-copy orthologues was aligned using `MAFFT`. To reproduce this alignment execute the `align_scos.sh` in `scripts`, followed by:  
-1. the path to the output directory
-2. path to the `Single_Copy_Orthologue_Sequences` directory created by `orthofinder`
-3. the number of threads `MAFFT` can spawn.
-
-> Nakamura, Yamada, Tomii, Katoh 2018 (Bioinformatics 34:2490–2492)
-Parallelization of MAFFT for large-scale multiple sequence alignments.
-(describes MPI parallelization of accurate progressive options) 
-
-```bash
-bash scripts/align_sco.sh dickeya_aligned_sco_proteins dickeya_orthologues/Results_Jun04/Single_Copy_Orthologue_Sequences/ 12
+scripts/find_orthologues.sh
 ```
 
-The output aligned files are placed in the `dickeya_aligned_sco_proteins` directory.
 
 
-## Collect Single-Copy Orthologue CDS Sequences
-
-The CDS sequences corresponding to each set of single-copy orthologues are identified and extracted with the Python script `extract_sco_cds.py`. `extract_sco_cds.py` takes three positional arguments:  
-1. Path to the directory containing the MAFFT alignments
-2. Path to the directory containing the predicted CDS (nucleotide sequences) (`<species>_predicted_cds/cds`)
-3. Path to the output directory
-
-```bash
-python3 scripts/extract_sco_cds.py dickeya_aligned_sco_proteins/ dickeya_predicted_cds/cds/ dickeya_sco_cds
-```
-
-The output is a set of unaligned CDS sequences corresponding to each single-copy orthologue, placed in the `dickeya_sco_cds` directory
-
-## Back-translate Aligned Single-Copy Orthologues
-
-The single-copy orthologue CDS sequences were threaded onto the corresponding aligned protein sequences using [`t-coffee`](http://www.tcoffee.org/Projects/tcoffee/).
-
-> T-Coffee: A novel method for multiple sequence alignments. Notredame, Higgins, Heringa, JMB, 302(205-217)2000
-
-The results can be reproduced by executing the `backtranslate.sh` script from this directory, using the following positional arguments:  
-1.
-
-```bash
-bash scripts/backtranslate.sh dickeya_sco_cds_aligned dickeya_aligned_sco_proteins dickeya_sco_cds
-```
-
-The backtranslated CDS sequences are placed in the `dickeya_sco_cds_aligned` directory.
 
 
-## Concatenating CDS into a Multigene Alignment
-
-The threaded single-copy orthologue CDS sequences were concatenated into a single sequence per input organism using the Python script `concatenate_cds.py`. To reproduce this, execute the script from this directory, using the following command:
-
-```bash
-python3 scripts/concatenate_cds.py dickeya_genomes/ dickeya_sco_cds_aligned/ dickeya_concatenated_cds
-```
-
-`concatenate_cds.py` takes 3 positional arguments:  
-1. Path to the directory containing the downloaded genomes (`<genus>_genomes/*.fna`)
-2. Path to output from `bash scripts/backtranslate.sh`, this is the directory containing threaded CDS sequences for concatenation (`<genus>_sco_cds_aligned`)
-3. Output directory (`<genus>_concatenated_cds`)
-
-Two files are generated, a FASTA file with the concatenated multigene sequences, and a partition file allowing a different set of model parameters to be fit to each gene in phylogenetic reconstruction.
+## Retrieve CAZy CAZyme annotations
 
 
-## Phylogenetic reconstruction -- Tree construction
-
-To construct the phylogenetic tree, the bash script `build_tree.sh` was used. This script executes a series of [`raxml-ng`](https://github.com/amkozlov/raxml-ng) commands. The `raxml-ng parse` command estimated memory and processor requirements as
-```text
-* Estimated memory requirements                : 13317 MB
-* Recommended number of threads / MPI processes: 84
-```
-but, as we had limited access to computing resource at the time, we had to proceed with 6 cores.
-
-All genes were considered as separate partitions in the reconstuction, with parameters estimated  for the `GTR+FO+G4m+B` model (as recommended by `raxml-ng check`).
-
-Tree reconstructions are placed in the `dickeya_tree` directory. The best estimate tree is `03_infer.raxml.bestTree` and the midpoint-rooted, manually-annotated/coloured tree (using [`figtree`](http://tree.bio.ed.ac.uk/software/figtree/)) is `03_infer.raxml.bestTree.annotated`
-
-> Alexey M. Kozlov, Diego Darriba, Tomáš Flouri, Benoit Morel, and Alexandros Stamatakis (2019) RAxML-NG: A fast, scalable, and user-friendly tool for maximum likelihood phylogenetic inference. Bioinformatics, btz305 [doi:10.1093/bioinformatics/btz305](https://doi.org/10.1093/bioinformatics/btz305)
-
-The following command was used to invoke `build_tree.sh`:
-```bash
-bash scripts/build_tree.sh dickeya_concatenated_cds dickeya_tree
-```
-
-`build_tree.sh` takes 2 positional arguments:  
-1. Path to <genus>_concatenated_cds dir containing the concatenated.fasta and concatenated.part partition files
-2. Path to the output directory (<genus>_tree)
-
-
-## Retrieving CAZy Family Annotations
-
-### Extract protein sequences from genomes
-
-For genomic assemblies from which CDS features were retrieved, the retrieved CDS features were used. For genomic assemblies 
-from which no CDS features were retrieved, the predicted CDS features from `prodigal` were used. All fasta parsed by `orthofinder` where 
-gathered into a single directory by using the Python script `gather_fasta_for_Orthofinder.py`.
-
-```bash
-python3 scripts/gather_fasta_for_Orthofinder.py dickeya_proteins/ orthofinder_dickerya_input_fastas -f -p predicted_cds_dickeya/ 
-```
+### Extract protein sequences
 
 Orthofinder requires one fasta file per species/genome. The Python script `extract_proteins_genomes.py` was used to create the necessary fasta files.
-The script was invoked using the command:
+
+`extract_proteins_genomes.py` takes 2 positional arguments:
+1. Path to the directory containing downloaded genomes (using `ncbi-genome-download`)
+2. Path to the output directory to write out protein sequences (`<genera>_proteins`)
+
+For retrieving the protein sequences of Dickeya and Pectobacteriaceae species, the following command was used:  
 ```bash
-python3 scripts/extract_proteins_genomes.py dickeya_genomes_flat/ dickeya_proteins -f 
+python3 scripts/extract_proteins_genomes.py dickeya_pectobacteriaceae_genomes/ dickeya_pectobacteriaceae_proteins -f 
 ```
 
-The output is writen to `dickeya_proteins`, and each output fasta file is named `<species>_<genbank_accession>.fasta`, allowing for 
-multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single 
-fasta file.
+The output was writen to `dickeya_pectobacteriaceae_proteins`, and each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
 
 37 of the Dickeya genomic assemblies contained no CDS features.
+
+
+### CDS extraction from genomes
+
+To retrieve proteins from downloaded genomic assemblies the Python script `extract_cds_annotations`, which takes 
+2 positional arguments:
+1. Path to the directory containing the downloaded genomic assemblies (`<genus>_genomes/*.gbff`)
+2. Path to output directory to write out retrieved protein sequences to (`<genus>_extracted_proteins/*.fasta`)
+
+`extract_cds_annotations` was invoked using the command:
+```bash
+python3 scripts/extract_cds_annotations.py dickeya_genomes dickeya_extracted_proteins
+```
+
+### Retrieve CAZy annotations
+
+Proteins retrieved from the genomes were then checked to see if they had been annotated by CAZy. If so, the CAZy family annotations 
+were added to the tab deliminted list, used as input for `coinfinder`.
+
+Proteins not annotated by CAZy were written out to FASTA files for parsing by `dbCAN` to retrieve any non-CAZy annotated CAZymes.
+
+Empty FASTA files from genomes from which no CDS features were retrieved, were moved to the directory 
+
+The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins.
+
+### Predict CAZymes and retrieve annotations
+
+Predicted CDSs and proteins not annotated by CAZy were parsed by dbCAN to identify non-CAZy annotated CAZymes. This was automated by using the Python script `get_dbcan_cazymes.py`, which also added the CAZy family annotations to the tab deliminated list created from CAZy CAZyme annotations.
+
+To reproduce this part of the analysis, use the command:
+```bash
+Python3 scripts/get_dbcan_cazymes.py dickeya_fastas_for_dbcan predicted_cds_non_cazy_cazymes cazy_fam_genome_annotations.txt
+```
+
+
+## CAZy family association and dissociation
+
+To evaluate CAZy family association and dissociation, `coinfinder` was used.

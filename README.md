@@ -110,9 +110,23 @@ The analysis of CAZy family association within plant pathogenic species, Dickeya
 
 Download genomic assemblies using the tool [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/).
 
+The retrieval of genomes from Dickeya species was performed using the `--genera` option.
+
+To retrieve the taxonomy IDs of all genomic assemblies descendent from Pectobacteriaceae, the Python script 
+`get_taxids.py` was invoked, using the following command:
+```bash
+python3 scripts/get_taxids.py eemh1@st-andrews.ac.uk Pectobacteriaceae pectobacteriaceae_taxids.txt
+```
+`get_taxids.py` takes 3 positional arguments:
+1. User email address
+2. Terms (separated by commas) to query NCBI with, each term is performed as a single query
+3. Output txt file to write out tax ids
+
+The Pectobacteriaceae taxonomy IDs were written out to `pectobacteriaceae_taxids.txt`
+
 To download the genomes of Dickeya and Pectobacteriaceae genomes, the following command was executed:  
 ```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya,Pectobacteriaceae --output-folder dickeya_pectobacteriaceae_genomes --flat-output bacteria
+ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --taxids pectobacteriaceae_taxids.txt --output-folder dickeya_pectobacteriaceae_genomes --flat-output bacteria --formats genbank,fasta
 ```
 
 The Dickeya and Pectobacteriaceae genomes were stored in the directory `dickeya_pectobacteriaceae_genomes`
@@ -144,6 +158,11 @@ in the directory containing the genomic assemblies so that they can be parsed by
 versions of the genomic assemblies are retained.
 
 The output was written to the directory `dickeya_pectobacteriaceae_predicted_cds`.
+
+
+### Roary for denogram generation
+
+
 
 
 ### Identification of Single-Copy Orthologues

@@ -133,7 +133,7 @@ To automate invoking `prodigal` the `bash` script `predict_cds.sh` was used, whi
 `predict_cds.sh` creates 3 subdirectories in the output directory:
 1. `cds`: Contains FASTA files of the predicted cds sequences (DNA sequences) (`*.fasta`)
 2. `protein`: Contains FASTA files of translated predicted cds sequeces (Protein sequences) (`*.faa`)
-3. `gbk`: Contains GenBank style annotation files (`*.gbk`)
+3. `gbk`: Contains the master annotation files in GFF3 format (a requirement fo `Roary`) (`*.gff`)
 
 To invoke `prodigal` for Dickeya and Pectobacteriasea species,the `bash` script `predict_cds.sh` was invoked using the following command:
 ```

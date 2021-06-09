@@ -102,35 +102,52 @@ Invoke `prodigal` for all GenBank assemblies in a directory, to predict CDS feat
 
 This section tracks the work currently being conducted and work to do
 
+## Download genomic assemblies from NCBI
+
+Reference sequence genomic assemblies were used for the creation of the phylogenetic tree.
+GenBank genomic assemblies were used for identify the CAZomes of species.
+
+For retrieval of Dickeya genomes, the tool [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/) was used. 
+To retrieve RefSeq Dickeya genomes the following command was used:  
+```bash
+ncbi-genome-download --assembly-levels complete,chromosome,scaffold ---genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_ref --flat-output --formats genbank,fasta,gff bacteria
+```
+To retrieve GenBank Dickeya genomes the following command was used (*note the exclusion of the `--section` flag*):
+```bash
+ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold ---genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_gbk --flat-output --formats genbank,fasta,gff bacteria
+```
+
+To retrieve the all genomic assemblies descendent from Pectobacteriaceae, the Python script 
+`get_assemblies.py` was invoked.
+To RefSeq genomes, the following command was used:  
+```bash
+python3 scripts/get_taxids.py <insert_email_address> Pectobacteriaceae gbff,fna,gff dickeya_pectobacteriaceae_genomes_ref -f -n
+```
+For genomic assemblies listed immediately below, NCBI contained no RefSeq. Therefore, the GenBank assembly was used for these assemblies.
+* GCF_018141505.1
+* GCF_017426805.1
+* GCF_016950115.1
+* GCF_016642095.1
+* GCF_016495705.1
+* GCF_013339845.1
+* GCF_013334165.1
+* GCF_009931555.1
+
+To retrieve Pectobacteriaceae GenBank assemblies the following command was used (*note the addition of the `--gbk` (GenBank) flag*):  
+```bash
+python3 scripts/get_taxids.py <insert_email_address> Pectobacteriaceae gbff,fna,gff dickeya_pectobacteriaceae_genomes_gbk -f -n --gbk
+```
+
+The options `--force` and `--nodelete` were invoked to enable writing out to the same directory `ncbi-genome-download` wrote the Dickeya genomes to, without deleting the genomes downloaded by `ncbi-genome-download`.
+
+The retrieved Dickeya and Pectobacteriaceae **Ref** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_ref`, along with the GenBank assemblies for assemblies that did not have a RefSeq in NCBI.
+
+The retrieved Dickeya and Pectobacteriaceae **GenBank** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_gbk`.
+
+
 ## Phylogenetic Tree Construction
 
 The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
-
-### Download genomic assemblies from NCBI
-
-Download genomic assemblies using the tool [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/).
-
-The retrieval of genomes from Dickeya species was performed using the `--genera` option.
-
-To retrieve the taxonomy IDs of all genomic assemblies descendent from Pectobacteriaceae, the Python script 
-`get_taxids.py` was invoked, using the following command:
-```bash
-python3 scripts/get_taxids.py <insert_email_address> Pectobacteriaceae pectobacteriaceae_taxids.txt
-```
-`get_taxids.py` takes 3 positional arguments:
-1. User email address
-2. Terms (separated by commas) to query NCBI with, each term is performed as a single query
-3. Output txt file to write out tax ids
-
-The Pectobacteriaceae taxonomy IDs were written out to `pectobacteriaceae_taxids.txt`
-
-To download the genomes of Dickeya and Pectobacteriaceae genomes, the following command was executed:  
-```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --taxids pectobacteriaceae_taxids.txt --output-folder dickeya_pectobacteriaceae_genomes --flat-output bacteria --formats genbank,fasta
-```
-
-The Dickeya and Pectobacteriaceae genomes were stored in the directory `dickeya_pectobacteriaceae_genomes`
-
 
 ### Predicting CDS
 

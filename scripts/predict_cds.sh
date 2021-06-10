@@ -53,10 +53,11 @@ gunzip $1/*.gz
 
 for FILE in $1/*.fna
 do
+    echo $FILE
     prodigal \
       -f gff \
       -a $2/proteins/`basename ${FILE%%fna}`faa \
       -d $2/cds/`basename ${FILE%%fna}`fasta \
       -i ${FILE} \
-      -o $2/gbk/`basename ${FILE%%fna}`gbk
+      -o $2/gbk/`basename ${FILE%%fna}`gff
 done

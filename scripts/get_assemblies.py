@@ -38,16 +38,21 @@
 # SOFTWARE.
 """Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
-
+import sys
 import logging
+import re
 import time
 
 from typing import List, Optional
 
 from Bio import Entrez
+from socket import timeout
 from tqdm import tqdm
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
 from scripts.utilities import config_logger
+from scripts.utilities.file_io import make_output_directory
 from scripts.utilities.parsers import parse_get_assemblies
 
 
@@ -66,6 +71,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)
+
+    make_output_directory(args.output_dir, args.force, args.nodelete)
 
     Entrez.email = args.email
 
@@ -111,8 +118,6 @@ def get_tax_ids(uid_list, term, args):
 
     Return nothing.
     """
-    logger = logging.getLogger(__name__)
-
     # batch query UIDs
     with entrez_retry(Entrez.epost, db="Assembly", id=(",".join(uid_list))) as record_handle:
         epost_result = Entrez.read(record_handle, validate=False)
@@ -131,18 +136,20 @@ def get_tax_ids(uid_list, term, args):
     ) as batch_handle:
         batch_result = Entrez.read(batch_handle, validate=False)
     
-    tax_ids = set()  # add Tax Ids to set first to prevent writing out duplicate Tax IDs
-    for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
-        tax_ids.add(batch_result['DocumentSummarySet']['DocumentSummary'][index]["AssemblyAccession"])
-    
-    if len(tax_ids) == 0:
-        logger.warning(f"Retrieved 0 Tax IDs for {term}")
-        return
+    accession_urls = {}  # add Tax Ids to set first to prevent writing out duplicate Tax IDs
 
-    for tax_id in tqdm(tax_ids, desc=f"Writing out tax ids for {term}"):
-        with open(args.output, "a") as fh:
-            fh.write(f"{tax_id}\n")
+
+    for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
+        accession_urls[batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyAccession']] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
     
+    for accession in tqdm(accession_urls, desc=f"Downloading genomes for {term}"):
+        for file_type in ((args.file_types).split(",")):
+            download_file(
+                accession_number=accession,
+                assembly_name=accession_urls[accession],
+                file_type=file_type,
+                args=args,
+            )
     return
 
 
@@ -184,6 +191,84 @@ def entrez_retry(entrez_func, *func_args, **func_kwargs):
 
     return record
 
+
+def download_file(
+    accession_number, assembly_name, file_type, args, url_prefix="ftp://ftp.ncbi.nlm.nih.gov/genomes/all"
+):
+    """Download file.
+
+    :param accession_number: str, accession number of genome
+    :param assembly_name: str, name of assembly
+    :param file_type: str, denotes in logger file type downloaded
+    param args: parser arguments
+
+    Return nothing.
+    """
+    logger = logging.getLogger(__name__)
+
+    if args.gbk:
+        gbk_accession = accession_number.replace("GCF_", "GCA_")
+    else:
+        gbk_accession = accession_number.replace("GCA_", "GCF_")
+
+    file_name = f"{gbk_accession}_{assembly_name}_genomic.{file_type}"
+    file_name = file_name.replace(" ","")
+    output_path = args.output_dir / file_name
+
+    if output_path.exists():
+        logger.warning(f"Output file {output_path} exists, not downloading")
+        return
+
+    escape_characters = re.compile(r"[\s/,#\(\)]")
+    escape_name = re.sub(escape_characters, "_", assembly_name)
+
+    filestem = "_".join([gbk_accession, escape_name])
+
+    url_parts = tuple(filestem.split("_", 2))
+    # separate identifying numbers from version number, and split up into groups of 3 digits
+    sub_directories = "/".join(
+        [url_parts[1][i : i + 3] for i in range(0, len(url_parts[1].split(".")[0]), 3)]
+    )
+
+    genbank_url = f"{url_prefix}/{url_parts[0]}/{sub_directories}/{filestem}/{filestem}_genomic.{file_type}.gz"
+
+    # Try URL connection
+    try:
+        response = urlopen(genbank_url, timeout=args.timeout)
+    except (HTTPError, URLError, timeout) as e:
+        logger.error(
+            f"Failed to download {file_type} for {accession_number}: {genbank_url} --\n{e}"
+        )
+        return
+    except ValueError as e:
+        logger.error(
+            f"VALUEERROR: Failed to download {file_type} for {accession_number}: {genbank_url} --\n{e}"
+        )
+        return
+
+
+    # Download file
+    file_size = int(response.info().get("Content-length"))
+    bsize = 1_048_576
+    try:
+        with open(output_path, "wb") as out_handle:
+            # Using leave=False as this will be an internally-nested progress bar
+            with tqdm(
+                total=file_size,
+                leave=False,
+                desc=f"Downloading {accession_number} {file_type}",
+            ) as pbar:
+                while True:
+                    buffer = response.read(bsize)
+                    if not buffer:
+                        break
+                    pbar.update(len(buffer))
+                    out_handle.write(buffer)
+    except IOError:
+        logger.error(f"Download failed for {accession_number}", exc_info=1)
+        return
+
+    return
 
 
 if __name__ == "__main__":

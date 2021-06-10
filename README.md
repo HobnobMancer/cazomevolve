@@ -104,10 +104,8 @@ This section tracks the work currently being conducted and work to do
 
 ## Download genomic assemblies from NCBI
 
-Reference sequence genomic assemblies were used for the creation of the phylogenetic tree.
-GenBank genomic assemblies were used for identify the CAZomes of species.
-
-For both the reference and GenBank assemblies the GenBank (`.gbff`), FASTA (`.fna`) and GFF3 (`.gff`) files were retrieved.
+GenBank genomic assemblies were used for identify the CAZomes of species and creation of the phylogenetic tree.
+The FASTA (`.fna`) and GenBank (`.gbff`) files were retrieved for every genome.
 
 The Python script `get_assemblies.py` was used to retrieve genomic assemblies (of scaffold assembly level and up) from NCBI.
 `get_assemblies.py` takes 4 position arguments:
@@ -116,34 +114,17 @@ The Python script `get_assemblies.py` was used to retrieve genomic assemblies (o
 3. File extensions of genomes to retrieve (separated by commas, and excluding '.' prefix)
 4. Path to an output directory
 
-To retrieve **RefSeq** Dickeya and Pectobacteriaceae genomes the following command was used:
+To retrieve Pectobacteriaceae genomes the following command was used:
 ```bash
-python3 scripts/get_assemblies.py <email> Dickeya,Pectobacteriaceae gbff,fna,gff dickeya_pectobacteriaceae_genomes_ref
+python3 scripts/get_assemblies.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
 ```
 
-To retrieve **GenBank** Dickeya and Pectobacteriaceae genomes the following command was used (*note the addition of the `--gbk` (GenBank) flag*):
+311 pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GenBank formats. All files were unzipped using the command:
 ```bash
-python3 scripts/get_assemblies.py <email> Dickeya,Pectobacteriaceae gbff,fna,gff dickeya_pectobacteriaceae_genomes_gbk --gbk
+gunzip pectobacteriaceae_genomes/*.gz
 ```
 
-96 Dickeya genomes were retrieved from NCBI, in the GenBank, FASTA and GFF3 formats.
-??? Pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GFF3 formats.
-
-For genomic assemblies listed immediately below, NCBI contained no RefSeq. Therefore, the GenBank assembly was used for these assemblies.
-* Pectobacteriaceae
-    * GCA_018141505.1
-    * GCA_017426805.1
-    * GCA_016950115.1
-    * GCA_016642095.1
-    * GCA_016495705.1
-    * GCA_013339845.1
-    * GCA_013334165.1
-    * GCA_009931555.1
-* Dickeya
-
-The retrieved Dickeya and Pectobacteriaceae **Ref** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_ref`, along with the GenBank assemblies for assemblies that did not have a RefSeq in NCBI.
-
-The retrieved Dickeya and Pectobacteriaceae **GenBank** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_gbk`.
+The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pectobacteriaceae_genomes`.
 
 
 ## Phylogenetic Tree Construction

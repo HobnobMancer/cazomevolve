@@ -68,12 +68,35 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "output",
+        "file_types",
+        type=str,
+        help="File extensions of file types to dowload, exluding '.' preix. For example, gbff,fna",
+    )
+
+    parser.add_argument(
+        "output_dir",
         type=Path,
-        help="Path where to write out txt file of tax ids",
+        help="Path to directory to write out genomic assemblies",
     )
 
     # Add optional arguments
+    parser.add_argument(
+        "--gbk",
+        dest="gbk",
+        action="store_true",
+        default=False,
+        help="Retrieve GenBank (GCA) instead of Refseq (GCF)",
+    )
+
+    # Add option to force file over writting
+    parser.add_argument(
+        "-f",
+        "--force",
+        dest="force",
+        action="store_true",
+        default=False,
+        help="Force file over writting",
+    )
     # Add option to specific directory for log to be written out to
     parser.add_argument(
         "-l",
@@ -82,6 +105,23 @@ def build_parser(argv: Optional[List] = None):
         metavar="log file name",
         default=None,
         help="Defines log file name and/or path",
+    )
+    # Add option to prevent over writing of existing files
+    # and cause addition of files to output directory
+    parser.add_argument(
+        "-n",
+        "--nodelete",
+        dest="nodelete",
+        action="store_true",
+        default=False,
+        help="enable/disable deletion of exisiting files",
+    )
+    parser.add_argument(
+        "--timeout",
+        dest="timeout",
+        type=int,
+        default=30,
+        help="time in seconds before connection times out",
     )
     # Add option to specify verbose logging
     parser.add_argument(

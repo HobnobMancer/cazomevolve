@@ -110,11 +110,11 @@ GenBank genomic assemblies were used for identify the CAZomes of species.
 For retrieval of Dickeya genomes, the tool [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/) was used. 
 To retrieve RefSeq Dickeya genomes the following command was used:  
 ```bash
-ncbi-genome-download --assembly-levels complete,chromosome,scaffold ---genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_ref --flat-output --formats genbank,fasta,gff bacteria
+ncbi-genome-download --assembly-levels complete,chromosome,scaffold --genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_ref --flat-output --formats genbank,fasta,gff bacteria
 ```
 To retrieve GenBank Dickeya genomes the following command was used (*note the exclusion of the `--section` flag*):
 ```bash
-ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold ---genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_gbk --flat-output --formats genbank,fasta,gff bacteria
+ncbi-genome-download --section genbank --assembly-levels complete,chromosome,scaffold --genera Dickeya --output-folder dickeya_pectobacteriaceae_genomes_gbk --flat-output --formats genbank,fasta,gff bacteria
 ```
 
 To retrieve the all genomic assemblies descendent from Pectobacteriaceae, the Python script 
@@ -143,6 +143,8 @@ The options `--force` and `--nodelete` were invoked to enable writing out to the
 The retrieved Dickeya and Pectobacteriaceae **Ref** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_ref`, along with the GenBank assemblies for assemblies that did not have a RefSeq in NCBI.
 
 The retrieved Dickeya and Pectobacteriaceae **GenBank** genomes were stored in the directory `dickeya_pectobacteriaceae_genomes_gbk`.
+
+All downloaded genomic assembleis were unzipped using `gunzip`: `gunzip */*.gz`
 
 
 ## Phylogenetic Tree Construction

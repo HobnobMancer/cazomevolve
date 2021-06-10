@@ -40,7 +40,7 @@
 # predicted_CDS.sh
 #
 # Annotate genomes: Predicted CDS in all genomic assemblies contained in a directory
-
+#
 # $1 directory containing genomic assembleis
 # $2 output directory
 mkdir $2
@@ -54,7 +54,7 @@ gunzip $1/*.gz
 for FILE in $1/*.fna
 do
     prodigal \
-      -f gff
+      -f gff \
       -a $2/proteins/`basename ${FILE%%fna}`faa \
       -d $2/cds/`basename ${FILE%%fna}`fasta \
       -i ${FILE} \

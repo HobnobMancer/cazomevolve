@@ -38,6 +38,7 @@
 # SOFTWARE.
 """Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
+import urllib.request
 import sys
 import logging
 import re
@@ -140,6 +141,13 @@ def get_tax_ids(uid_list, term, args):
 
 
     for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
+        # do not download contigs
+        if (
+            batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'Contig'
+        ) or (
+            batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'contig'
+        ):
+            continue
         accession_urls[batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyAccession']] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
     
     for accession in tqdm(accession_urls, desc=f"Downloading genomes for {term}"):
@@ -212,8 +220,8 @@ def download_file(
         gbk_accession = accession_number.replace("GCA_", "GCF_")
 
     file_name = f"{gbk_accession}_{assembly_name}_genomic.{file_type}"
-    file_name = file_name.replace(" ","")
-    output_path = args.output_dir / file_name
+    file_name = file_name.replace(" ","_")
+    output_path = args.output_dir / f"{file_name}.gz"
 
     if output_path.exists():
         logger.warning(f"Output file {output_path} exists, not downloading")
@@ -232,41 +240,30 @@ def download_file(
 
     genbank_url = f"{url_prefix}/{url_parts[0]}/{sub_directories}/{filestem}/{filestem}_genomic.{file_type}.gz"
 
-    # Try URL connection
-    try:
-        response = urlopen(genbank_url, timeout=args.timeout)
-    except (HTTPError, URLError, timeout) as e:
-        logger.error(
-            f"Failed to download {file_type} for {accession_number}: {genbank_url} --\n{e}"
-        )
-        return
-    except ValueError as e:
-        logger.error(
-            f"VALUEERROR: Failed to download {file_type} for {accession_number}: {genbank_url} --\n{e}"
-        )
-        return
 
-
-    # Download file
-    file_size = int(response.info().get("Content-length"))
-    bsize = 1_048_576
     try:
-        with open(output_path, "wb") as out_handle:
-            # Using leave=False as this will be an internally-nested progress bar
-            with tqdm(
-                total=file_size,
-                leave=False,
-                desc=f"Downloading {accession_number} {file_type}",
-            ) as pbar:
-                while True:
-                    buffer = response.read(bsize)
-                    if not buffer:
-                        break
-                    pbar.update(len(buffer))
-                    out_handle.write(buffer)
-    except IOError:
-        logger.error(f"Download failed for {accession_number}", exc_info=1)
-        return
+        req = urllib.request.Request(genbank_url)
+        with urllib.request.urlopen(req) as response:
+            fsize = int(response.info().get("Content-length"))
+
+            # Define buffer sizes
+            bsize = 1048576  # buffer size
+            fsize_dl = 0  # bytes downloaded
+
+            # Download file
+            with open(output_path, "wb") as ofh:
+                with tqdm(total=fsize, disable=False, desc=genbank_url) as pbar:
+                    while True:
+                        buffer = response.read(bsize)
+                        if not buffer:
+                            break
+                        fsize_dl += len(buffer)
+                        ofh.write(buffer)
+                        pbar.update(bsize)
+    except Exception as e:
+        logger.error(f"Failed to download {genbank_url}:\n{e}")
+        with open("failed_download.log", "a") as lfh:
+            lfh.write(f"Failed to download {genbank_url}:\n{e}\n")
 
     return
 

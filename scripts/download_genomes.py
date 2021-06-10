@@ -46,15 +46,15 @@ import time
 
 from typing import List, Optional
 
-from Bio import Entrez
 from socket import timeout
+from Bio import Entrez
 from tqdm import tqdm
-from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
 
 from scripts.utilities import config_logger
 from scripts.utilities.file_io import make_output_directory
-from scripts.utilities.parsers import parse_get_assemblies
+from scripts.utilities.parsers import parse_download_genomes
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -63,10 +63,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     Return dataframe of protein data.
     """
     if argv is None:
-        parser = parse_get_assemblies.build_parser()
+        parser = parse_download_genomes.build_parser()
         args = parser.parse_args()
     else:
-        parser = parse_get_assemblies.build_parser(argv)
+        parser = parse_download_genomes.build_parser(argv)
         args = parser.parse_args()
 
     if logger is None:
@@ -240,30 +240,33 @@ def download_file(
 
     genbank_url = f"{url_prefix}/{url_parts[0]}/{sub_directories}/{filestem}/{filestem}_genomic.{file_type}.gz"
 
-
+    # try URL connection
     try:
-        req = urllib.request.Request(genbank_url)
-        with urllib.request.urlopen(req) as response:
-            fsize = int(response.info().get("Content-length"))
-
-            # Define buffer sizes
-            bsize = 1048576  # buffer size
-            fsize_dl = 0  # bytes downloaded
-
-            # Download file
-            with open(output_path, "wb") as ofh:
-                with tqdm(total=fsize, disable=False, desc=genbank_url) as pbar:
-                    while True:
-                        buffer = response.read(bsize)
-                        if not buffer:
-                            break
-                        fsize_dl += len(buffer)
-                        ofh.write(buffer)
-                        pbar.update(bsize)
-    except Exception as e:
-        logger.error(f"Failed to download {genbank_url}:\n{e}")
-        with open("failed_download.log", "a") as lfh:
-            lfh.write(f"Failed to download {genbank_url}:\n{e}\n")
+        response = urlopen(genbank_url, timeout=args.timeout)
+    except (HTTPError, URLError, timeout) as e:
+        logger.error(
+            f"Failed to download {file_type} for {accession_number}", exc_info=1,
+        )
+        return
+    file_size = int(response.info().get("Content-length"))
+    bsize = 1_048_576
+    try:
+        with open(output_path, "wb") as out_handle:
+            # Using leave=False as this will be an internally-nested progress bar
+            with tqdm(
+                total=file_size,
+                leave=False,
+                desc=f"Downloading {accession_number} {file_type}",
+            ) as pbar:
+                while True:
+                    buffer = response.read(bsize)
+                    if not buffer:
+                        break
+                    pbar.update(len(buffer))
+                    out_handle.write(buffer)
+    except IOError:
+        logger.error(f"Download failed for {accession_number}", exc_info=1)
+        return
 
     return
 

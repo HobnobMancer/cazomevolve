@@ -119,10 +119,8 @@ To retrieve Pectobacteriaceae genomes the following command was used:
 python3 scripts/get_assemblies.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
 ```
 
-311 pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GenBank formats. All files were unzipped using the command:
-```bash
-gunzip pectobacteriaceae_genomes/*.gz
-```
+311 pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GenBank formats.
+
 
 The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pectobacteriaceae_genomes`.
 
@@ -131,13 +129,27 @@ The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pe
 
 The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
 
+### Core gene identification and alignment
+
+[`roary`](https://github.com/sanger-pathogens/Roary/) was used to identify the core pangenome and produce an alignment of core genes for building a phylogenetic tree.
+
+> Page, A. J., Cummins, C. A., Hunt, M., Wong, V. K., Reuter, S., Holden, M. T. G., Fookes, M., Falush, D., Keane, J. A., Parkhill, J. (2015) 'Roary: rapid large-scale prokaryote pan genome analysis', Bioinformatics, 31(22), pp.3691-3693
+
+To reproduce the analysis, use the following command (which was invoked from this directory):  
+```bash
+roary -e --mafft -f pectobacteriaceae_core_genes -p 6 pectobacteriaceae_predicted_cds/gbk/*.gff
+```
+
+The aligned core genes were written out to `pectobacteriaceae_core_genes`.
+
+
 ### Predicting CDS
 
 To ensure consistency of nomenclature and support back-threading of nucleotide sequences onto aligned single-copy orthologues, the genomes were reannotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
 
 > Hyatt D, Chen GL, Locascio PF, Land ML, Larimer FW, Hauser LJ. Prodigal: prokaryotic gene recognition and translation initiation site identification. BMC Bioinformatics. 2010 Mar 8;11:119. doi: 10.1186/1471-2105-11-119. PMID: 20211023; PMCID: PMC2848648.
 
-The output was placed in `dickeya_pectobacteriaceae_predicted_cds`.
+The output was placed in `pectobacteriaceae_predicted_cds`.
 
 To automate invoking `prodigal` the `bash` script `predict_cds.sh` was used, which takes 2 positional arguments:  
 1. Path to the directory containing downloaded genomes (from `ncbi-genome-download`)
@@ -149,14 +161,14 @@ To automate invoking `prodigal` the `bash` script `predict_cds.sh` was used, whi
 3. `gbk`: Contains the master annotation files in GFF3 format (a requirement fo `Roary`) (`*.gff`)
 
 To invoke `prodigal` for Dickeya and Pectobacteriasea species,the `bash` script `predict_cds.sh` was invoked using the following command:
+```bash
+scripts/predict_CDS.sh pectobacteriaceae_genomes pectobacteriaceae_predicted_cds | tee pectobacteriaceae_predicted_cds/cds_prediction.log
 ```
-bash scripts/predict_CDS.sh dickeya_pectobacteriaceae_genomes dickeya_pectobacteriaceae_predicted_cds | tee dickeya_pectobacteriaceae_predicted_cds/cds_prediction.log
-```
-This command writes the output to the terminal and creates a log file. The script `predict_CDS.sh` also decompresses the files 
+This command writes the output to the terminal and creates a log file. The script `predict_cds.sh` also decompresses the files 
 in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. Both the decompressed and compressed 
 versions of the genomic assemblies are retained.
 
-The output was written to the directory `dickeya_pectobacteriaceae_predicted_cds`.
+The output was written to the directory `pectobacteriaceae_predicted_cds`.
 
 
 ### Roary for denogram generation
@@ -192,7 +204,7 @@ scripts/find_orthologues.sh
 Orthofinder requires one fasta file per species/genome. The Python script `extract_proteins_genomes.py` was used to create the necessary fasta files.
 
 `extract_proteins_genomes.py` takes 2 positional arguments:
-1. Path to the directory containing downloaded genomes (using `ncbi-genome-download`)
+1. Path to the directory containing downloaded genomes
 2. Path to the output directory to write out protein sequences (`<genera>_proteins`)
 
 For retrieving the protein sequences of Dickeya and Pectobacteriaceae species, the following command was used:  
@@ -200,9 +212,9 @@ For retrieving the protein sequences of Dickeya and Pectobacteriaceae species, t
 python3 scripts/extract_proteins_genomes.py dickeya_pectobacteriaceae_genomes/ dickeya_pectobacteriaceae_proteins -f 
 ```
 
-The output was writen to `dickeya_pectobacteriaceae_proteins`, and each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
+The output was writen to `pectobacteriaceae_proteins`, and each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
 
-37 of the Dickeya genomic assemblies contained no CDS features.
+(37 of the Dickeya genomic assemblies contained no CDS features)
 
 
 ### CDS extraction from genomes

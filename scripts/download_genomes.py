@@ -222,11 +222,15 @@ def download_file(
     file_name = f"{gbk_accession}_{assembly_name}_genomic.{file_type}"
     file_name = file_name.replace(" ","_")
     output_path = args.output_dir / f"{file_name}.gz"
+    unzipped_path = args.output_dir / f"{file_name}"
 
     if output_path.exists():
         logger.warning(f"Output file {output_path} exists, not downloading")
         return
-
+    if unzipped_path.exists():
+        logger.warning(f"Output file {unzipped_path} exists, not downloading")
+        return
+    
     escape_characters = re.compile(r"[\s/,#\(\)]")
     escape_name = re.sub(escape_characters, "_", assembly_name)
 

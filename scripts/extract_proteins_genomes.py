@@ -70,7 +70,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     if logger is None:
         config_logger(args)
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(__package__)
 
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
@@ -95,8 +95,8 @@ def get_genomic_assembly_paths(args):
     gbk_files = (
         entry for entry in Path(args.input_dir).iterdir() if (entry.is_file() and entry.name.endswith("genomic.gbff"))
     )
-
-    if len(gbk_files) == 0:
+    print(gbk_files, len(list(gbk_files)))
+    if len(list(gbk_files)) == 0:
         logger.error(
             f"Found 0 assemblies in {args.input_dir}\n"
             "Check the path is correct. Terminating program"
@@ -104,7 +104,7 @@ def get_genomic_assembly_paths(args):
         sys.exit(1)
     
     else:
-        logger.warning(f"Retrieved {len(gbk_files)} from {args.input_dir}")
+        logger.warning(f"Retrieved {len(list(gbk_files))} from {args.input_dir}")
     
     return gbk_files
 

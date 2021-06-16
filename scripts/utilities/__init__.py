@@ -53,7 +53,7 @@ def config_logger(args) -> logging.Logger:
     :param args: cmd-line args parser
     Return nothing
     """
-    logger = logging.getLogger(__package__)
+    logger = logging.getLogger()
 
     # Set format of loglines
     log_formatter = logging.Formatter("[%(levelname)s] [%(name)s]: %(message)s")

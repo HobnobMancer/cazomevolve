@@ -62,17 +62,21 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "output_dir",
+        "prokka_proteins",
         type=Path,
-        help="Path to a SINGLE output directory",
+        help="Path to Prokka output directory, containing all predicted protein FASTA files"
     )
 
     parser.add_argument(
-        "-p",
-        "--predicted_cds",
+        "cazy_output_dir",
         type=Path,
-        default=None,
-        help="Path to dir containing predicted CDS from prodigal",
+        help="Path to dir to store FASTAs for searching for CAZy annotated proteins",
+    )
+
+    parser.add_argument(
+        "dbcan_output_dir",
+        type=Path,
+        help="Path dir to store FASTAs to be parsed by dbCAN",
     )
 
     # Add optional arguments

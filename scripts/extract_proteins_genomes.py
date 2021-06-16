@@ -39,17 +39,13 @@
 """Script for extracting protein sequences from genomic assemblies for single ortholog search"""
 
 
-import gzip
 import logging
 import sys
 
 from pathlib import Path
 from typing import List, Optional
 
-import pandas as pd
-
 from Bio import SeqIO
-from tqdm import tqdm
 
 from scripts.utilities import config_logger, build_logger
 from scripts.utilities.file_io import make_output_directory
@@ -95,8 +91,11 @@ def get_genomic_assembly_paths(args):
     gbk_files = (
         entry for entry in Path(args.input_dir).iterdir() if (entry.is_file() and entry.name.endswith("genomic.gbff"))
     )
-    print(gbk_files, len(list(gbk_files)))
-    if len(list(gbk_files)) == 0:
+    gbk_file_list = [
+        entry for entry in Path(args.input_dir).iterdir() if (entry.is_file() and entry.name.endswith("genomic.gbff"))
+    ]
+
+    if len(gbk_file_list) == 0:
         logger.error(
             f"Found 0 assemblies in {args.input_dir}\n"
             "Check the path is correct. Terminating program"
@@ -104,7 +103,7 @@ def get_genomic_assembly_paths(args):
         sys.exit(1)
     
     else:
-        logger.warning(f"Retrieved {len(list(gbk_files))} from {args.input_dir}")
+        logger.warning(f"Retrieved {len(gbk_file_list)} from {args.input_dir}")
     
     return gbk_files
 
@@ -128,7 +127,7 @@ def compile_fasta(assembly_path, args):
 
     species = ""
 
-    with gzip.open(assembly_path, "rt") as handle:
+    with open(assembly_path, "rt") as handle:
         for gb_record in SeqIO.parse(handle, "genbank"):
             for (index, feature) in enumerate(gb_record.features):
                 if feature.type == "source":
@@ -146,7 +145,7 @@ def compile_fasta(assembly_path, args):
     protein_count = 0
 
     with open(output_path, "a") as fh:
-        with gzip.open(assembly_path, "rt") as handle:  # unzip the genomic assembly
+        with open(assembly_path, "rt") as handle:  # unzip the genomic assembly
             for gb_record in SeqIO.parse(handle, "genbank"):
                 for (index, feature) in enumerate(gb_record.features):
                     # Parse over only protein encoding features (type = 'CDS')

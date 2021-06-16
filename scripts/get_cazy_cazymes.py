@@ -48,40 +48,35 @@
 
 import json
 import logging
-import shutil
 import sys
 
 from pathlib import Path
 from typing import List, Optional
 
-from Bio import SeqIO
 from tqdm import tqdm
 
 from scripts.utilities import config_logger
-from scripts.utilities.file_io import make_output_directory, get_file_paths
-from scripts.utilities.parsers import parse_identify_cazy
+from scripts.utilities.parsers import parse_identify_cazymes
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     if argv is None:
-        parser = parse_identify_cazy.build_parser()
+        parser = parse_identify_cazymes.build_parser()
         args = parser.parse_args()
     else:
-        parser = parse_identify_cazy.build_parser(argv)
+        parser = parse_identify_cazymes.build_parser(argv)
         args = parser.parse_args()
 
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)
 
-    make_output_directory(args.output_dir, args.force, args.nodelete)
-
     # retrieve dictionary of CAZy classifications
     cazy_dict = get_cazy_dict(args)
 
-    fasta_files_paths = get_file_paths(args, ".fasta")
+    fasta_files_paths, number_of_files = get_fasta_paths(args)
 
-    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations"):
+    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
         get_cazy_annotations(fasta_path, args, cazy_dict)
 
 
@@ -95,7 +90,7 @@ def get_cazy_dict(args):
     logger = logging.getLogger(__name__)
 
     try:
-        with open(args.dict, "r") as fh:
+        with open(args.cazy, "r") as fh:
             cazy_dict = json.load(fh)
 
     except FileNotFoundError:
@@ -109,6 +104,40 @@ def get_cazy_dict(args):
     return cazy_dict
 
 
+def get_fasta_paths(args):
+    """Retrieve paths to fasta files created by extract_proteins_genomes.py.
+
+    :param args: cmd-line args parser
+
+    Return two lists, one of path to FASTA files contain sequences, one of empty FASTA files.
+    """
+    logger = logging.getLogger(__name__)
+
+    # retrieve all files from directory
+    files_in_entries = (
+        entry for entry in Path(args.input_dir).iterdir() if (
+            entry.is_file() and entry.name.endswith(".fasta")
+        )
+    )
+
+    file_list = [
+        entry for entry in Path(args.input_dir).iterdir() if (
+            entry.is_file() and entry.name.endswith(".fasta")
+        )
+    ]
+
+    if len(file_list) == 0:
+        logger.error(
+            f"Found 0 fasta files in {args.input_dir}\n"
+            "Check the path is correct. Terminating program"
+        )
+        sys.exit(1)
+    
+    logger.warning(f"Retrieved {len(file_list)} FASTA files")
+
+    return files_in_entries, len(file_list)
+
+
 def get_cazy_annotations(fasta_path, args, cazy_dict):
     """Get the CAZy family annotations for each fasta file.
 
@@ -120,48 +149,46 @@ def get_cazy_annotations(fasta_path, args, cazy_dict):
 
     Return nothing.
     """
-    logger = logging.getLogger(__name__)
-    if fasta_path.stat().st_size == 0:
-        logger.warning(
-            f"FASTA file {fasta_path.name} is empty."
-        )
-        # move to directory used as input for dbCAN
-        target_path = args.dbcan_dir / fasta_path.name
-        shutil.move(fasta_path, target_path)
-        return
-
     # compile path to write out non-CAZy annotated proteins
     output_path = args.output_dir / fasta_path.name
 
     with open(fasta_path, "r") as fh:
         lines = fh.read().splitlines()
+    
+    # extract genomic accession from the file name
+    genomic_accession = (
+        str(fasta_path.name).split("_")[-2] + "_" + str(fasta_path.name).split("_")[-1]
+    ).replace(".fasta", "")
 
     index = 0
     with open(args.tab_annno_list, "a") as fh:
         # fasta file contains proteins from extract_cds_annotations.py, extracted from the genome
         for index in range(len(lines)):
             if lines[index].startswith(">"):
-                protein_accession = list.split("|")[3]
+                protein_accession = (lines[index]).split("|")[3]
 
                 try:
                     family_annotations = cazy_dict[protein_accession]
                     # drop subfamily annotations if present
                     family_annotations = list(set([fam.split("_")[0] for fam in family_annotations]))
                     for fam in family_annotations:
-                        fh.write(f"{fam}\t{fasta_path.name.replace('.fasta','')}")
+                        fh.write(f"{fam}\t{genomic_accession}\n")
                 
                 except KeyError:  # not included in CAZy, write to FASTA for parsing by dbCAN
-                    protein_data = lines[index]
+                    protein_data = f">{protein_accession}\n"
                     seq = []  # seq data
                     sequence_line = True  # check if parsing a line containing a seq
                     sequence_index = index + 1  # start by checking the next line
 
                     while sequence_line:  # while parsing lines containing seq data
-                        if lines[sequence_index].startswith(">") is False:  # line contains a seq
-                            seq.append(lines[sequence_index])
-                            sequence_index += 1
-                        else:
-                            sequence_line = False  # line contains the data for the next protein
+                        try:
+                            if lines[sequence_index].startswith(">") is False:  # line contains a seq
+                                seq.append(f"{lines[sequence_index]}\n")
+                                sequence_index += 1
+                            else:
+                                sequence_line = False  # line contains the data for the next protein
+                        except IndexError:  # riased when read end of the file
+                            break
                     
                     for seq_line in seq:
                         protein_data += seq_line  # add seq to the protein data

@@ -116,7 +116,7 @@ The Python script `get_assemblies.py` was used to retrieve genomic assemblies (o
 
 To retrieve Pectobacteriaceae genomes the following command was used:
 ```bash
-python3 scripts/get_assemblies.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
+python3 scripts/download_genomes.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
 ```
 
 311 pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GenBank formats.
@@ -128,6 +128,16 @@ The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pe
 ## Phylogenetic Tree Construction
 
 The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
+
+
+### Dendogram creation using average nucleotide identitiy
+
+To create an approximate estimation of the phylogenetic tree, the average nucleotide identity between all 
+download genomic fasta files (`*.fna`) was used. Note, this 'phylogenetic tree' is better described as a
+dendogram rather than a phylogenetic tree becuase it does not 
+
+pyani -- average_nucleotide_identity.py -i pectobacteriaceae_genomes/ -o pyani_output/ -l pyani_log_1.log -v --nocompress --noclobber -f --skip_nucmer --gformat pdf,png,eps
+
 
 ### Core gene identification and alignment
 
@@ -162,8 +172,9 @@ To automate invoking `prodigal` the `bash` script `predict_cds.sh` was used, whi
 
 To invoke `prodigal` for Dickeya and Pectobacteriasea species,the `bash` script `predict_cds.sh` was invoked using the following command:
 ```bash
-scripts/predict_CDS.sh pectobacteriaceae_genomes pectobacteriaceae_predicted_cds | tee pectobacteriaceae_predicted_cds/cds_prediction.log
+scripts/predict_CDS.sh pectobacteriaceae_genomes pectobacteriaceae_predicted_cds | tee prokka_cds_prediction.log
 ```
+
 This command writes the output to the terminal and creates a log file. The script `predict_cds.sh` also decompresses the files 
 in the directory containing the genomic assemblies so that they can be parsed by `prodigal`. Both the decompressed and compressed 
 versions of the genomic assemblies are retained.
@@ -193,9 +204,6 @@ scripts/find_orthologues.sh
 ```
 
 
-
-
-
 ## Retrieve CAZy CAZyme annotations
 
 
@@ -209,25 +217,38 @@ Orthofinder requires one fasta file per species/genome. The Python script `extra
 
 For retrieving the protein sequences of Dickeya and Pectobacteriaceae species, the following command was used:  
 ```bash
-python3 scripts/extract_proteins_genomes.py dickeya_pectobacteriaceae_genomes/ dickeya_pectobacteriaceae_proteins -f 
+python3 scripts/extract_proteins_genomes.py pectobacteriaceae_genomes/ pectobacteriaceae_proteins
 ```
 
 The output was writen to `pectobacteriaceae_proteins`, and each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
 
-(37 of the Dickeya genomic assemblies contained no CDS features)
+(48 of the pectobacteriaceae genomic assemblies contained no CDS features)
 
 
-### CDS extraction from genomes
+### Extracting predicted proteins
 
-To retrieve proteins from downloaded genomic assemblies the Python script `extract_cds_annotations`, which takes 
-2 positional arguments:
-1. Path to the directory containing the downloaded genomic assemblies (`<genus>_genomes/*.gbff`)
-2. Path to output directory to write out retrieved protein sequences to (`<genus>_extracted_proteins/*.fasta`)
+For the genomic assemblies from which no CDS features were retrieved, the predicted protein sequences from `prokka` were used.
 
-`extract_cds_annotations` was invoked using the command:
+For genomic assemblies that did contain CDS features from which proteins were extracted, the extracted proteins were searched against CAZy to check for CAZy annotated CAZyomes.
+
+In order to perform these two operations, the FASTA files containing extracted proteins needed to be moved into a directory which could be used as input for searching for CAZy annotated proteins, and empty FASTA files (from genomic assemblies from which no CDS features were retrieved) needed to be in another directory to be used as input for dbCAN, in order to predict the CAZome.
+
+To do this the `bash` script `gather_fastas.sh` was used, which wraps the Python script `gather_fastas.py`.
+
+`gather_fastas.sh` takes four positional arguments:
+1. Path to the dir containing extracted proteins (the output dir from `extract_proteins_genomes.py`)
+2. Path to the prokka output dir
+3. Path to dir to be used as input for the CAZy annotated protein search
+4. Path to the dir to be used as input by dbCAN
+
+To reproduce the analysis the following command was used, and run from this dir:
 ```bash
-python3 scripts/extract_cds_annotations.py dickeya_genomes dickeya_extracted_proteins
+scripts/gather_fastas.sh pectobacteriaceae_extracted_proteins/ pectobacteriaceae_prokka/ pectobacteriaceae_cazy_input/ pectobacteriaceae_dbcan_input/
 ```
+
+`pectobacteriaceae_cazy_input` was used as the input dir for CAZy annotated protein search.
+`pectobacteriaceae_dbcan_input` was used as input for dbCAN prediction of CAZymes.
+
 
 ### Retrieve CAZy annotations
 
@@ -239,6 +260,7 @@ Proteins not annotated by CAZy were written out to FASTA files for parsing by `d
 Empty FASTA files from genomes from which no CDS features were retrieved, were moved to the directory 
 
 The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins.
+
 
 ### Predict CAZymes and retrieve annotations
 

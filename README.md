@@ -257,10 +257,18 @@ were added to the tab deliminted list, used as input for `coinfinder`.
 
 Proteins not annotated by CAZy were written out to FASTA files for parsing by `dbCAN` to retrieve any non-CAZy annotated CAZymes.
 
-Empty FASTA files from genomes from which no CDS features were retrieved, were moved to the directory 
+The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins, and write out non-CAZy annotated proteins to FASTA files to be parsed by dbCAN.
 
-The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins.
+`get_cazy_cazymes.py` takes _ positional arguments:
+1. Path to dir containing FASTA files of proteins extracted from the genomic assemblies
+2. Path to a CAZy JSON file, keyed by protein accessions and valued by list of CAZy family annotations
+3. Path to dir containing FASTA files to be parsed by dbCAN
+4. Path to a file containing a tab deliminted list of CAZy families and genomic accession, as described by `coinfinder`
 
+To repeat the analysis, use the following command from this dir:
+```bash
+python3 scripts/get_cazy_cazymes.py pectobacteriaceae_cazy_input/ cazy_dict_2021_03.json pectobacteriaceae_dbcan_input cazy_fam_tab_list
+```
 
 ### Predict CAZymes and retrieve annotations
 

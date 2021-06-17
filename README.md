@@ -279,6 +279,8 @@ To reproduce this part of the analysis, use the command:
 Python3 scripts/get_dbcan_cazymes.py dickeya_fastas_for_dbcan predicted_cds_non_cazy_cazymes cazy_fam_genome_annotations.txt
 ```
 
+Using the command `grep -o ">" pectobacteriaceae_dbcan_input/*.fasta | wc -l`, dbCAN parsed 1,290,317 proteins.
+
 
 ## CAZy family association and dissociation
 

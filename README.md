@@ -55,6 +55,14 @@ MAFFT
 Coinfinder
 For all required Python libraries please read 'requirements.txt'.   
 
+### Python modules
+- [tqdm]()
+- []()
+
+### R packages
+- [ape]()
+- [dplyr]()
+
 <p>&nbsp;</p>
 
 ## Current Developments

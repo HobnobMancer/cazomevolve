@@ -105,24 +105,105 @@ This section tracks the work currently being conducted and work to do
 ## Download genomic assemblies from NCBI
 
 GenBank genomic assemblies were used for identify the CAZomes of species and creation of the phylogenetic tree.
+
 The FASTA (`.fna`) and GenBank (`.gbff`) files were retrieved for every genome.
 
-The Python script `get_assemblies.py` was used to retrieve genomic assemblies (of scaffold assembly level and up) from NCBI.
-`get_assemblies.py` takes 4 position arguments:
+The Python script `download_genomes.py` was used to retrieve genomic assemblies (of scaffold assembly level and up) from NCBI.
+`download_genomes.py` takes 4 position arguments:
 1. User email address (required by NCBI.Entrez)
 2. Terms (separated by commas) to search NCBI
 3. File extensions of genomes to retrieve (separated by commas, and excluding '.' prefix)
 4. Path to an output directory
 
+To retrieve GenBank assemblies and not reference sequences, add the flag `--gbk` to the end of the command.
+
 To retrieve Pectobacteriaceae genomes the following command was used:
 ```bash
-python3 scripts/download_genomes.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
+python3 scripts/genomes/download_genomes.py <email> Pectobacteriaceae fna,gbff pectobacteriaceae_genomes --gbk
 ```
 
-311 pectobacteriaceae genomes were retrieved from NCBI, in the GenBank, FASTA and GenBank formats.
-
+297 pectobacteriaceae genomes were retrieved from NCBI, in FASTA and GenBank formats.
 
 The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pectobacteriaceae_genomes`.
+
+## Protein sequence retrival
+
+### Extract protein sequences from genomic assemblies
+
+The Python script `extract_gbk_proteins.py` was used to retrieve protein sequences from the genomic assemblies, and write them to FASTA files. One FASTA files was created per genomic assembly.
+
+`extract_gbk_proteins.py` takes 2 positional arguments:
+1. Path to the directory containing downloaded genomes
+2. Path to the output directory to write out protein sequences (`<genera>_proteins`)
+
+For retrieving the protein sequences of Pectobacteriaceae species, the following command was used:  
+```bash
+python3 scripts/genomes/extract_gbk_proteins.py pectobacteriaceae_genomes/ pectobacteriaceae_proteins
+```
+
+The output was writen to `pectobacteriaceae_proteins`.
+
+Each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
+
+48 of the pectobacteriaceae genomic assemblies contained no CDS features.
+
+### Genome annotation and protein prediction
+
+For the genomic assemblies from which no CDS features were retrieved, `prokka` was used to annotate the genomes.
+
+```bash
+scripts/predict_CDS.sh pectobacteriaceae_genomes pectobacteriaceae_predicted_cds | tee prokka_cds_prediction.log
+```
+The predicted protein sequences were written to one FASTA file per parsed genome, and were written out the directory `pectobacteriaceae_dbcan_input`.
+
+## CAZome annotation and CAZy family list creation
+
+For genomic assemblies that did contain CDS features from which proteins were extracted, the extracted proteins were searched against CAZy to check for CAZy annotated CAZyomes.
+
+The following bash command was used to move FASTA files that were empty becuase no GenBank CDS features were retrieved, the files were moved to the directory `empty_fastas`:
+
+```bash
+find . -type f -size 0 -exec mv pectobacteriaceae_proteins empty_fastas
+```
+
+### Retrieve CAZy annotated proteins
+
+Proteins retrieved from GenBank CDS features were queried against a local CAZyme database containing CAZy annotations, created using `cazy_webscraper` [Hobbs *et al*., 2021].
+
+> Hobbs, Emma E. M.; Pritchard, Leighton; Chapman, Sean; Gloster, Tracey M. (2021): cazy_webscraper Microbiology Society Annual Conference 2021 poster. figshare. Poster. https://doi.org/10.6084/m9.figshare.14370860.v7 
+
+The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins, and write out non-CAZy annotated proteins to FASTA files to be parsed by dbCAN.
+
+`get_cazy_cazymes.py` takes _ positional arguments:
+1. Path to dir containing FASTA files of proteins extracted from the genomic assemblies
+2. Path to a CAZy JSON file, keyed by protein accessions and valued by list of CAZy family annotations
+3. Path to dir containing FASTA files to be parsed by dbCAN
+4. Path to a file containing a tab deliminted list of CAZy families and genomic accession, as described by `coinfinder`
+
+To repeat the analysis, use the following command from this dir:
+```bash
+python3 scripts/get_cazy_cazymes.py \
+pectobacteriaceae_proteins \  # path to directory containing GenBank annotated proteins
+cazy_dict_2021_03.json \  # cazy_webscraper created CAZy family dict
+pectobacteriaceae_dbcan_input \  # path to directory of FASTA files to be parsed by dbCAN
+cazy_fam_tab_list  # path to write tab deliminted of CAZy families to
+```
+
+### Predict CAZymes
+
+Proteins predicted by `prokka` and protein sequences extracted from GenBank CDS features but not annotated by CAZy were parsed by `dbCAN` [Zhange *et al*., 2018] to identify the CAZomes of all genomes.
+
+> Zhang H, Yohe T, Huang L, Entwistle S, Wu P, Yang Z, Busk PK, Xu Y, Yin Y. (2018) dbCAN2: a meta server for automated carbohydrate-active enzyme annotation. Nucleic Acids Res. 46(W1):W95-W101
+
+To reproduce this part of the analysis, use the command:
+```bash
+Python3 scripts/get_dbcan_cazymes.py dickeya_fastas_for_dbcan predicted_cds_non_cazy_cazymes cazy_fam_genome_annotations.txt
+```
+
+dbCAN parsed 1,290,317 proteins. This values was retrieved using the command.
+```bash
+grep -o ">" pectobacteriaceae_dbcan_input/*.fasta | wc -l
+```
 
 
 ## Phylogenetic Tree Construction
@@ -130,16 +211,25 @@ The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pe
 The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
 
 
-### Dendogram creation using average nucleotide identitiy
+### Whole genome distance-based phylogenetic tree reconstruction
 
 To create an approximate estimation of the phylogenetic tree, the average nucleotide identity between all 
 download genomic fasta files (`*.fna`) was used. Note, this 'phylogenetic tree' is better described as a
 dendogram rather than a phylogenetic tree becuase it does not 
 
+```bash
 pyani -- average_nucleotide_identity.py -i pectobacteriaceae_genomes/ -o pyani_output/ -l pyani_log_1.log -v --nocompress --noclobber -f --skip_nucmer --gformat pdf,png,eps
+```
 
+### CAZome composition distance-based phylogenetic tree reconstruction
 
-### Core gene identification and alignment
+**Build CAZy family presence-absence matrix**
+
+**Construct dendogram**
+
+### Model-based phylogenetic tree reconstruction
+
+#### Core gene identification and alignment
 
 [`roary`](https://github.com/sanger-pathogens/Roary/) was used to identify the core pangenome and produce an alignment of core genes for building a phylogenetic tree.
 
@@ -152,8 +242,7 @@ roary -e --mafft -f pectobacteriaceae_core_genes -p 6 pectobacteriaceae_predicte
 
 The aligned core genes were written out to `pectobacteriaceae_core_genes`.
 
-
-### Predicting CDS
+#### Predicting CDS
 
 To ensure consistency of nomenclature and support back-threading of nucleotide sequences onto aligned single-copy orthologues, the genomes were reannotated using [`prodigal`](https://github.com/hyattpd/Prodigal).
 
@@ -181,13 +270,13 @@ versions of the genomic assemblies are retained.
 
 The output was written to the directory `pectobacteriaceae_predicted_cds`.
 
-
-### Roary for denogram generation
-
+#### Roary for denogram generation
 
 
 
-### Identification of Single-Copy Orthologues
+
+
+#### Identification of Single-Copy Orthologues
 
 Orthologues present in each of the input genomes were identified using the package [`orthofinder`](https://github.com/davidemms/OrthoFinder)
 
@@ -204,84 +293,11 @@ scripts/find_orthologues.sh
 ```
 
 
-## Retrieve CAZy CAZyme annotations
-
-
-### Extract protein sequences
-
-Orthofinder requires one fasta file per species/genome. The Python script `extract_proteins_genomes.py` was used to create the necessary fasta files.
-
-`extract_proteins_genomes.py` takes 2 positional arguments:
-1. Path to the directory containing downloaded genomes
-2. Path to the output directory to write out protein sequences (`<genera>_proteins`)
-
-For retrieving the protein sequences of Dickeya and Pectobacteriaceae species, the following command was used:  
-```bash
-python3 scripts/extract_proteins_genomes.py pectobacteriaceae_genomes/ pectobacteriaceae_proteins
-```
-
-The output was writen to `pectobacteriaceae_proteins`, and each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
-
-(48 of the pectobacteriaceae genomic assemblies contained no CDS features)
-
-
-### Extracting predicted proteins
-
-For the genomic assemblies from which no CDS features were retrieved, the predicted protein sequences from `prokka` were used.
-
-For genomic assemblies that did contain CDS features from which proteins were extracted, the extracted proteins were searched against CAZy to check for CAZy annotated CAZyomes.
-
-In order to perform these two operations, the FASTA files containing extracted proteins needed to be moved into a directory which could be used as input for searching for CAZy annotated proteins, and empty FASTA files (from genomic assemblies from which no CDS features were retrieved) needed to be in another directory to be used as input for dbCAN, in order to predict the CAZome.
-
-To do this the `bash` script `gather_fastas.sh` was used, which wraps the Python script `gather_fastas.py`.
-
-`gather_fastas.sh` takes four positional arguments:
-1. Path to the dir containing extracted proteins (the output dir from `extract_proteins_genomes.py`)
-2. Path to the prokka output dir
-3. Path to dir to be used as input for the CAZy annotated protein search
-4. Path to the dir to be used as input by dbCAN
-
-To reproduce the analysis the following command was used, and run from this dir:
-```bash
-scripts/gather_fastas.sh pectobacteriaceae_extracted_proteins/ pectobacteriaceae_prokka/ pectobacteriaceae_cazy_input/ pectobacteriaceae_dbcan_input/
-```
-
-`pectobacteriaceae_cazy_input` was used as the input dir for CAZy annotated protein search.
-`pectobacteriaceae_dbcan_input` was used as input for dbCAN prediction of CAZymes.
-
-
-### Retrieve CAZy annotations
-
-Proteins retrieved from the genomes were then checked to see if they had been annotated by CAZy. If so, the CAZy family annotations 
-were added to the tab deliminted list, used as input for `coinfinder`.
-
-Proteins not annotated by CAZy were written out to FASTA files for parsing by `dbCAN` to retrieve any non-CAZy annotated CAZymes.
-
-The Python script `get_cazy_cazymes.py` was used to identify CAZy annotated proteins, and write out non-CAZy annotated proteins to FASTA files to be parsed by dbCAN.
-
-`get_cazy_cazymes.py` takes _ positional arguments:
-1. Path to dir containing FASTA files of proteins extracted from the genomic assemblies
-2. Path to a CAZy JSON file, keyed by protein accessions and valued by list of CAZy family annotations
-3. Path to dir containing FASTA files to be parsed by dbCAN
-4. Path to a file containing a tab deliminted list of CAZy families and genomic accession, as described by `coinfinder`
-
-To repeat the analysis, use the following command from this dir:
-```bash
-python3 scripts/get_cazy_cazymes.py pectobacteriaceae_cazy_input/ cazy_dict_2021_03.json pectobacteriaceae_dbcan_input cazy_fam_tab_list
-```
-
-### Predict CAZymes and retrieve annotations
-
-Predicted CDSs and proteins not annotated by CAZy were parsed by dbCAN to identify non-CAZy annotated CAZymes. This was automated by using the Python script `get_dbcan_cazymes.py`, which also added the CAZy family annotations to the tab deliminated list created from CAZy CAZyme annotations.
-
-To reproduce this part of the analysis, use the command:
-```bash
-Python3 scripts/get_dbcan_cazymes.py dickeya_fastas_for_dbcan predicted_cds_non_cazy_cazymes cazy_fam_genome_annotations.txt
-```
-
-Using the command `grep -o ">" pectobacteriaceae_dbcan_input/*.fasta | wc -l`, dbCAN parsed 1,290,317 proteins.
-
-
 ## CAZy family association and dissociation
 
 To evaluate CAZy family association and dissociation, `coinfinder` was used.
+
+coinfinder -i sp_alpha_beta_nospaces -p pyani_sp_tree.new -o circular_ -a
+
+Bonferroni significance correction, given 3321 tests, the significance level has been reduced from 0.05 to 1.50557e-05.
+is that good or bad lol

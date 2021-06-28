@@ -1,4 +1,4 @@
-# cfv_investigator
+# cazomevole
 
 [![Funding](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)
 [![PhD licence](https://img.shields.io/badge/Licence-MIT-green)](https://github.com/HobnobMancer/PhD_Project_Scripts/blob/master/LICENSE)
@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-v3.7.---orange)](https://www.python.org/about/)
 [![Research](https://img.shields.io/badge/Bioinformatics-Protein%20Engineering-ff69b4)](http://www.eastscotbiodtp.ac.uk/eastbio-student-cohort-2019)
 
-**C**azy **F**amily co**V**ariance **investigator** (`cfv_investigator`) evaluates the covariance of CAZy family annotations within genomes. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
+**Cazom**e **Evolve** (`cazome`) invetigates the evolution of CAZomes by searching for CAZy families that associated more than expected from their lineage. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
 
 ## Contents
 

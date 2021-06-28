@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-v3.7.---orange)](https://www.python.org/about/)
 [![Research](https://img.shields.io/badge/Bioinformatics-Protein%20Engineering-ff69b4)](http://www.eastscotbiodtp.ac.uk/eastbio-student-cohort-2019)
 
-**Cazom**e **Evolve** (`cazome`) invetigates the evolution of CAZomes by searching for CAZy families that associated more than expected from their lineage. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
+**Cazom**e **Evolve** (`cazomevolve`) invetigates the evolution of CAZomes by searching for CAZy families that associated more than expected from their lineage. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
 
 ## Contents
 

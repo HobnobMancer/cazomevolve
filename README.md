@@ -60,8 +60,8 @@ For all required Python libraries please read 'requirements.txt'.
 - []()
 
 ### R packages
-- [ape]()
-- [dplyr]()
+- [ape](https://www.rdocumentation.org/packages/ape/versions/5.5)
+- [dplyr](https://www.rdocumentation.org/packages/dplyr/versions/0.7.8)
 
 <p>&nbsp;</p>
 
@@ -153,15 +153,28 @@ The output was writen to `pectobacteriaceae_proteins`.
 
 Each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
 
-48 of the pectobacteriaceae genomic assemblies contained no CDS features.
+48 of the pectobacteriaceae genomic assemblies contained no CDS features. These genomes were moved to the directory `pectobacteriaceae_prokka_input`.
 
 ### Genome annotation and protein prediction
 
-For the genomic assemblies from which no CDS features were retrieved, `prokka` was used to annotate the genomes.
+For the genomic assemblies from which no CDS features were retrieved, `prokka` [Seemann, 2014] was used to annotate the genomes.
+
+> Seemann T. (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9
+
+The bash script `predict_cds_prokka.sh` was used to automate invoking `prokka` for all genomes from NCBI GenBank that did not contain any GenBank CDS annotations.
+
+`predict_cds_prokka.sh` takes three positional arguments:
+1. Path to a directory containing all FASTA files to be parsed by `prokka`
+2. Path to directory to write out all `prokka` predictions/outputs to
+3. Path to directory to write out all FASTA file of `prokka` predicted proteins to
 
 ```bash
-scripts/predict_CDS.sh pectobacteriaceae_genomes pectobacteriaceae_predicted_cds | tee prokka_cds_prediction.log
+scripts/annotate/predict_cds_prokka.sh \
+pectobacteriaceae_prokka_input \
+pectobacteriaceae_prokka_output \
+pectobacteriaceae_dbcan_input | tee prokka_log_file.log
 ```
+
 The predicted protein sequences were written to one FASTA file per parsed genome, and were written out the directory `pectobacteriaceae_dbcan_input`.
 
 ## CAZome annotation and CAZy family list creation
@@ -216,18 +229,26 @@ grep -o ">" pectobacteriaceae_dbcan_input/*.fasta | wc -l
 
 ## Phylogenetic Tree Construction
 
-The analysis of CAZy family association within plant pathogenic species, Dickeya and Pectobacteriaceae species were analysed.
-
-
 ### Whole genome distance-based phylogenetic tree reconstruction
 
-To create an approximate estimation of the phylogenetic tree, the average nucleotide identity between all 
+To create an approximate estimation of the phylogenetic tree, the average nucleotide identity (ANI) between all 
 download genomic fasta files (`*.fna`) was used. Note, this 'phylogenetic tree' is better described as a
 dendogram rather than a phylogenetic tree becuase it does not 
 
+The Python module `pyani` [Pritchard et al., 2016] was used to calculate the ANI between every possible pair of genomes from the genomes retrieved from NCBI.
+
+> Pritchard et al. (2016) "Genomics and taxonomy in diagnostics for food security: soft-rotting enterobacterial plant pathogens" Anal. Methods 8, 12-24
+
+To reproduce the analysis, use the following command from this directory.
 ```bash
-pyani -- average_nucleotide_identity.py -i pectobacteriaceae_genomes/ -o pyani_output/ -l pyani_log_1.log -v --nocompress --noclobber -f --skip_nucmer --gformat pdf,png,eps
+pyani -- average_nucleotide_identity.py \
+-i pectobacteriaceae_genomes/  \ # path to directory containing downloaded .fna files
+-o pectobacteriaceae_pyani_output/ \ # path to output directory
+-l pyani_log.log \ # write out log file
+-v --nocompress --noclobber -g --gformat pdf,png,eps
 ```
+
+The output from `pyani` was parsed using the R script `build_distance_tree.R`, to build a distance-based phylogenetic tree and write it out the tree in the Newick-format (as required by `coinfinder`). To use the R script `build_distance_tree.R` modify the variable `input_matix_path` to define the path to the `pyani` ANI table output, and the variable `output_path` to define the output path of the tree file.
 
 ### CAZome composition distance-based phylogenetic tree reconstruction
 

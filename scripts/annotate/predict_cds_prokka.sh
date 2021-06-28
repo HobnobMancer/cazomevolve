@@ -43,6 +43,7 @@
 #
 # $1 directory containing genomic assemblies that contain no GenBank CDS features
 # $2 output directory
+# $3 directory to move all FASTA files to
 mkdir $2
 
 # decompress files
@@ -59,3 +60,5 @@ do
         --cpus 6
 
 done
+
+mv $2/*/*.faa $3/*.faa

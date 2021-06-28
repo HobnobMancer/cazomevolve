@@ -2,10 +2,8 @@
 
 [![Funding](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)
 [![PhD licence](https://img.shields.io/badge/Licence-MIT-green)](https://github.com/HobnobMancer/PhD_Project_Scripts/blob/master/LICENSE)
-[![CircleCI](https://circleci.com/gh/HobnobMancer/pyrewton.svg?style=shield)](https://circleci.com/gh/HobnobMancer/PhD_Project_Scripts)
-[![codecov](https://codecov.io/gh/HobnobMancer/pyrewton/branch/master/graph/badge.svg)](https://codecov.io/gh/HobnobMancer/pyrewton)
-[![Python](https://img.shields.io/badge/Python-v3.7.---orange)](https://www.python.org/about/)
-[![Research](https://img.shields.io/badge/Bioinformatics-Protein%20Engineering-ff69b4)](http://www.eastscotbiodtp.ac.uk/eastbio-student-cohort-2019)
+![Python](https://img.shields.io/badge/Python-v3.9.---orange)
+![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
 
 **Cazom**e **Evolve** (`cazomevolve`) invetigates the evolution of CAZomes by searching for CAZy families that associated more than expected from their lineage. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
 

@@ -119,6 +119,8 @@ def get_tax_ids(uid_list, term, args):
 
     Return nothing.
     """
+    logger = logging.getLogger(__name__)
+
     # batch query UIDs
     with entrez_retry(Entrez.epost, db="Assembly", id=(",".join(uid_list))) as record_handle:
         epost_result = Entrez.read(record_handle, validate=False)
@@ -137,24 +139,55 @@ def get_tax_ids(uid_list, term, args):
     ) as batch_handle:
         batch_result = Entrez.read(batch_handle, validate=False)
     
-    accession_urls = {}  # add Tax Ids to set first to prevent writing out duplicate Tax IDs
-
+    accession_data = {}  # {Assembly accession : Assembly Name}
 
     for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
-        # do not download contigs
-        if (
-            batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'Contig'
-        ) or (
-            batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'contig'
-        ):
-            continue
-        accession_urls[batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyAccession']] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
-    
-    for accession in tqdm(accession_urls, desc=f"Downloading genomes for {term}"):
+        if args.contig_ignore:
+            # do not download contigs
+            if (
+                batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'Contig'
+            ) or (
+                batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'contig'
+            ):
+                continue
+
+        accession_number_v = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyAccession']  # includes version number
+        accession_number = accession_number_v[: (accession_number_v.find("."))]  # accession number excluding version number
+        search_results = [acc for acc in list(accession_data.keys()) if acc.startswith(accession_number)]
+
+        if len(search_results) == 0:  # no other versions of the assembly found
+            accession_data[accession_number_v] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
+        
+        elif len(search_results) == 1:
+            accession_v = accession_number_v[(accession_number_v.find(".")) + 1 : ]
+            existing_accession = search_results[0]
+            existing_v = existing_accession[(existing_accession.find(".")) + 1 : ]
+
+            if accession_v > existing_v:
+                # the new accession number is a new version that the assembly already in the dict
+                # remove the old assembly
+                accession_data = accession_data.pop(existing_v)
+                # add the newer version
+                accession_data[accession_number_v] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
+
+            # else: existing version is newer so do no overwrite
+
+        else:  # another version of the assembly found
+            accession_v = accession_number_v[(accession_number_v.find(".")) + 1 : ]
+            logger.warning(f"Multiple versions of {accession_v} found. Identifying the most recent")
+            search_results.sort()
+            existing_accession = existing_accession = search_results[-1]
+            existing_v = existing_accession[(existing_accession.find(".")) + 1 : ]
+
+            if accession_v > existing_v:
+                accession_data = accession_data.pop(existing_v)
+                accession_data[accession_number_v] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
+
+    for accession in tqdm(accession_data, desc=f"Downloading genomes for {term}"):
         for file_type in ((args.file_types).split(",")):
             download_file(
                 accession_number=accession,
-                assembly_name=accession_urls[accession],
+                assembly_name=accession_data[accession],
                 file_type=file_type,
                 args=args,
             )

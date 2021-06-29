@@ -81,6 +81,14 @@ def build_parser(argv: Optional[List] = None):
 
     # Add optional arguments
     parser.add_argument(
+        "--contig_ignore",
+        dest="contig_ignore",
+        action="store_true",
+        default=False,
+        help="Ignore contigs. Download all assemblies except contigs",
+    )
+
+    parser.add_argument(
         "--gbk",
         dest="gbk",
         action="store_true",

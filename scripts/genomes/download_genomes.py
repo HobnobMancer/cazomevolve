@@ -38,8 +38,6 @@
 # SOFTWARE.
 """Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
-import urllib.request
-import sys
 import logging
 import re
 import time

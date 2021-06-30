@@ -140,20 +140,21 @@ The retrieved Pectobacteriaceae GenBank genomes were stored in the directory `pe
 
 The Python script `extract_gbk_proteins.py` was used to retrieve protein sequences from the genomic assemblies, and write them to FASTA files. One FASTA files was created per genomic assembly.
 
-`extract_gbk_proteins.py` takes 2 positional arguments:
+`extract_gbk_proteins.py` takes 3 positional arguments:
 1. Path to the directory containing downloaded genomes
 2. Path to the output directory to write out protein sequences (`<genera>_proteins`)
+3. Path to a directory to copy genomic assemblies to if they contain no CDS features, and thus are to be parsed by `prokka` to predict CDS and proteins
 
-For retrieving the protein sequences of Pectobacteriaceae species, the following command was used:  
+For retrieving the protein sequences of Pectobacteriaceae species and separating the genomic assemblies with no CDS features to be parsed by `prokka`, the following command was used:  
 ```bash
-python3 scripts/genomes/extract_gbk_proteins.py pectobacteriaceae_genomes/ pectobacteriaceae_proteins
+python3 scripts/genomes/extract_gbk_proteins.py pectobacteriaceae_genomes/ pectobacteriaceae_proteins/ pectobacteriaceae_prokka_input/
 ```
 
 The output was writen to `pectobacteriaceae_proteins`.
 
 Each output fasta file was named `<species>_<genbank_accession>.fasta`, allowing for multiple genomic assemblies for each species. Otherwise, all proteins from all genomics assemblies for a specie would be merged into a single fasta file.
 
-48 of the pectobacteriaceae genomic assemblies contained no CDS features. These genomes were moved to the directory `pectobacteriaceae_prokka_input`.
+48 of the pectobacteriaceae genomic assemblies contained no CDS features. These genomes were copied to the directory `pectobacteriaceae_prokka_input`.
 
 ### Genome annotation and protein prediction
 

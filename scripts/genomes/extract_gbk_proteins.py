@@ -40,12 +40,14 @@
 
 
 import logging
+import shutil
 import sys
 
 from pathlib import Path
 from typing import List, Optional
 
 from Bio import SeqIO
+from tqdm import tqdm
 
 from scripts.utilities import config_logger, build_logger
 from scripts.utilities.file_io import make_output_directory
@@ -73,9 +75,19 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # get paths to genomic assemblies
     genomic_assembly_paths = get_genomic_assembly_paths(args)
 
+    empty_asssemblies = []
+
     # create fasta files
     for assembly_path in genomic_assembly_paths:
-        compile_fasta(assembly_path, args)
+        assem_path = compile_fasta(assembly_path, args)
+        if assem_path is not None:
+            empty_asssemblies.append(assem_path)
+    
+    # move assemblies with no CDS features to a dir to be parsed by prokka and dbCAN
+    for assembly_path in tqdm(empty_asssemblies):
+        filename = assembly_path.name
+        target_path = args.dbcan_dir / filename
+        shutil.copy(assembly_path, target_path)
 
 
 def get_genomic_assembly_paths(args):
@@ -175,6 +187,7 @@ def compile_fasta(assembly_path, args):
 
     if protein_count == 0:
         no_proteins_logger.warning(f"{genomic_accession}")
+        return assembly_path
 
     return
 

@@ -51,7 +51,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 
 setuptools.setup(
-    name="cvf_investigator",
+    name="cazomevolve",
     version="0.0.1",
     # Metadata
     author="Emma E. M. Hobbs",
@@ -60,7 +60,7 @@ setuptools.setup(
         [
             (
                 "Python scripts used for the parsing of data during the evaluation of CAZy"
-                "family association and dissociation"
+                "family co-evolution"
             )
         ]
     ),
@@ -71,11 +71,16 @@ setuptools.setup(
     platforms="Posix, MacOS X",
     entry_points={
         "console_scripts": [
-            "extract_protein_genomes.py = scripts.extract_proteins_genomes:main",
+            "download_genomes.py = scripts.genomes.download_genomes:main",
+            "extract_gbk_proteins.py = scripts.genomes.extract_gbk_proteins:main",
+            "cazy_frequency_matrix.py = scripts.trees.matrixes.cazy_frequency_matrix.py",
+            "get_cazy_cazymes.py = scripts.cazymes.get_cazy_cazymes.py",
+            "get_dbcan_cazymes.py = scripts.cazymes.get_dbcan_cazymes.py",
         ]
     },
     install_requires=[
         "biopython",
+        "pandas",
         "tqdm",
     ],
     packages=setuptools.find_packages(),

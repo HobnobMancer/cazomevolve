@@ -74,7 +74,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         make_output_directory(args.output_dir, args.force, args.nodelete)
 
     if str(args.tab_anno_list.parent) != ".":
-        make_output_directory(args.tab_anno_list, args.force, args.nodelete)
+        make_output_directory(args.tab_anno_list.parent, args.force, args.nodelete)
 
     # connect to the local CAZyme db
     connection = get_db_connection(args.database, args.sql_echo, False)

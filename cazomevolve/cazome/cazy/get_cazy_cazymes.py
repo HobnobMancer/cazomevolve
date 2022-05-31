@@ -153,7 +153,7 @@ def get_cazy_annotations(fasta_path, args, connection):
 
     in_cazy, not_in_cazy = set(), []
 
-    with open(args.tab_annno_list, "a") as fh:
+    with open(args.tab_anno_list, "a") as fh:
         for record in SeqIO.parse(fasta_path, "fasta"):
             try:
                 gbk_table_dict[record.id]

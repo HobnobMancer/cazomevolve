@@ -41,6 +41,7 @@
 
 
 import logging
+import re
 import sys
 
 from typing import List, Optional
@@ -81,15 +82,28 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     logger.info(f"Found {genome_paths} genomic assemblies in '{args.genome_dir}'")
 
-    txid = "strept"
+    txid = ""
     for assembly_path in tqdm(genome_paths, desc="Extracting protein seqs"):
-        assembly_accession = ""
+        try:
+            genomic_accession = re.findall(r"GCF_\d+\.\d+_", str(assembly_path))[0]
+            genomic_accession = genomic_accession[:-1]
+        except IndexError:
+            try:
+                genomic_accession = re.findall(r"GCA_\d+\.\d+_", str(assembly_path))[0]
+                genomic_accession = genomic_accession[:-1]
+            except IndexError:
+                logger.warning(
+                    f"Could not retrieve genomic accession from\n{assembly_path}\n"
+                    "Skipping assembly"
+                )
+                continue
+        
         _path = extract_protein_seqs(
             assembly_path,
-            assembly_accession,
+            genomic_accession,
             txid,
             args.protein_dir,
-            file_stem=args.prefix,
+            filestem=args.prefix,
         )
 
 

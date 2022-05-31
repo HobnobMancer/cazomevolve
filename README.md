@@ -61,6 +61,60 @@ For all required Python libraries please read 'requirements.txt'.
 
 <p>&nbsp;</p>
 
+
+
+## Method
+
+### Download genomes
+
+#### Already have a list of genomic version accessions
+
+If you already have a list of genomic version accessions in a plain text file, using the Python package `ncbi-genome-download` to download the genomic assemblies 
+in `.gbff` (used to annotate the CAZome) and `.fna` (used to reconstruct the phylogenetic tree) formats - do **not** use the `--flat-format` option, leave the genomic assemblies compressed.
+
+#### Retrieve all genomic assemblies associated with a specific term
+
+To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the Python script `cazomevolve/genomes/download_genomes.py`. The script takes 4 required arguments:
+
+1. User email address (required by NCBI)
+2. The term of interest
+3. The file formats to download the genomic assemblies in. Each file format is defined by its file extension. Separate file formats with a single comma, for example `gbff,fna`
+4. Path to an output directory (this will be build by `cazomevolve`).
+
+By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
+
+### Extract protein seqs
+
+Use the Python script `cazomevolve/genomes/extract_prot_seqs.py` to extract the protein sequences from annotations in the genomic assemblies.
+
+One multisequence FASTA file is produced per genomic assembly, listing all protein sequences extracted from the respective genomic assembly.
+
+Two position arguments are required:
+1. Path to the directory containing the compressed genomic assemblies
+2. Path to an output directory to write out all multisequence FASTA files
+
+## Reconstruct the phylogenetic tree
+
+### A baysian based approach
+
+### A distance based approach
+
+## Annotate the CAZomes
+
+### Step 1: Using CAZy -- retrieve the canonical classifications
+
+### Step 2: Using dbCAN --- retrieve predicted classifications
+
+## Build the input for `coinfinder`
+
+## Find networks of co-evolving CAZy families
+
+## Build a presence/abensce and CAZy family number matrices
+
+## Build dendograms based upon CAZome compositions, and compare against the phylogenetic tree
+
+## Map genome and CAZome distances onto a plot
+
 ## Directories
 
 Below is a directory plan of this repository, followed by a brief overview of each directories role , to facilitate navigation through the repository.

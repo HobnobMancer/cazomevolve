@@ -82,8 +82,6 @@ def build_parser(argv: Optional[List] = None):
         help="Path to write out tab deliminated list",
     )
 
-    # Add optional arguments
-    # Add option to force file over writting
     parser.add_argument(
         "-f",
         "--force",
@@ -92,7 +90,7 @@ def build_parser(argv: Optional[List] = None):
         default=False,
         help="Force file over writting",
     )
-    # Add option to specific directory for log to be written out to
+    
     parser.add_argument(
         "-l",
         "--log",
@@ -101,8 +99,7 @@ def build_parser(argv: Optional[List] = None):
         default=None,
         help="Defines log file name and/or path",
     )
-    # Add option to prevent over writing of existing files
-    # and cause addition of files to output directory
+    
     parser.add_argument(
         "-n",
         "--nodelete",
@@ -111,7 +108,15 @@ def build_parser(argv: Optional[List] = None):
         default=False,
         help="enable/disable deletion of exisiting files",
     )
-    # Add option to specify verbose logging
+
+    parser.add_argument(
+        "--sql_echo",
+        dest="sql_echo",
+        action="store_true",
+        default=False,
+        help="Set verbose SQLite3 logging",
+    )    
+
     parser.add_argument(
         "-v",
         "--verbose",

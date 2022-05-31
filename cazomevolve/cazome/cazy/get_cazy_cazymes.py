@@ -54,7 +54,7 @@ from cazy_webscraper.sql.sql_interface.get_data.get_table_dicts import get_gbk_t
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
-
+from cazomevolve.utilities.parsers.get_cazy_parser import build_parser
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):

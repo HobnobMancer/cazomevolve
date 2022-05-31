@@ -63,7 +63,7 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "cazy",
+        "database",
         type=Path,
         default=None,
         help="Path CAZy JSON file, keyed by protein accessions, valued by list of families",

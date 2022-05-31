@@ -5,7 +5,12 @@
 ![Python](https://img.shields.io/badge/Python-v3.9.---orange)
 ![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
 
-**Cazom**e **Evolve** (`cazomevolve`) invetigates the evolution of CAZomes by searching for CAZy families that associated more than expected from their lineage. This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
+**Cazome** **Evolve** (`cazomevolve`) invetigates the evolution of CAZomes by:
+* searching for CAZy families that associated more than expected from their lineage
+* projecting the CAZome composition onto a plot
+* building a dendogram using distances calculated from the CAZome composition 
+
+This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
 
 ## Contents
 
@@ -19,23 +24,23 @@
 
 Carbohydrate Active enZymes are a subset of proteins that generate, modify and/or degrade carbohydrates. CAZy (www.cazy.org) is the most comprehensive CAZyme database, grouping proteins by sequence similarity into CAZy families. **C**azy **F**amily co**V**ariance **investigator** (`cfv_investigator`) investigates the covariance of CAZy family annotations within proteomes across all species annotated by CAZy, and evaluates taxonomic specific covaraince of CAZy families.
 
-`cfv_investigator` is a fully packaged bioinformatic (still in development), automating all steps of the analysis:
-1. Retrieval of genomic accessions from which proteins catalogued within CAZy are derived from, and the associated taxonomic data of the source organism
+`cazomevolve` is a bioinformatic package (still in development) for:
+1. Retrieving of genomic accessions from which proteins catalogued within CAZy are derived from, and the associated taxonomic data of the source organism
 2. Tracking frequency of CAZy family annotations for all genomic assemblies identified in step 1
 3. Calculation of covariance of CAZy family annotations across all genomic assemblies identified in step 1, and for taxonomic specific groups (at the kingdom, genus and species taxonomic level)
+4. Generating dataframes of the number of CAZymes per CAZy family for each genomic assembly
+5. Generating a presence/absence matrix for each CAZy family in each genomic assembly
 
 <p>&nbsp;</p>
 
 ## Installation
 
-The easiest method is to use pip to install `pyrewton` and all requirements.
-
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.8`   
+`conda create -n <venv_name> python=3.9`   
 `conda activate <venv_name>`
 
 2. Clone the repository
-`git clone https://github.com/HobnobMancer/cfv_investigator.git`
+`git clone https://github.com/HobnobMancer/cazomevolve.git`
 
 3. Install pyrewton
 `pip3 install -e <path to directory containing setup.py file>`   
@@ -49,15 +54,10 @@ POISx or Mac OS, or linux emulator
 Python version 3.8+   
 Miniconda3 or Anaconda managed microenvironment, incorporated code checkers are included in list form in 'requirements.txt'.   
 Miniconda3 environment file is also available in the GitHub repository: 'environment.yml'.   
-For all required Python libraries please read 'requirements.txt'.   
+For all required Python libraries please read 'requirements.txt'. 
 
-<p>&nbsp;</p>
-
-## Current Developments
-
-This section of the README lists the areas that are currently being worked upon and expanded:
-- Retrieval of genomic accessions from which proteins catalogued within CAZy are derived from, and the associated taxonomic data of the source organism
-    - Working on batch quering NCBI to minimise the number of calls made to NCBI.Entrez
+* [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/)
+* [`saintBioutils`](https://github.com/HobnobMancer/saintBioutils)
 
 <p>&nbsp;</p>
 
@@ -81,7 +81,7 @@ Directory containing all Jupyter notebooks, and html copies used for easier in-b
 
 Directory containing all `pytest` files for testing `pyrewton`, including subdirectories for test inputs and targets. Each module/submodule has its own specific test input and target subdirectory.
 
-### **cfv_investigator**
+### **cazomevolve**
 
 Directory containing all `pyrewton` program modules (including all submodules and Python scripts).
 <p>&nbsp;</p>

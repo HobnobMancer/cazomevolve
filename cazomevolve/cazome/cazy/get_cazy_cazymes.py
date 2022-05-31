@@ -51,6 +51,7 @@ from typing import List, Optional
 from Bio import SeqIO
 from cazy_webscraper.sql.sql_orm import get_db_connection, Session, Genbank, CazyFamily
 from cazy_webscraper.sql.sql_interface.get_data.get_table_dicts import get_gbk_table_dict
+from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
@@ -68,6 +69,12 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)
+
+    if str(args.output_dir.parent) != ".":
+        make_output_directory(args.output_dir, args.force, args.nodelete)
+
+    if str(args.tab_anno_list.parent) != ".":
+        make_output_directory(args.tab_anno_list, args.force, args.nodelete)
 
     # connect to the local CAZyme db
     connection = get_db_connection(args.database, args.sql_echo, False)

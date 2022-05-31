@@ -109,6 +109,22 @@ Modules that build the data set required for calculating the covariance, calcula
 
 ### Download genomes
 
+#### Already have a list of genomic version accessions
+
+If you already have a list of genomic version accessions in a plain text file, using the Python package `ncbi-genome-download` to download the genomic assemblies 
+in `.gbff` (used to annotate the CAZome) and `.fna` (used to reconstruct the phylogenetic tree) formats - do **not** use the `--flat-format` option, leave the genomic assemblies compressed.
+
+#### Retrieve all genomic assemblies associated with a specific term
+
+To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the Python script `cazomevolve/genomes/download_genomes.py`. The script takes 4 required arguments:
+
+1. User email address (required by NCBI)
+2. The term of interest
+3. The file formats to download the genomic assemblies in. Each file format is defined by its file extension. Separate file formats with a single comma, for example `gbff,fna`
+4. Path to an output directory (this will be build by `cazomevolve`).
+
+By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
+
 ### Extract protein seqs
 
 Use the Python script `cazomevolve/genomes/extract_prot_seqs.py` to extract the protein sequences from annotations in the genomic assemblies.

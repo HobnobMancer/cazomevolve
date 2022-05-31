@@ -101,7 +101,9 @@ Two position arguments are required:
 
 ## Annotate the CAZomes
 
-### Step 1: Using CAZy -- retrieve the canonical classifications
+### Option 1: Using `cazomevolve` and `cazy_webscraper`
+
+#### Step 1: Using CAZy -- retrieve the canonical classifications
 
 Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write the annotations to a tab delimited list (<fam> <genomic accession>).
 
@@ -111,7 +113,19 @@ The required args are:
 3. Path to an output directory to write out the protein sequences of proteins not listed in the local CAZyme database
 4. Path to write out the tab delimited list of CAZy family annotations
 
-### Step 2: Using dbCAN --- retrieve predicted classifications
+#### Step 2: Using dbCAN --- retrieve predicted classifications
+
+### Option 2: Using `pyrewton` and `cazy_webscraper`
+
+You can use the Python package [`pyrewton`](https://hobnobmancer.github.io/pyrewton/) to annotate the CAZome for a set of genomic assemblies, using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) and `dbCAN` [Zhange et al., 2018]. `pyrewton` compiles the canconical and predicted CAZyme classifications into a local SQLite3 database.
+
+> Han Zhang, Tanner Yohe, Le Huang, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin, dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research, Volume 46, Issue W1, 2 July 2018, Pages W95–W101, https://doi.org/10.1093/nar/gky418
+
+To retrieve the CAZy family annotations associated with each genomic assembly, execute the following sql command against the local CAZome database compiled using `pyrewton`:
+```sql
+
+```
+Export the resulting table as a `tsv` file or tab delimited list.
 
 ## Build the input for `coinfinder`
 

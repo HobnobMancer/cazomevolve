@@ -70,7 +70,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     logger = logging.getLogger(__name__)
 
     # connect to the local CAZyme db
-    connection = get_db_connection(args.database, args, False)
+    connection = get_db_connection(args.database, args.sql_echo, False)
 
     # retrieve path to protein FASTA files
     fasta_files_paths, number_of_files = get_fasta_paths(args)
@@ -158,7 +158,7 @@ def get_cazy_annotations(fasta_path, args, connection):
                 not_in_cazy.append(record)
 
     if len(not_in_cazy) != 0:
-        logger.info(f"Writing out protein seqs not in CAZy to {output_path}")
+        logger.info(f"Writing out protein seqs for {len(not_in_cazy)} proteins not in CAZy to {output_path}")
         SeqIO.write(not_in_cazy, output_path, "fasta")
 
     if len(in_cazy) != 0:

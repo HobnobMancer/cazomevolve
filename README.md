@@ -135,3 +135,24 @@ Two position arguments are required:
 1. Path to the directory containing the compressed genomic assemblies
 2. Path to an output directory to write out all multisequence FASTA files
 
+## Reconstruct the phylogenetic tree
+
+### A baysian based approach
+
+### A distance based approach
+
+## Annotate the CAZomes
+
+### Step 1: Using CAZy -- retrieve the canonical classifications
+
+### Step 2: Using dbCAN --- retrieve predicted classifications
+
+## Build the input for `coinfinder`
+
+## Find networks of co-evolving CAZy families
+
+## Build a presence/abensce and CAZy family number matrices
+
+## Build dendograms based upon CAZome compositions, and compare against the phylogenetic tree
+
+## Map genome and CAZome distances onto a plot

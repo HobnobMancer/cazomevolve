@@ -76,7 +76,7 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "tab_annno_list",
+        "tab_anno_list",
         type=Path,
         default=None,
         help="Path to write out tab deliminated list",

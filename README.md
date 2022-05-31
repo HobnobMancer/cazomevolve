@@ -103,3 +103,19 @@ Modules that are involved in retrieving handling data from NCBI. This includes r
 ### **covariance**
 
 Modules that build the data set required for calculating the covariance, calculate the covariance of CAZy family annotations for all genomic accessions retrieved and taxonomic specific groups.
+
+
+## Method
+
+### Download genomes
+
+### Extract protein seqs
+
+Use the Python script `cazomevolve/genomes/extract_prot_seqs.py` to extract the protein sequences from annotations in the genomic assemblies.
+
+One multisequence FASTA file is produced per genomic assembly, listing all protein sequences extracted from the respective genomic assembly.
+
+Two position arguments are required:
+1. Path to the directory containing the compressed genomic assemblies
+2. Path to an output directory to write out all multisequence FASTA files
+

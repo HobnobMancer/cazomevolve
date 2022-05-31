@@ -61,48 +61,6 @@ For all required Python libraries please read 'requirements.txt'.
 
 <p>&nbsp;</p>
 
-## Directories
-
-Below is a directory plan of this repository, followed by a brief overview of each directories role , to facilitate navigation through the repository.
-
-### **assets**
-
-Directory containing all files needed for the GitHub page, created for easy access to accompanying Jupyter notebooks.
-
-### **docs**
-
-Directory containing files to build documentation hosted at ReadTheDocs.
-
-### **notebooks**
-
-Directory containing all Jupyter notebooks, and html copies used for easier in-browser viewing via the GitHub pages. These notebooks include the data outputs from using `cfv_investigator`, how to use the package and how the package works.
-
-### **tests**
-
-Directory containing all `pytest` files for testing `pyrewton`, including subdirectories for test inputs and targets. Each module/submodule has its own specific test input and target subdirectory.
-
-### **cazomevolve**
-
-Directory containing all `pyrewton` program modules (including all submodules and Python scripts).
-<p>&nbsp;</p>
-
-## Modules
-
-_Please find more detailed documentation at for operation and troubleshooting at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)_
-
-This is an overview of the functionalities of each module within `pyrewton`, as well as basics of operation. For more detailed documentation on the operation of each module and indiviudal Python scripts please see the documentation at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)
-
-### **utilities**
-
-Contains all functions that are called from other Python scripts for building command-line parsers and loggers. Includes the submodule **file_io**, which contains functions that are called from other Python scripts for handling directories and files in `pyrewton`, including retrieving program inputs and creating output directories.
-
-### **ncbi**
-
-Modules that are involved in retrieving handling data from NCBI. This includes retrieval of genomic accession numbers and source organism taxonomic data.
-
-### **covariance**
-
-Modules that build the data set required for calculating the covariance, calculate the covariance of CAZy family annotations for all genomic accessions retrieved and taxonomic specific groups.
 
 
 ## Method
@@ -156,3 +114,46 @@ Two position arguments are required:
 ## Build dendograms based upon CAZome compositions, and compare against the phylogenetic tree
 
 ## Map genome and CAZome distances onto a plot
+
+## Directories
+
+Below is a directory plan of this repository, followed by a brief overview of each directories role , to facilitate navigation through the repository.
+
+### **assets**
+
+Directory containing all files needed for the GitHub page, created for easy access to accompanying Jupyter notebooks.
+
+### **docs**
+
+Directory containing files to build documentation hosted at ReadTheDocs.
+
+### **notebooks**
+
+Directory containing all Jupyter notebooks, and html copies used for easier in-browser viewing via the GitHub pages. These notebooks include the data outputs from using `cfv_investigator`, how to use the package and how the package works.
+
+### **tests**
+
+Directory containing all `pytest` files for testing `pyrewton`, including subdirectories for test inputs and targets. Each module/submodule has its own specific test input and target subdirectory.
+
+### **cazomevolve**
+
+Directory containing all `pyrewton` program modules (including all submodules and Python scripts).
+<p>&nbsp;</p>
+
+## Modules
+
+_Please find more detailed documentation at for operation and troubleshooting at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)_
+
+This is an overview of the functionalities of each module within `pyrewton`, as well as basics of operation. For more detailed documentation on the operation of each module and indiviudal Python scripts please see the documentation at [Read the Docs](https://phd-project-scripts.readthedocs.io/en/latest/)
+
+### **utilities**
+
+Contains all functions that are called from other Python scripts for building command-line parsers and loggers. Includes the submodule **file_io**, which contains functions that are called from other Python scripts for handling directories and files in `pyrewton`, including retrieving program inputs and creating output directories.
+
+### **ncbi**
+
+Modules that are involved in retrieving handling data from NCBI. This includes retrieval of genomic accession numbers and source organism taxonomic data.
+
+### **covariance**
+
+Modules that build the data set required for calculating the covariance, calculate the covariance of CAZy family annotations for all genomic accessions retrieved and taxonomic specific groups.

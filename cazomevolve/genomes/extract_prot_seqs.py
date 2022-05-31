@@ -46,15 +46,12 @@ import sys
 from typing import List, Optional
 
 from saintBioutils.genbank.parse_genomes import extract_protein_seqs
+from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilites.file_io.get_paths import get_file_paths
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
 from cazomevolve.utilities.parsers.extract_prot_parser import build_parser
-
-
-GENOME_DIR = "genomes/genomic_assemblies"
-PROTEINS_DIR = "proteins"
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -68,6 +65,9 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if logger is None:
         logger = logging.getLogger(__name__)
         config_logger(args, logger_name=__name__)
+
+    if str(args.protein_dir.parent) != ".":
+        make_output_directory(args.protein_dir, args.force, args.nodelete)
 
     # get paths to genomic assemblies
     genome_paths = get_file_paths(args.genome_dir, suffixes="gz")
@@ -89,7 +89,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
             assembly_accession,
             txid,
             args.protein_dir,
-            file_stem=args.suffix,
+            file_stem=args.prefix,
         )
 
 

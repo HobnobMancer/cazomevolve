@@ -118,6 +118,20 @@ def get_family_annotations(output_dir, args):
         # get the fams at least two tools agreed upon
         dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
 
+        try:
+            fam_annotations[protein_accession]
+            for fam in dbcan_fams:
+                fam_annotations[protein_accession].add(fam)
+        except KeyError:
+            fam_annotations[protein_accession] = dbcan_fams
+
+    with open(args.tab_anno_list, "a") as fh:
+        for protein_accession in tqdm(fam_annotations, desc=f"Adding fam annotations to tab delim list"):
+            protein_fams = fam_annotations[protein_accession]
+            for fam in protein_fams:
+                fh.write(f"{fam}\t{genomic_accession}\n")
+
+    return
 
 
 def get_tool_fams(tool_data):

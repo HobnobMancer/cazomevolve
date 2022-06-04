@@ -48,7 +48,7 @@ from typing import List, Optional
 
 from saintBioutils.genbank.parse_genomes import extract_protein_seqs
 from saintBioutils.utilities.file_io import make_output_directory
-from saintBioutils.utilites.file_io.get_paths import get_file_paths
+from saintBioutils.utilities.file_io.get_paths import get_file_paths
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 

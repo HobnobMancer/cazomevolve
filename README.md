@@ -101,9 +101,45 @@ Two position arguments are required:
 
 ## Annotate the CAZomes
 
-### Step 1: Using CAZy -- retrieve the canonical classifications
+### Option 1: Using `cazomevolve` and `cazy_webscraper`
 
-### Step 2: Using dbCAN --- retrieve predicted classifications
+#### Step 1: Using CAZy -- retrieve the canonical classifications
+
+Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write the annotations to a tab delimited list (<fam> <genomic accession>).
+
+The required args are:
+1. Path to the directory containing the FASTA protein sequences files
+2. Path to the local CAZyme database compiled using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/)
+3. Path to an output directory to write out the protein sequences of proteins not listed in the local CAZyme database
+4. Path to write out the tab delimited list of CAZy family annotations
+
+#### Step 2: Using dbCAN --- retrieve predicted classifications
+
+Use the Python script `cazomevolve/cazome/invoke_dbcan.py` to use `dbCAN` to predicte the CAZymes in each FASTA file of protein sequences.
+
+2 positional arguments are required:
+1. Input dir: path to directory containing all FASTA files of protein sequences
+2. Output dir: path to write out all dbCAN output files. One subdir is created in the output dir for each FASTA file parsed by `dbCAN`
+
+By default `dbCAN` version >= 3.0.4 is used (which uses `HMMER`, `DIAMOND` and `eCAMI`). To use `dbCAN` version 2.0.11 (which uses `HMMER`, `DIAMOND` and `Hotpep`) add the `-V2` or `--version_2` flag.
+
+To extract the CAZy family predictions from `dbCAN` version 2 and/or 3, use the Python script `cazomevolve/cazome/get_dbcan_cazymes.py`, which will write out the CAZy family annotations to a tab delimited list. 
+
+Two positional arguments are required:
+1. dbCAN dir: path to output dir from `invoke_dbcan<num>.py`
+2. Path to write out tab delimited list - this may already exist and contain the CAZy family annotations from the local CAZyme database. The script will add the predicted CAZy family annotaitons from the `dbCAN` to the existing file. If a file does not already exist, a new file will be created.
+
+### Option 2: Using `pyrewton` and `cazy_webscraper`
+
+You can use the Python package [`pyrewton`](https://hobnobmancer.github.io/pyrewton/) to annotate the CAZome for a set of genomic assemblies, using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) and `dbCAN` [Zhange et al., 2018]. `pyrewton` compiles the canconical and predicted CAZyme classifications into a local SQLite3 database.
+
+> Han Zhang, Tanner Yohe, Le Huang, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin, dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research, Volume 46, Issue W1, 2 July 2018, Pages W95–W101, https://doi.org/10.1093/nar/gky418
+
+To retrieve the CAZy family annotations associated with each genomic assembly, execute the following sql command against the local CAZome database compiled using `pyrewton`:
+```sql
+
+```
+Export the resulting table as a `tsv` file or tab delimited list.
 
 ## Build the input for `coinfinder`
 

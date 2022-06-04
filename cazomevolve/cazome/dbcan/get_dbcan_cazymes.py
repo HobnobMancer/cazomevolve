@@ -173,3 +173,7 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
             dbcan_consensus.add(fam)
     
     return dbcan_consensus
+
+
+if __name__ == "__main__":
+    main()

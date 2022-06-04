@@ -115,6 +115,20 @@ The required args are:
 
 #### Step 2: Using dbCAN --- retrieve predicted classifications
 
+Use the Python script `cazomevolve/cazome/invoke_dbcan2.py` to use `dbCAN` version 2.0.11 (which uses `HMMER`, `DIAMOND` and `Hotpep`) to predicte the CAZymes in each FASTA file of protein sequences
+**OR**
+Use the Python script `cazomevolve/cazome/invoke_dbcan2.py` to use `dbCAN` version >=3.0.4 (which uses `HMMER`, `DIAMOND` and `eCAMI`) to predicte the CAZymes in each FASTA file of protein sequences
+
+Both scripts require 2 positional arguments:
+1. Input dir: path to directory containing all FASTA files of protein sequences
+2. Output dir: path to write out all dbCAN output files. One subdir is created in the output dir for each FASTA file parsed by `dbCAN`
+
+To extract the CAZy family predictions from `dbCAN` version 2 and/or 3, use the Python script `cazomevolve/cazome/get_dbcan_cazymes.py`, which will write out the CAZy family annotations to a tab delimited list. 
+
+Two positional arguments are required:
+1. dbCAN dir: path to output dir from `invoke_dbcan<num>.py`
+2. Path to write out tab delimited list - this may already exist and contain the CAZy family annotations from the local CAZyme database. The script will add the predicted CAZy family annotaitons from the `dbCAN` to the existing file. If a file does not already exist, a new file will be created.
+
 ### Option 2: Using `pyrewton` and `cazy_webscraper`
 
 You can use the Python package [`pyrewton`](https://hobnobmancer.github.io/pyrewton/) to annotate the CAZome for a set of genomic assemblies, using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) and `dbCAN` [Zhange et al., 2018]. `pyrewton` compiles the canconical and predicted CAZyme classifications into a local SQLite3 database.

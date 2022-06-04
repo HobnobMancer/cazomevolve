@@ -72,6 +72,9 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # get path to output directories from dbCAN
     output_dirs = get_dir_paths(args.dbcan_dir)
 
+    for output_dir in tqdm(output_dirs, desc="Parsing dbCAN output dirs"):
+        get_family_annotations(output_dir, args)
+
 
 def get_family_annotations(output_dir, args):
     """Extract CAZy family annotations from the dbCAN output

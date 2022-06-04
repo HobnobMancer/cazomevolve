@@ -71,6 +71,16 @@ def build_parser():
 
     # Add option to force file over writting
     parser.add_argument(
+        "-V2"
+        "--version_2",
+        dest="version_2",
+        action="store_true",
+        default=False,
+        help="Use dbCAN version 2 NOT 3",
+    )
+
+    # Add option to force file over writting
+    parser.add_argument(
         "-f",
         "--force",
         dest="force",

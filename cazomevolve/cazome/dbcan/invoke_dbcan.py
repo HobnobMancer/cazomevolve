@@ -81,25 +81,37 @@ def main():
         invoke_dbcan(fasta_path, output_dir)
 
 
-def invoke_dbcan(input_path, out_dir):
+def invoke_dbcan(input_path, out_dir, args):
     """Invoke the prediction tool (run-)dbCAN.
 
     :param input_path: path to input FASTA file
     :param out_dir: path to output directory for input FASTA file query
+    :param args: cmd-line args parser
 
     Return nothing
     """
     # make the output directory
     make_output_directory(out_dir, True, False)
 
-    # create list of args to invoke run_dbCAN
-    dbcan_args = [
-        "run_dbcan",
-        str(input_path),
-        "protein",
-        "--out_dir",
-        str(out_dir),
-    ]
+    if args.version_2:
+        # create list of args to invoke run_dbCAN
+        dbcan_args = [
+            "run_dbcan.py",
+            str(input_path),
+            "protein",
+            "--out_dir",
+            str(out_dir),
+        ]
+
+    else:
+        # create list of args to invoke run_dbCAN
+        dbcan_args = [
+            "run_dbcan",
+            str(input_path),
+            "protein",
+            "--out_dir",
+            str(out_dir),
+        ]
 
     with open(f"{out_dir}/dbcan.log", "w+") as fh:
         process = subprocess.run(dbcan_args, stdout=fh, text=True)

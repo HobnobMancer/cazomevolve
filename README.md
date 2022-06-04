@@ -141,9 +141,15 @@ To retrieve the CAZy family annotations associated with each genomic assembly, e
 ```
 Export the resulting table as a `tsv` file or tab delimited list.
 
-## Build the input for `coinfinder`
-
 ## Find networks of co-evolving CAZy families
+    
+Use the Python package `coinfinder` ([Whelan et al., 2020](https://www.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000338)) to identify networks of co-evolving CAZy families.
+
+> Fiona J. Whelan, Martin Rusilowicz, & James O. McInerney. "Coinfinder: detecting significant associations and dissociations in pangenomes." doi: https://doi.org/10.1099/mgen.0.000338
+    
+See the `coinfinder` [documentation](https://github.com/fwhelan/coinfinder) for details.
+    
+To customise the resulting phylogenetic tree and heatmap, edit the R script `network.R` in `coinfinder`.
 
 ## Build a presence/abensce and CAZy family number matrices
 

@@ -87,17 +87,7 @@ def get_family_annotations(output_dir, args):
     Return nothing"""
     logger = logging.getLogger(__name__)
 
-    try:
-        genomic_accession = re.findall(r"GCA_\d+\.\d+\.", output_dir.name)[0][:-1]
-    except IndexError:
-        try:
-            genomic_accession = re.findall(r"GCF_\d+\.\d+\.", output_dir.name)[0][:-1]
-        except IndexError:
-            print(
-                f"Could not get find genomic accession in {output_dir.name}\n"
-                "Skipping output dir\n"
-            )
-            return
+    genomic_accession = output_dir.name
     
     fam_annotations = {}  # {protein accession: {fams}} -- a single protein can appear on multiple lines
 

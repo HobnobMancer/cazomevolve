@@ -51,7 +51,7 @@ from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths
 from saintBioutils.utilities.logger import config_logger
 
-from cazomevolve.utilities.parsers.get_cazy_parser import build_parser
+from cazomevolve.utilities.parsers.get_dbcan2_parser import build_parser
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):

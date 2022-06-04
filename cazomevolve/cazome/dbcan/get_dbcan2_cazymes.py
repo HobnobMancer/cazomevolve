@@ -115,6 +115,9 @@ def get_family_annotations(output_dir, args):
         hotpep_fams = get_tool_fams(line[2])
         diamond_fams = get_tool_fams(line[3])
 
+        # get the fams at least two tools agreed upon
+        dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
+
 
 
 def get_tool_fams(tool_data):
@@ -135,3 +138,25 @@ def get_tool_fams(tool_data):
         fams.add(domain)
     
     return fams
+
+
+def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
+    """Get the fams at least two tools predicted
+    
+    :param hmmer_fams: set of CAZy family annotations
+    :param hotpep_fams: set of CAZy family annotations
+    :param diamond_fams: set of CAZy family annotations
+    
+    Return set
+    """
+    hmmer_hotpep = hmmer_fams & hotpep_fams
+    hmmer_diamond = hmmer_fams & diamond_fams
+    hotpep_diamond = hotpep_fams & diamond_fams
+
+    dbcan_consensus = set()
+
+    for consensus in [hmmer_hotpep, hmmer_diamond, hotpep_diamond]:
+        for fam in consensus:
+            dbcan_consensus.add(fam)
+    
+    return dbcan_consensus

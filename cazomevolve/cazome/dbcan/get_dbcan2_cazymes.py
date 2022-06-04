@@ -42,10 +42,9 @@
 
 import logging
 import re
-import subprocess
 
 from tqdm import tqdm
-from typing import List, Optional, overload
+from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths

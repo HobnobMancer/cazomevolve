@@ -111,22 +111,22 @@ def get_family_annotations(output_dir, args):
 
         protein_accession = line[0]
 
-        hmmer_fams = get_hmmer_fams(line[1])
+        hmmer_fams = get_tool_fams(line[1])
+        hotpep_fams = get_tool_fams(line[2])
+        diamond_fams = get_tool_fams(line[3])
 
-        # hotpep = 2
-        # diamond = 3
 
 
-def get_hmmer_fams(hmmer_data):
-    """Get HMMER predicted CAZy family annotations
+def get_tool_fams(tool_data):
+    """Get predicted CAZy family annotations for a specific tool
     
-    :param hmmer_data: str, output from HMMER
+    :param tool_data: str, output from prediction tool
     
     Return set of CAZy family predictions"""
-    if hmmer_data == "-":
+    if tool_data == "-":
         return set()
     
-    hmmer_domains = hmmer_data.split("+")  # each predicted domain is separated b "+"
+    hmmer_domains = tool_data.split("+")  # each predicted domain is separated b "+"
 
     fams = set()
 

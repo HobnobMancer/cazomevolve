@@ -82,8 +82,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # retrieve path to protein FASTA files
     fasta_files_paths, number_of_files = get_fasta_paths(args)
 
+    gbk_table_dict = get_gbk_table_dict(connection)
+
     for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
-        get_cazy_annotations(fasta_path, args, connection)
+        get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
 
 
 def get_fasta_paths(args):
@@ -112,18 +114,19 @@ def get_fasta_paths(args):
             "Check the path is correct. Terminating program"
         )
         sys.exit(1)
-    
+
     logger.warning(f"Retrieved {len(file_list)} FASTA files")
 
     return files_in_entries, len(file_list)
 
 
-def get_cazy_annotations(fasta_path, args, connection):
+def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
     """Get the CAZy family annotations for each fasta file.
 
     Move empty fasta files to directory used as input for dbCAN.
 
     :param fasta_path: POSIX path to FASTA file
+    :param gbk_table_dict: dict of data in the cazyme db Genbanks table
     :param args: cmd-line args parser
     :param connection: connection to a sqlite db
 
@@ -134,15 +137,13 @@ def get_cazy_annotations(fasta_path, args, connection):
     # compile path to write out non-CAZy annotated proteins
     output_path = args.output_dir / fasta_path.name
 
-    gbk_table_dict = get_gbk_table_dict(connection)
-    
     # extract genomic accession from the file name
     try:
-        genomic_accession = re.findall(r"GCF_\d+\.\d+", fasta_path.name)[0]
+        genomic_accession = re.findall(r"GCF_\d+\.\d+\.", fasta_path.name)[0]
         genomic_accession = genomic_accession
     except IndexError:
         try:
-            genomic_accession = re.findall(r"GCA_\d+\.\d+", fasta_path.name)[0]
+            genomic_accession = re.findall(r"GCA_\d+\.\d+\.", fasta_path.name)[0]
             genomic_accession = genomic_accession
         except IndexError:
             logger.warning(
@@ -150,19 +151,20 @@ def get_cazy_annotations(fasta_path, args, connection):
                 "Skipping FASTA file"
             )
             return
+    
+    genomic_accession = genomic_accession[:-1]
 
     in_cazy, not_in_cazy = set(), []
 
-    with open(args.tab_anno_list, "a") as fh:
-        for record in SeqIO.parse(fasta_path, "fasta"):
-            try:
-                gbk_table_dict[record.id]
-                # in CAZy
-                in_cazy.add(record.id)
+    for record in tqdm(SeqIO.parse(fasta_path, "fasta")):
+        try:
+            gbk_table_dict[record.id]
+            # in CAZy
+            in_cazy.add(record.id)
 
-            except KeyError:
-                # Not in CAZy
-                not_in_cazy.append(record)
+        except KeyError:
+            # Not in CAZy
+            not_in_cazy.append(record)
 
     if len(not_in_cazy) != 0:
         logger.info(f"Writing out protein seqs for {len(not_in_cazy)} proteins not in CAZy to {output_path}")
@@ -177,7 +179,7 @@ def get_cazy_annotations(fasta_path, args, connection):
                         join(CazyFamily, Genbank.families).\
                             filter(Genbank.genbank_accession == protein_accession).\
                                 all()
-                    
+
                     for result in fam_query:
                         fam = result[1].family
                         fh.write(f"{fam}\t{genomic_accession}\n")

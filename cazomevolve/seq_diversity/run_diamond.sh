@@ -41,23 +41,22 @@
 
 # run_diamond.sh
 
-# $1 cazy family
-# $2 input FASTA file
-# $3 diamond db to be created
-# $4 output file
+# $1 input FASTA file
+# $2 diamond db to be created
+# $3 output file
 
 # build db
 echo 'Building database'
 diamond makedb \
-    --in $2 \
-    --db $3
+    --in $1 \
+    --db $2
 
 # run diamond
 echo 'Running DIAMOND'
 diamond blastp \
-    --db $3 \
-    --query $2 \
-    --out $4 \
+    --db $2 \
+    --query $1 \
+    --out $3 \
     --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
     --evalue 10 \
     --max-target-seqs 0

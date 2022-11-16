@@ -63,9 +63,42 @@ For all required Python libraries please read 'requirements.txt'.
 
 
 
-## Method
+# Method
 
-### Download genomes
+# Explore sequence diversity in CAZy families
+
+Presuming a local CAZyme database has already been generated using `cazy_webscraper`:
+
+1. Generate a multisequence FASTA file for each CAZy family of interest using the bash script `get_fam_seqs.sh`, which 
+takes 4 positional arguments:
+
+* email address
+* path to a local cazyme db
+* name(s) of families of interest (separate with a single comma)
+* path to an output dir (do not include terminal /)
+
+Or use `cazy_webscraper` directly to create a multisequence FASTA file containing the protein sequences of interst
+
+2. Run all-vs-all sequence analysis for each multisequence FASTA file. Use the `run_blastp.sh` script to use BLASTP+ or the `run_diamond.sh` script to use DIAMOND (recommend for large families of >1000 proteins sequences)
+
+`run_blastp.sh` takes 2 positional arguments:
+* Path to the input FASTA file
+* Path for the output TSV file
+
+`run_diamond.sh` takes 3 positional arguments:
+* Path to the input FASTA file
+* Path to build the DIAMOND database at
+* Path for the output TSV file
+
+Both scripts are located in `cazomevolve/seq_diversity/` directory.
+
+3. Visualise the results using the `jupyter notebook` template located at `cazomevolve/seq_diversity/explore_seq_diversity.ipynb`. This generates clustermaps and heatmaps that plot the proteins in the same order as the generated clustermap.
+
+We recommend using the [BLAST Score Ratio (BSR)](https://widdowquinn.github.io/2018-03-06-ibioic/02-sequence_databases/05-blast_for_rbh.html#Normalised-bit-score,-and-coverage) to generate a clustermap, then generate heatmaps of the percentage identity (pident) and query coverage (qcov) so the proteins are plotted in the same order for the 3 plots and thus facilitates comparing between the three.
+
+Optionally, redundant protein sequences can be removed, and proteins of interest (mannually defined by the user) and functionally/structurally characterised proteins can be annotated on the plots, to facilitate identifying the degree of characterisation across a family.
+
+## Download genomes
 
 #### Already have a list of genomic version accessions
 
@@ -83,7 +116,7 @@ To download load all genomic assemblies associated with a term of interest, such
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 
-### Extract protein seqs
+## Extract protein seqs
 
 Use the Python script `cazomevolve/genomes/extract_prot_seqs.py` to extract the protein sequences from annotations in the genomic assemblies.
 

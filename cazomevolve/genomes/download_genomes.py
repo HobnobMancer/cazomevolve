@@ -118,7 +118,7 @@ def get_tax_ids(uid_list, term, args):
     # batch query UIDs
     with entrez_retry(Entrez.epost, db="Assembly", id=(",".join(uid_list))) as record_handle:
         epost_result = Entrez.read(record_handle, validate=False)
-    
+
     epost_webenv = epost_result["WebEnv"]
     epost_query_key = epost_result["QueryKey"]
 
@@ -132,7 +132,7 @@ def get_tax_ids(uid_list, term, args):
         retmode="xml"
     ) as batch_handle:
         batch_result = Entrez.read(batch_handle, validate=False)
-    
+
     accession_data = {}  # {Assembly accession : Assembly Name}
 
     for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):

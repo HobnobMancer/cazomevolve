@@ -72,14 +72,21 @@ def build_parser(argv: Optional[List] = None):
     parser.add_argument(
         "output_dir",
         type=Path,
-        help="Path write out fasta files for parsing by dbCAN",
+        help="Directory to write out fasta files for parsing by dbCAN",
     )
 
     parser.add_argument(
-        "tab_anno_list",
+        "fam_genome_list",
         type=Path,
         default=None,
-        help="Path to write out tab deliminated list",
+        help="Path to write out tab deliminated list of fam and genome pairs",
+    )
+
+    parser.add_argument(
+        "fam_genome_protein_list",
+        type=Path,
+        default=None,
+        help="Path to write out tab deliminated list of fam, genome and protein annocations",
     )
 
     parser.add_argument(

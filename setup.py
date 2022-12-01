@@ -79,6 +79,7 @@ setuptools.setup(
         ]
     },
     install_requires=[
+        "cazy_webscraper",
         "biopython",
         "pandas",
         "tqdm",

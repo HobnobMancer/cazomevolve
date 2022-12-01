@@ -105,7 +105,9 @@ Two position arguments are required:
 
 #### Step 1: Using CAZy -- retrieve the canonical classifications
 
-Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py`, or the command `cevolve_get_cazy_cazymes` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write the annotations to a tab delimited list (<fam> <genomic accession>).
+Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py`, or the command `cevolve_get_cazy_cazymes` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write two files of tab delimited list of the:
+1. <fam> <genomic accession>
+2. <fam> <genomic accession> <protein accession>
 
 The required args are:
 1. Path to the directory containing the FASTA protein sequences files

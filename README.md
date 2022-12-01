@@ -105,13 +105,16 @@ Two position arguments are required:
 
 #### Step 1: Using CAZy -- retrieve the canonical classifications
 
-Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write the annotations to a tab delimited list (<fam> <genomic accession>).
+Use the Python script `cazomevolve/cazome/cazy/get_cazy_cazymes.py`, or the command `cevolve_get_cazy_cazymes` to retrieve the CAZy family classifications for proteins extracted from the genomic assemblies, and write the annotations to a tab delimited list (<fam> <genomic accession>).
 
 The required args are:
 1. Path to the directory containing the FASTA protein sequences files
 2. Path to the local CAZyme database compiled using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/)
 3. Path to an output directory to write out the protein sequences of proteins not listed in the local CAZyme database
-4. Path to write out the tab delimited list of CAZy family annotations
+4. Path to write out the tab delimited list of CAZy family annotations and associated genomic assembly accessions
+5. Path to write out the tab delimited list of CAZy family annotations and associated genome and protein accessions 
+
+`cazomevolve` will build all necessary output directories.
 
 #### Step 2: Using dbCAN --- retrieve predicted classifications
 

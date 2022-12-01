@@ -70,12 +70,12 @@ setuptools.setup(
     platforms="Posix, MacOS X",
     entry_points={
         "console_scripts": [
-            "cazomevolve_download_genomes = cazomevolve.genomes.download_genomes:main",
-            "cazomevolve_extract_proteins = cazomevolve.genomes.extract_prot_seqs:main",
-            "cazomevolve_invoke_dbcan2 = cazomevolve.cazome.dbcan.invoke_dbcan_2:main",
-            "cazomevolve_invoke_dbcan3 = cazomevolve.cazome.dbcan.invoke_dbcan_3:main",
-            "cazomevolve_get_dbcan_cazymes = cazomevolve.cazome.dbcan.get_dbcan_cazymes:main",
-            "cazomevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
+            "cevolve_download_genomes = cazomevolve.genomes.download_genomes:main",
+            "cevolve_extract_proteins = cazomevolve.genomes.extract_prot_seqs:main",
+            "cevolve_invoke_dbcan2 = cazomevolve.cazome.dbcan.invoke_dbcan_2:main",
+            "cvolve_invoke_dbcan3 = cazomevolve.cazome.dbcan.invoke_dbcan_3:main",
+            "cevolve_get_dbcan_cazymes = cazomevolve.cazome.dbcan.get_dbcan_cazymes:main",
+            "cevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
         ]
     },
     install_requires=[

@@ -73,8 +73,14 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if str(args.output_dir.parent) != ".":
         make_output_directory(args.output_dir, args.force, args.nodelete)
 
-    if str(args.tab_anno_list.parent) != ".":
-        make_output_directory(args.tab_anno_list.parent, args.force, args.nodelete)
+    if str(args.fam_genome_list.parent) != ".":
+        make_output_directory(args.fam_genome_list.parent, args.force, args.nodelete)
+
+    if str(args.fam_genome_protein_list.parent) != ".":
+        if str(args.fam_genome_list.parent) == str(args.fam_genome_protein_list.parent):
+            make_output_directory(args.fam_genome_protein_list.parent, True, True)
+        else:
+            make_output_directory(args.fam_genome_protein_list.parent, args.force, args.nodelete)
 
     # connect to the local CAZyme db
     connection = get_db_connection(args.database, args.sql_echo, False)
@@ -151,38 +157,53 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
                 "Skipping FASTA file"
             )
             return
-    
+
     genomic_accession = genomic_accession[:-1]
 
     in_cazy, not_in_cazy = set(), []
 
-    for record in tqdm(SeqIO.parse(fasta_path, "fasta")):
-        try:
-            gbk_table_dict[record.id]
-            # in CAZy
-            in_cazy.add(record.id)
+    cazy_accessions = set(list(gbk_table_dict.keys()))  # gbk accessions in the local db
 
-        except KeyError:
-            # Not in CAZy
-            not_in_cazy.append(record)
+    fasta_seqs = {}  # {protein acc: seq record}
+    for record in SeqIO.parse(fasta_path, "fasta"):
+        fasta_seqs[record.id] = record
+
+    fasta_accessions = set(list(fasta_seqs.keys()))
+    print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path}")
+
+    acc_in_cazy = cazy_accessions & fasta_accessions
+    print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
+
+    acc_not_in_cazy = fasta_accessions.difference(in_cazy)
+    print(f"{len(acc_not_in_cazy)} proteins no in the local CAZyme db")
 
     if len(not_in_cazy) != 0:
-        logger.info(f"Writing out protein seqs for {len(not_in_cazy)} proteins not in CAZy to {output_path}")
-        SeqIO.write(not_in_cazy, output_path, "fasta")
+        not_in_cazy_seqs = []
+        for acc in acc_not_in_cazy:
+            not_in_cazy_seqs.append(fasta_seqs[acc])
+        SeqIO.write(not_in_cazy_seqs, output_path, "fasta")
 
     if len(in_cazy) != 0:
-        logger.info("Retrieving CAZy family annotaions from the local CAZyme database")
-        with open(args.tab_anno_list, "a") as fh:
-            for protein_accession in tqdm(in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
-                with Session(bind=connection) as session:
-                    fam_query = session.query(Genbank, CazyFamily).\
-                        join(CazyFamily, Genbank.families).\
-                            filter(Genbank.genbank_accession == protein_accession).\
-                                all()
+        fam_genome_data = ""
+        fam_genome_protein_data = ""
+        
+        for prot_acc in tqdm(in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
+            with Session(bind=connection) as session:
+                fam_query = session.query(Genbank, CazyFamily).\
+                    join(CazyFamily, Genbank.families).\
+                    filter(Genbank.genbank_accession == prot_acc).\
+                    all()
 
-                    for result in fam_query:
-                        fam = result[1].family
-                        fh.write(f"{fam}\t{genomic_accession}\n")
+                for result in fam_query:
+                    fam = result[1].family
+                    fam_genome_data += f"{fam}\t{genomic_accession}\n"
+                    fam_genome_protein_data += f"{fam}\t{genomic_accession}\t{prot_acc}\n"
+
+        with open(args.fam_genome_list, "a") as fh:
+            fh.write(fam_genome_data)
+        
+        with open(args.fam_genome_protein_list, "a") as fh:
+            fh.write(fam_genome_protein_data)
 
     return
 

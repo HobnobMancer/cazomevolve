@@ -1,1 +1,7 @@
 cazy_webscraper
+tqdm
+biopython
+numpy
+pandas
+saintBioutils>=0.0.19
+sqlalchemy==1.4.20

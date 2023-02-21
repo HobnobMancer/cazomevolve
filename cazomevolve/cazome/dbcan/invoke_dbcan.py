@@ -48,6 +48,7 @@ from tqdm import tqdm
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io import get_paths
 
+from cazomevolve import closing_message
 from cazomevolve.utilities.parsers.invoke_dbcan_parser import build_parser
 
 
@@ -58,27 +59,31 @@ def main():
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
     # get the path to every FASTA to be parsed by dbCAN
-    fasta_files_paths = list(set(get_paths.get_file_paths(args.input_dir, suffixes='fasta')))
-
+    fasta_files_paths = list(set(get_paths.get_file_paths(args.input_dir, suffixes=['fasta', 'faa'])))
+    fasta_files_paths.sort()
     print(f"Retrieved {len(fasta_files_paths)} fasta files from {args.input_dir}")
 
     for fasta_path in tqdm(fasta_files_paths, desc="Running dbCAN"):
-        if str(fasta_path).endswith("fasta") is False:
-            continue
         # define path to output dir that will house output for this specific input FASTA file
         # extract genomic accession from the file name, and name output dir after the accession
         try:
-            genomic_accession = re.findall(r"GCA_\d+\.\d+\.", fasta_path.name)[0][:-1]
+            genomic_accession = re.findall(r"GCa_\d+\.\d+", fasta_path.name)[0]
         except IndexError:
             try:
-                genomic_accession = re.findall(r"GCF_\d+\.\d+\.", fasta_path.name)[0][:-1]
+                genomic_accession = re.findall(r"GCF_\d+\.\d+", fasta_path.name)[0]
             except IndexError:
                 print(f"Could not get find genomic accession in {fasta_path.name}\nSkipping assembly\n")
                 continue
         
         output_dir = args.output_dir / genomic_accession
 
-        invoke_dbcan(fasta_path, output_dir)
+        if output_dir.exists():
+            print(f"Already parsed {genomic_accession}\nSKIIIP")
+            continue
+
+        invoke_dbcan(fasta_path, output_dir, args)
+
+    closing_message('Invoke dbCAN')
 
 
 def invoke_dbcan(input_path, out_dir, args):
@@ -111,10 +116,20 @@ def invoke_dbcan(input_path, out_dir, args):
             "protein",
             "--out_dir",
             str(out_dir),
+            "--stp_cpu",
+            "8",
+            "--tf_cpu",
+            "8",
+            "--eCAMI_jobs",
+            "8",
+            "--hmm_cpu",
+            "8",
+            "--dia_cpu",
+            "8",
         ]
 
     with open(f"{out_dir}/dbcan.log", "w+") as fh:
-        process = subprocess.run(dbcan_args, stdout=fh, text=True)
+        process = subprocess.run(dbcan_args, text=True, capture_output=True)
 
     return
 

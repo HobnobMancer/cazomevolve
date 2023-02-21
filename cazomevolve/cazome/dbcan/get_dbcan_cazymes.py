@@ -50,6 +50,7 @@ from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths
 from saintBioutils.utilities.logger import config_logger
 
+from cazomevolve import closing_message
 from cazomevolve.utilities.parsers.get_dbcan_parser import build_parser
 
 
@@ -66,14 +67,22 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     logger = logging.getLogger(__name__)
 
     # make output dir if necessary
-    if str(args.tab_anno_list.parent) != ".":
-        make_output_directory(args.tab_anno_list.parent, args.force, args.nodelete)
+    if str(args.fam_genome_list.parent) != ".":
+        make_output_directory(args.fam_genome_list.parent, args.force, args.nodelete)
+
+    if str(args.fam_genome_protein_list.parent) != ".":
+        if str(args.fam_genome_list.parent) == str(args.fam_genome_protein_list.parent):
+            make_output_directory(args.fam_genome_protein_list.parent, True, True)
+        else:
+            make_output_directory(args.fam_genome_protein_list.parent, args.force, args.nodelete)
 
     # get path to output directories from dbCAN
     output_dirs = get_dir_paths(args.dbcan_dir)
 
     for output_dir in tqdm(output_dirs, desc="Parsing dbCAN output dirs"):
         get_family_annotations(output_dir, args)
+
+    closing_message('Get dbCAN CAZymes')
 
 
 def get_family_annotations(output_dir, args):

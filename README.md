@@ -98,33 +98,245 @@ We recommend using the [BLAST Score Ratio (BSR)](https://widdowquinn.github.io/2
 
 Optionally, redundant protein sequences can be removed, and proteins of interest (mannually defined by the user) and functionally/structurally characterised proteins can be annotated on the plots, to facilitate identifying the degree of characterisation across a family.
 
-## Download genomes
+# Download genomes
 
-#### Already have a list of genomic version accessions
+To download the genomic assemblies, use either method [A] or [B]
 
-If you already have a list of genomic version accessions in a plain text file, using the Python package `ncbi-genome-download` to download the genomic assemblies 
-in `.gbff` (used to annotate the CAZome) and `.fna` (used to reconstruct the phylogenetic tree) formats - do **not** use the `--flat-format` option, leave the genomic assemblies compressed.
+## [A] Already have a list of genomic version accessions
 
-#### Retrieve all genomic assemblies associated with a specific term
+If you already have a list of genomic version accessions in a plain text file, using the Python package `ncbi-genome-download` to download the genomic assemblies genomic (`.fna`) and proteome (`.faa`) sequence files.
 
-To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the Python script `cazomevolve/genomes/download_genomes.py`. The script takes 4 required arguments:
+The `cazevolve_download_acc_genomes` configures using `ncbi-genome-download`. The command takes 4 positional arguments and 1 optional argument:
 
+**Positional arguments:**
+1. Path to file containing list of accessions (with a unique genome accession per row)
+2. Path to output directory (will be created by `cazevolve_download_acc_genomes`)
+3. File options - a comma-separated list, e.g. "fasta,assembly-report": Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
+4. Download Refseq ('refseq') or GenBank ('genbank') assemblies
+
+**Optional arguments:**
+1. Assembly level. Default 'all'. Comma separated list. Choose from: ['all', 'complete', 'chromosome', 'scaffold', 'contig']
+
+**Download the genomes in `.fna` and `faa` format.**
+
+## [B] Retrieve all genomic assemblies associated with a specific term
+
+To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the command`cazevolve_download_genomes`.
+
+**The command takes 4 requires arguments:**
 1. User email address (required by NCBI)
-2. The term of interest
-3. The file formats to download the genomic assemblies in. Each file format is defined by its file extension. Separate file formats with a single comma, for example `gbff,fna`
-4. Path to an output directory (this will be build by `cazomevolve`).
+2. The terms of interest. Comma-separated list, e.g. 'Pectobacterium,Dickeya'
+3. The file formats to download the genomic assemblies in. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]"
+4. Path to an output directory (this will be built by `cazomevolve`).
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 
-## Extract protein seqs
+**Optional flags:**
 
-Use the Python script `cazomevolve/genomes/extract_prot_seqs.py` to extract the protein sequences from annotations in the genomic assemblies.
+``--assembly_levels``, ``-A`` - Restrict the dataset to genomic assemblies of a specific assembly level(s). Space separated list, e.g. 'complete chromosome'. Choices: ['all', 'complete', 'chromosome', 'scaffold', 'contig']. Default 'all'.
 
-One multisequence FASTA file is produced per genomic assembly, listing all protein sequences extracted from the respective genomic assembly.
+``--genbank``, ``-G`` - Retrieve GenBank not RefSeq data. By default ``cazomevolve`` downloads RefSeq assemblies. Add this flag to the command to download GenBank assemblies instead.
 
-Two position arguments are required:
-1. Path to the directory containing the compressed genomic assemblies
-2. Path to an output directory to write out all multisequence FASTA files
+``-f``, ``--force`` - Force file over writting (default: False)
+``-l - log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+``--timeout`` TIMEOUT - time in seconds before connection times out (default: 30)
+``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
+
+# Annotate CAZomes
+
+To retrieve the most comprehensive annotation of the CAZome, the (widely considered) canonical classifications from CAZy retrieved using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) (Hobbs _et al.,_ 2022), combined with predicted CAZy family annotations from [`dbCAN`](https://github.com/linnabrown/run_dbcan) (Zhang _et al._ 2018).
+
+> Emma E. M. Hobbs, Tracey M. Gloster, Leighton Pritchard; cazy_webscraper: local compilation and interrogation of comprehensive CAZyme datasets, BioRxiv, 3 December 2022, https://doi.org/10.1101/2022.12.02.518825
+
+> Han Zhang, Tanner Yohe, Le Huang, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin; dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research, Volume 46, Issue W1, 2 July 2018, Pages W95–W101, https://doi.org/10.1093/nar/gky418
+
+## Build a local CAZyme database using `cazy_webscraper`
+
+To include 'canonical' CAZy family classifications from CAZy, download all data from the CAZy database and compile the data into a local CAZyme database using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) (Hobbs _et al., 2022).
+
+> cazy_webscraper: local compilation and interrogation of comprehensive CAZyme datasets
+Emma E. M. Hobbs, Tracey M. Gloster, Leighton Pritchard
+bioRxiv 2022.12.02.518825; doi: https://doi.org/10.1101/2022.12.02.518825
+
+```bash
+cazy_webscraper \
+    <email> \
+    -o <db file output path>
+```
+
+## Retrieve CAZy annotations
+
+Use `cazomevolve` to query the protein version accessions in the downloaded protein FASTA files against the local CAZyme db, to retrieve the 'canonical' CAZy family classifications, using the `cazevolve_get_cazy_cazymes` command.
+
+```bash
+cazevolve_get_cazy_cazymes \
+    <path to dir containing protein FASTA files> \
+    <path to local cazyme database> \
+    <path to dir to write out protein sequences NOT in the local db> \
+    <path to write out tab delimited lists of CAZy families and genomic accessions> \
+    <path to write out tab delimited lists of CAZy families, genomic accessions and protein accessions> \
+```
+
+Two tab delimited lists are generated, containing:
+1. Listing the CAZy family accession and genomic accession per line
+```bash
+fam1    genome1
+fam2    genome1
+fam1    genome2
+fam3    genome2
+```
+2. Listing the CAZy family, genomic accession and protein accession per line
+```bash
+fam1    genome1 protein1
+fam2    genome1 protein1
+fam1    genome2 protein2
+fam3    genome2 protein3
+```
+
+Optional args:
+```bash
+options:
+  -h, --help            show this help message and exit
+  -f, --force           Force file over writting (default: False)
+  -l log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+  --sql_echo            Set verbose SQLite3 logging (default: False)
+  -v, --verbose         Set logger level to 'INFO' (default: False)
+```
+
+## Invoke dbCAN
+
+_`eCAMI` is memory intensive. We recommend using the maximum availalbe RAM. 445 Pseudomonas proteomes on 64GB RAM, 8-core XX processor takes 4 days to run dbCAN._
+
+`dbCAN` can be automated to parse all FASTA files in a directory (e.g. all download protein FASTA files or FASTA files of proteins not in a local CAZyme database), using `cazomveolve`, specifically, the `cazevolve_run_dbcan` command.
+
+```bash
+cazevolve_run_dbcan \
+    <path to dir containing FASTA files> \
+    <path to output directory> 
+```
+
+The ouput directory will be created by `cazevolve_run_dbcan`. Inside the output directory, for each FASTA file parsed by `dbCAN` an output subdirectory will be created (named after the genomic version accession) and will contain the output from `dbCAN` for the respective protein FASTA file.
+
+Optional args:
+```bash
+options:
+  -h, --help            show this help message and exit
+  -V2--version_2        Use dbCAN version 2 NOT 3 (default: False)
+  -f, --force           Force file over writting (default: False)
+  -l log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+  -v, --verbose         Set logger level to 'INFO' (default: False)
+```
+
+## Retrieve dbCAN annotations
+
+After running dbCAN, `cazomevolve` can iterate through the output subdirectories created by `cazevolve_run_dbcan` and compile the data into two tab delimited lists, containing:
+1. Listing the CAZy family accession and genomic accession per line
+```bash
+fam1    genome1
+fam2    genome1
+fam1    genome2
+fam3    genome2
+```
+2. Listing the CAZy family, genomic accession and protein accession per line
+```bash
+fam1    genome1 protein1
+fam2    genome1 protein1
+fam1    genome2 protein2
+fam3    genome2 protein3
+```
+
+If paths to the tab delimited lists created by `cazevolve_get_cazy_cazymes` are provided, the dbCAN classifications will be **added** the existing tab delimited lists, and will not **overwrite** the data in the files (make sure to include the `-f`/`--force` and `-n`/`--nodelete` flags when wanting to add data to existing tab delimited files).
+
+```bash
+cazevolve_get_dbcan_cazymes \
+    <path to dbCAN output dir (contining output subdirs)> \
+    <path to write out tab delimited lists of CAZy families and genomic accessions> \
+    <path to write out tab delimited lists of CAZy families, genomic accessions and protein accessions>
+```
+
+Optional args:
+```bash
+options:
+  -h, --help            show this help message and exit
+  -f, --force           Force file over writting (default: False)
+  -l log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+  --sql_echo            Set verbose SQLite3 logging (default: False)
+  -v, --verbose         Set logger level to 'INFO' (default: False)
+  -v2, --version_2      Parse the data from dbCAN version 2 (default: False, parse data from dbCAN version 3)
+```
+
+# Reconstruct a phylogenetic tree using a baysian approach
+
+# Calculate ANI and construct a dendrogram
+
+# Explore the CAZome composition
+
+The module `cazomevolve.cazome.explore` contains functions for exploring the CAZome annotated by `cazomevolve`. These are:
+
+```python
+from cazomevolve.cazome.explore import (
+    cazome_sizes,
+    identify_families,
+    parse_data,
+    pca,
+    plot,
+    taxonomies,
+)
+
+# parse the output from cazomevolve tab delimited lists
+parse_data.get_dbcan_fams_data()
+parse_data.build_fam_freq_df()
+parse_data.index_df()  # index genome, genus and species to be row names
+
+# add taxonomic information for taxonomic context
+taxonomies.add_tax_info()
+taxonomies.get_gtdb_db_tax_dict()  # in development
+taxonomies.get_gtdb_search_tax_dict()
+taxonomies.get_ncbi_tax_dict()  # in development
+taxonomies.get_group_sample_sizes()  # returns the number of genomes per group (genus or species)
+
+# summarise the size of the cazomes
+cazome_sizes.get_cazome_size_df()
+cazome_sizes.get_proteome_size()
+cazome_sizes.get_cazome_proportion_df()
+cazome_sizes.get_num_of_fams_per_group()
+
+# identify the core CAZome, i.e. families that appear in every genome
+identify_families.identify_core_cazome()
+identify_families.get_core_fam_freqs()
+
+# identify families that are specific to a group (i.e. genus or species)
+identify_families.get_group_specific_fams()
+
+# identity families that always appear together 
+identify_families.get_cooccurring_fams()  # across all genomes
+identify_families.get_grps_cooccurring_fams()  # in a specific group (i.e. genus or species)
+
+# visually summarise the data
+plot.get_clustermap()  # clustermap of cazy family freqs - potentially add clustering by cazy class freqs
+
+# perform and visualise PCA
+pca.perform_pca()
+pca.plot_explained_variance()
+pca.plot_spree()
+pca.plot_pca()  # project genomes onto PCs
+pca.plot_loadings()
+```
+
+# Identify networks of co-evolving CAZy families using `coinfinder`
+
+
+
+
+
 
 ## Reconstruct the phylogenetic tree
 

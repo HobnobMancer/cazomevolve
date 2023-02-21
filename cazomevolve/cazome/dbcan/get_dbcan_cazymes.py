@@ -141,19 +141,22 @@ def get_tool_fams(tool_data):
     if tool_data == "-":
         return set()
     
-    hmmer_domains = tool_data.split("+")  # each predicted domain is separated b "+"
+    predicted_domains = tool_data.split("+")  # each predicted domain is separated b "+"
 
     fams = set()
 
-    for domain in hmmer_domains:
+    for domain in predicted_domains:
         domain = domain.split("(")[0].split("_")[0]  # drop CAZy subfamily
-        fams.add(domain)
+        if domain.startswith(("G", "P", "C", "A")):  # filter out EC numbers
+            fams.add(domain)
     
     return fams
 
 
 def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     """Get the fams at least two tools predicted
+
+    Hotpep == eCAMI - does not matter which verion of the dbCAN was used
     
     :param hmmer_fams: set of CAZy family annotations
     :param hotpep_fams: set of CAZy family annotations
@@ -164,12 +167,13 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     hmmer_hotpep = hmmer_fams & hotpep_fams
     hmmer_diamond = hmmer_fams & diamond_fams
     hotpep_diamond = hotpep_fams & diamond_fams
+    all_tools = hmmer_fams & diamond_fams & hotpep_fams
 
-    dbcan_consensus = set()
-
-    for consensus in [hmmer_hotpep, hmmer_diamond, hotpep_diamond]:
-        for fam in consensus:
-            dbcan_consensus.add(fam)
+    dbcan_consensus = list(
+        set(
+            list(all_tools) + list(hotpep_diamond) + list(hmmer_diamond) + list(hmmer_hotpep)
+            )
+        )
     
     return dbcan_consensus
 

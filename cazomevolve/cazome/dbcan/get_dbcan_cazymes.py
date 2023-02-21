@@ -116,12 +116,18 @@ def get_family_annotations(output_dir, args):
                 fam_annotations[protein_accession].add(fam)
         except KeyError:
             fam_annotations[protein_accession] = dbcan_fams
-
-    with open(args.tab_anno_list, "a") as fh:
-        for protein_accession in tqdm(fam_annotations, desc=f"Adding fam annotations to tab delim list"):
-            protein_fams = fam_annotations[protein_accession]
+    
+    with open(args.fam_genome_list, 'a') as fh:
+        for protein_acc in tqdm(fam_annotations, desc="Adding fam-genome annotations to tab delim list"):
+            protein_fams = fam_annotations[protein_acc]
             for fam in protein_fams:
                 fh.write(f"{fam}\t{genomic_accession}\n")
+
+    with open(args.fam_genome_protein_list, 'a') as fh:
+        for protein_acc in tqdm(fam_annotations, desc="Adding fam-genome-protein annotations to tab delim list"):
+            protein_fams = fam_annotations[protein_acc]
+            for fam in protein_fams:
+                fh.write(f"{fam}\t{genomic_accession}\t{protein_acc}\n")
 
     return
 

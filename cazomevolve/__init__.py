@@ -38,3 +38,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Bioinforamtic package for exploring the evolution of CAZomes"""
+
+
+import logging
+
+
+__version__ = "0.0.2"
+
+
+def closing_message(job):
+    """Write closing messsage to terminal
+    
+    :param job: str, name of module run
+    :param args: CLI arguments parser
+    """
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    message = f"""
+    =====================cazomevolve: {job}=====================
+    Version: {VERSION_INFO}
+    """
+
+    if args.verbose:
+        logger.info(message)
+    else:
+        print(message)

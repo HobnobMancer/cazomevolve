@@ -52,6 +52,7 @@ from tqdm import tqdm
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 
+from cazomevolve import closing_message
 from cazomevolve.utilities.parsers.download_genomes_parser import build_parser
 
 
@@ -75,12 +76,18 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     Entrez.email = args.email
 
-    for term in tqdm(((args.terms).split(",")), desc="Getting Tax IDs"):
+    uid_lists = []
+
+    for term in tqdm(((args.terms).split(",")), desc="Searching NCBI with terms"):
         uid_list = get_id_list(term)
         if uid_list is None:
             continue
+        uid_lists.append(uid_list)
 
+    for uid_list in tqdm(uid_lists, desc="Processing UID lists"):
         get_tax_ids(uid_list, term, args)
+
+    closing_message('Download genomes', args)
 
 
 def get_id_list(term):
@@ -108,9 +115,11 @@ def get_id_list(term):
 
 def get_tax_ids(uid_list, term, args):
     """Retrieve Taxonomy ID for each UID and write to output file.
+
     :param uid_list: list of UIDs from NCBI
     :param term: str, term used to retrieve UIDs
     :param args: cmd-line args parser
+
     Return nothing.
     """
     logger = logging.getLogger(__name__)
@@ -136,14 +145,16 @@ def get_tax_ids(uid_list, term, args):
     accession_data = {}  # {Assembly accession : Assembly Name}
 
     for index in range(len(batch_result['DocumentSummarySet']['DocumentSummary'])):
-        if args.contig_ignore:
-            # do not download contigs
-            if (
-                batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'Contig'
-            ) or (
-                batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'] == 'contig'
-            ):
-                continue
+        proceed = False
+        if 'all' in args.assembly_levels:
+            proceed = True
+        else:
+            assembly_level = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyStatus'].lower()
+            if assembly_level in args.assembly_levels:
+                proceed = True
+
+        if proceed is False:
+            continue
 
         accession_number_v = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyAccession']  # includes version number
         accession_number = accession_number_v[: (accession_number_v.find("."))]  # accession number excluding version number
@@ -229,23 +240,25 @@ def download_file(
     accession_number, assembly_name, file_type, args, url_prefix="ftp://ftp.ncbi.nlm.nih.gov/genomes/all"
 ):
     """Download file.
+
     :param accession_number: str, accession number of genome
     :param assembly_name: str, name of assembly
-    :param file_type: str, denotes in logger file type downloaded
+    :param file_type: str, denotes in logger file type downloaded [accepted = 'protein.faa', 'genomic.fna']
     param args: parser arguments
+
     Return nothing.
     """
     logger = logging.getLogger(__name__)
 
-    if args.gbk:
+    if args.genbank:   # retrieve GenBank not RefSeq
         gbk_accession = accession_number.replace("GCF_", "GCA_")
-    else:
+    else:  # retrieve RefSeq not GenBank
         gbk_accession = accession_number.replace("GCA_", "GCF_")
 
-    file_name = f"{gbk_accession}_{assembly_name}_genomic.{file_type}"
+    file_name = f"{gbk_accession}_{assembly_name}.{file_type}"
     file_name = file_name.replace(" ","_")
-    output_path = args.output_dir / f"{file_name}.gz"
-    unzipped_path = args.output_dir / f"{file_name}"
+    output_path = args.output_dir / file_name
+    unzipped_path = Path(str(output_path).replace('.gz', ''))
 
     if output_path.exists():
         logger.warning(f"Output file {output_path} exists, not downloading")
@@ -265,7 +278,7 @@ def download_file(
         [url_parts[1][i : i + 3] for i in range(0, len(url_parts[1].split(".")[0]), 3)]
     )
 
-    genbank_url = f"{url_prefix}/{url_parts[0]}/{sub_directories}/{filestem}/{filestem}_genomic.{file_type}.gz"
+    genbank_url = f"{url_prefix}/{url_parts[0]}/{sub_directories}/{filestem}/{filestem}_{file_type}.gz"
 
     # try URL connection
     try:

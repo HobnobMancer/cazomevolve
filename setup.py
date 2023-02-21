@@ -52,7 +52,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 setuptools.setup(
     name="cazomevolve",
-    version="0.0.1",
+    version="0.0.2",
     # Metadata
     author="Emma E. M. Hobbs",
     author_email="eemh1@st-andrews.ac.uk",
@@ -71,26 +71,33 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "cevolve_download_genomes = cazomevolve.genomes.download_genomes:main",
-            "cevolve_extract_proteins = cazomevolve.genomes.extract_prot_seqs:main",
-            "cevolve_invoke_dbcan2 = cazomevolve.cazome.dbcan.invoke_dbcan_2:main",
-            "cvolve_invoke_dbcan3 = cazomevolve.cazome.dbcan.invoke_dbcan_3:main",
+            "cevolve_invoke_dbcan = cazomevolve.cazome.dbcan.invoke_dbcan:main",
             "cevolve_get_dbcan_cazymes = cazomevolve.cazome.dbcan.get_dbcan_cazymes:main",
             "cevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
         ]
     },
+    scripts=[
+        'cazomevolve/genomes/download_acc_genomes.sh',
+        'cazomevolve/seq_diversity/get_fam_seqs.sh',
+        'cazomevolve/seq_diversity/run_blastp.sh',
+        'cazomevolve/seq_diversity/run_diamond.sh',
+    ],
     install_requires=[
         "cazy_webscraper",
         "biopython",
         "pandas",
         "tqdm",
         "saintbioutils",
+        "numpy",
+        "seaborn",
+        "sqlalchemy",
     ],
     packages=setuptools.find_packages(),
     package_data={
     },
     include_package_data=True,
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",

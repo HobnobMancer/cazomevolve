@@ -49,8 +49,8 @@ def build_parser(argv: Optional[List] = None):
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = argparse.ArgumentParser(
-        prog="get_dbcan2_cazymes.py",
-        description="Retrieve CAZy annotations from dbCAN V2 output",
+        prog="get_dbcan_cazymes.py",
+        description="Retrieve CAZy annotations from dbCAN output",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
@@ -63,10 +63,17 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "tab_anno_list",
+        "fam_genome_list",
         type=Path,
         default=None,
-        help="Path to write out tab deliminated list",
+        help="Path to write out tab deliminated list of fam and genome pairs",
+    )
+
+    parser.add_argument(
+        "fam_genome_protein_list",
+        type=Path,
+        default=None,
+        help="Path to write out tab deliminated list of fam, genome and protein annocations",
     )
 
     parser.add_argument(
@@ -95,14 +102,6 @@ def build_parser(argv: Optional[List] = None):
         default=False,
         help="enable/disable deletion of exisiting files",
     )
-
-    parser.add_argument(
-        "--sql_echo",
-        dest="sql_echo",
-        action="store_true",
-        default=False,
-        help="Set verbose SQLite3 logging",
-    )    
 
     parser.add_argument(
         "-v",

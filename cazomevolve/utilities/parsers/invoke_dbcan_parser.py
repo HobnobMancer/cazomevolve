@@ -69,7 +69,6 @@ def build_parser():
         help="Path to directory to write out genomic assemblies",
     )
 
-    # Add option to force file over writting
     parser.add_argument(
         "-V2"
         "--version_2",

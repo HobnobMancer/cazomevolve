@@ -50,6 +50,7 @@ from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths
 from saintBioutils.utilities.logger import config_logger
 
+from cazomevolve import closing_message
 from cazomevolve.utilities.parsers.get_dbcan_parser import build_parser
 
 
@@ -66,14 +67,22 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     logger = logging.getLogger(__name__)
 
     # make output dir if necessary
-    if str(args.tab_anno_list.parent) != ".":
-        make_output_directory(args.tab_anno_list.parent, args.force, args.nodelete)
+    if str(args.fam_genome_list.parent) != ".":
+        make_output_directory(args.fam_genome_list.parent, args.force, args.nodelete)
+
+    if str(args.fam_genome_protein_list.parent) != ".":
+        if str(args.fam_genome_list.parent) == str(args.fam_genome_protein_list.parent):
+            make_output_directory(args.fam_genome_protein_list.parent, True, True)
+        else:
+            make_output_directory(args.fam_genome_protein_list.parent, args.force, args.nodelete)
 
     # get path to output directories from dbCAN
     output_dirs = get_dir_paths(args.dbcan_dir)
 
     for output_dir in tqdm(output_dirs, desc="Parsing dbCAN output dirs"):
         get_family_annotations(output_dir, args)
+
+    closing_message('Get dbCAN CAZymes')
 
 
 def get_family_annotations(output_dir, args):
@@ -116,12 +125,18 @@ def get_family_annotations(output_dir, args):
                 fam_annotations[protein_accession].add(fam)
         except KeyError:
             fam_annotations[protein_accession] = dbcan_fams
-
-    with open(args.tab_anno_list, "a") as fh:
-        for protein_accession in tqdm(fam_annotations, desc=f"Adding fam annotations to tab delim list"):
-            protein_fams = fam_annotations[protein_accession]
+    
+    with open(args.fam_genome_list, 'a') as fh:
+        for protein_acc in tqdm(fam_annotations, desc="Adding fam-genome annotations to tab delim list"):
+            protein_fams = fam_annotations[protein_acc]
             for fam in protein_fams:
                 fh.write(f"{fam}\t{genomic_accession}\n")
+
+    with open(args.fam_genome_protein_list, 'a') as fh:
+        for protein_acc in tqdm(fam_annotations, desc="Adding fam-genome-protein annotations to tab delim list"):
+            protein_fams = fam_annotations[protein_acc]
+            for fam in protein_fams:
+                fh.write(f"{fam}\t{genomic_accession}\t{protein_acc}\n")
 
     return
 
@@ -135,19 +150,22 @@ def get_tool_fams(tool_data):
     if tool_data == "-":
         return set()
     
-    hmmer_domains = tool_data.split("+")  # each predicted domain is separated b "+"
+    predicted_domains = tool_data.split("+")  # each predicted domain is separated b "+"
 
     fams = set()
 
-    for domain in hmmer_domains:
+    for domain in predicted_domains:
         domain = domain.split("(")[0].split("_")[0]  # drop CAZy subfamily
-        fams.add(domain)
+        if domain.startswith(("G", "P", "C", "A")):  # filter out EC numbers
+            fams.add(domain)
     
     return fams
 
 
 def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     """Get the fams at least two tools predicted
+
+    Hotpep == eCAMI - does not matter which verion of the dbCAN was used
     
     :param hmmer_fams: set of CAZy family annotations
     :param hotpep_fams: set of CAZy family annotations
@@ -158,12 +176,13 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     hmmer_hotpep = hmmer_fams & hotpep_fams
     hmmer_diamond = hmmer_fams & diamond_fams
     hotpep_diamond = hotpep_fams & diamond_fams
+    all_tools = hmmer_fams & diamond_fams & hotpep_fams
 
-    dbcan_consensus = set()
-
-    for consensus in [hmmer_hotpep, hmmer_diamond, hotpep_diamond]:
-        for fam in consensus:
-            dbcan_consensus.add(fam)
+    dbcan_consensus = list(
+        set(
+            list(all_tools) + list(hotpep_diamond) + list(hmmer_diamond) + list(hmmer_hotpep)
+            )
+        )
     
     return dbcan_consensus
 

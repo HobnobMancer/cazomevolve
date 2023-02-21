@@ -45,17 +45,49 @@ from pathlib import Path
 from typing import List, Optional
 
 
+class ValidateFormats(argparse.Action):
+    """Check the user has provided valid genome file formats."""
+    def __call__(self, parser, args, values, option_string=None):
+        valid_formats = {
+            'genomic': 'genomic.fna',
+            'protein': 'protein.faa',
+        }
+        invalid = False
+        accepted_values = []
+        for value in values:
+            try:
+                accepted_values.append(valid_formats[value])
+            except KeyError:
+                invalid = True
+                raise ValueError(f'Invalid file format "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+        if invalid:
+            sys.exit(1)
+        setattr(args, self.dest, values)
+
+
+class ValidateLevels(argparse.Action):
+    """Check the user has provided valid assembly levels."""
+    def __call__(self, parser, args, values, option_string=None):
+        valid_formats = ['all', 'complete', 'chromosome', 'scaffold', 'contig']
+        invalid = False
+        for value in values:
+            if value not in valid_formats:
+                invalid = True
+                raise ValueError(f'Invalid assembly level "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+        if invalid:
+            sys.exit(1)
+        setattr(args, self.dest, values)
+
+
 def build_parser(argv: Optional[List] = None):
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = argparse.ArgumentParser(
-        prog="get_taxids",
-        description="Retrieve taxonomy IDs from NCBI and write to a txt file",
+        prog="download_genomes",
+        description="Download all genomic assemblies associated with a given term in NCBI Assembly database",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-
     # Add positional arguments to parser
-
     parser.add_argument(
         "email",
         type=str,
@@ -65,13 +97,16 @@ def build_parser(argv: Optional[List] = None):
     parser.add_argument(
         "terms",
         type=str,
-        help="Terms to search NCBI, separate terms with a single comma",
+        help="Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'",
     )
 
     parser.add_argument(
         "file_types",
+        nargs='+',
+        action=ValidateFormats,
+        choices=['genomic', 'protein'],
         type=str,
-        help="File extensions of file types to dowload, exluding '.' preix. For example, gbff,fna",
+        help="File formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]",
     )
 
     parser.add_argument(
@@ -82,15 +117,22 @@ def build_parser(argv: Optional[List] = None):
 
     # Add optional arguments
     parser.add_argument(
-        "--contig_ignore",
-        dest="contig_ignore",
-        action="store_true",
-        default=False,
-        help="Ignore contigs. Download all assemblies except contigs",
+        "-A",
+        "--assembly_levels",
+        nargs='+',
+        action=ValidateLevels,
+        choices=['all', 'complete', 'chromosome', 'scaffold', 'contig'],
+        type=str,
+        default=['all'],
+        help=(
+            "Assembly levels of genomes to download. Default='all'. Can provide multiple levels.\n"
+            "Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig']"
+        ),
     )
 
     parser.add_argument(
-        "--gbk",
+        "-G",
+        "--genbank",
         dest="gbk",
         action="store_true",
         default=False,

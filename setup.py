@@ -76,7 +76,12 @@ setuptools.setup(
             "cevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
         ]
     },
-    scripts=['eastbio_storage/cazomevolve/cazomevolve/genomes/download_acc_genomes.sh'],
+    scripts=[
+        'cazomevolve/genomes/download_acc_genomes.sh',
+        'cazomevolve/seq_diversity/get_fam_seqs.sh',
+        'cazomevolve/seq_diversity/run_blastp.sh',
+        'cazomevolve/seq_diversity/run_diamond.sh',
+    ],
     install_requires=[
         "cazy_webscraper",
         "biopython",

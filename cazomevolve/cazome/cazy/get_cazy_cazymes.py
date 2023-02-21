@@ -55,6 +55,7 @@ from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
+from cazomevolve import closing_message
 from cazomevolve.utilities.parsers.get_cazy_parser import build_parser
 
 
@@ -92,6 +93,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
+
+    closing_message('Get CAZy CAZymes')
 
 
 def get_fasta_paths(args):

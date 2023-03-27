@@ -67,6 +67,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     gtdb_df = load_gtdb_df(args)
 
+    # gather tax info
+
     closing_message('Add taxs')
 
 
@@ -77,16 +79,64 @@ def load_gtdb_df(args):
 
     Return pandas dataframe
     """
+    col_names = ['Genome']
+    if args.kingdom:
+        col_names.append('Kingdom')
+    if args.phylum:
+        col_names.append('Phylum')
+    if args.tax_class:
+        col_names.append('Class')
+    if args.tax_order:
+        col_names.append('Order')
+    if args.tax_family:
+        col_names.append('Family')
+    if args.genus:
+        col_names.append('Genus')
+    if args.species:
+        col_names.append('Species')
+
     if args.gtdb is None:
         logger.warning("No GTDB tsv file provided.\nRetrieving all classifications from NCBI")
-        gtdb_df = pd.DataFrame({
-            'Genome': [],
-            'Tax': [],
-        })
+        # build an empty dataframe with the desired column names
+        gtdb_data = {}
+        for col_name in col_names:
+            gtdb_data[col_name] = []
+        gtdb_df = pd.DataFrame(gtdb_data)
     
     else:
-        gtdb_df = pd.read_tsv(args.gtdb)
-        gtdb_df.columns = ['Genome', 'Tax']
+        gtdb_data = []
+        dl_gtdb_df = pd.read_tsv(args.gtdb)
+        dl_gtdb_df.columns = ['Genome', 'Tax']
+        
+        # separate output tax into genus and species
+        for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
+            genome_taxonomy = [dl_gtdb_df.iloc[ri]['Genome']]
+            tax_info = dl_gtdb_df.iloc[ri]['Tax'].split(";")
+            for data in tax_info:
+                if args.kingdom and (data.strip().startswith('d__')):
+                    genome_taxonomy.append(data.replace('d__','').strip())
+
+                elif args.phylum and (data.strip().startswith('p__')):
+                    genome_taxonomy.append(data.replace('p__','').strip())
+
+                elif args.tax_class and (data.strip().startswith('c__')):
+                    genome_taxonomy.append(data.replace('c__','').strip())
+
+                elif args.tax_order and (data.strip().startswith('o__')):
+                    genome_taxonomy.append(data.replace('o__','').strip())
+
+                elif args.tax_family and (data.strip().startswith('f__')):
+                    genome_taxonomy.append(data.replace('f__','').strip())
+
+                elif args.genus and (data.strip().startswith('g__')):
+                    genome_taxonomy.append(data.replace('g__','').strip())
+
+                elif args.speces and (data.strip().startswith('s__')):
+                    species = " ".join(data.strip().split(" ")[1:])  # remove genus from species name
+                    genome_taxonomy.append(species)
+
+            gtdb_data.append(genome_taxonomy)
+            gtdb_df = pd.DataFrame(gtdb_data, columns=col_names)
     
     return gtdb_df
 

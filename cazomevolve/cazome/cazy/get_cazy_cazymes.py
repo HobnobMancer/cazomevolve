@@ -103,7 +103,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     gbk_table_dict = get_gbk_table_dict(connection)
     print("Loading the GenBanks annotations into dict")
 
-    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
+    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations"):
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
 
     closing_message('Get CAZy CAZymes')
@@ -158,7 +158,7 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
     print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
 
     acc_not_in_cazy = fasta_accessions.difference(in_cazy)
-    print(f"{len(acc_not_in_cazy)} proteins no in the local CAZyme db")
+    print(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
 
     if len(not_in_cazy) != 0:
         not_in_cazy_seqs = []

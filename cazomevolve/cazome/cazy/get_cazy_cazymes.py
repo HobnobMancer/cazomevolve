@@ -153,10 +153,12 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
     fasta_accessions = set(list(fasta_seqs.keys()))
     print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path.name}")
 
+    acc_in_cazy, acc_not_in_cazy = set(), set()  # ensure they are reset to 0
+
     acc_in_cazy = cazy_accessions & fasta_accessions
     print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
 
-    acc_not_in_cazy = fasta_accessions.difference(in_cazy)
+    acc_not_in_cazy = fasta_accessions.difference(acc_in_cazy)
     print(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
 
     if len(acc_not_in_cazy) != 0:
@@ -171,7 +173,7 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
         fam_genome_data = ""
         fam_genome_protein_data = ""
         
-        for prot_acc in tqdm(in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
+        for prot_acc in tqdm(acc_in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
             with Session(bind=connection) as session:
                 fam_query = session.query(Genbank, CazyFamily).\
                     join(CazyFamily, Genbank.families).\

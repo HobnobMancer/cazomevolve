@@ -52,6 +52,7 @@ from Bio import SeqIO
 from cazy_webscraper.sql.sql_orm import get_db_connection, Session, Genbank, CazyFamily
 from cazy_webscraper.sql.sql_interface.get_data.get_table_dicts import get_gbk_table_dict
 from saintBioutils.utilities.file_io import make_output_directory
+from saintBioutils.utilities.file_io.get_paths import get_file_paths
 from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
@@ -87,7 +88,16 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     connection = get_db_connection(args.database, args.sql_echo, False)
 
     # retrieve path to protein FASTA files
-    fasta_files_paths, number_of_files = get_fasta_paths(args)
+    fasta_files_paths = get_file_paths(args.input_dir, suffixes=['.fasta', '.faa'])
+
+    if len(fasta_files_paths) == 0:
+        logger.error(
+            f"Found 0 fasta files in {args.input_dir}\n"
+            "Check the path is correct. Terminating program"
+        )
+        sys.exit(1)
+
+    logger.warning(f"Retrieved {len(fasta_files_paths)} FASTA files")
 
     gbk_table_dict = get_gbk_table_dict(connection)
 
@@ -95,38 +105,6 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
 
     closing_message('Get CAZy CAZymes')
-
-
-def get_fasta_paths(args):
-    """Retrieve paths to fasta files created by extract_proteins_genomes.py.
-    :param args: cmd-line args parser
-    Return two lists, one of path to FASTA files contain sequences, one of empty FASTA files.
-    """
-    logger = logging.getLogger(__name__)
-
-    # retrieve all files from directory
-    files_in_entries = (
-        entry for entry in Path(args.input_dir).iterdir() if (
-            entry.is_file() and entry.name.endswith(".fasta")
-        )
-    )
-
-    file_list = [
-        entry for entry in Path(args.input_dir).iterdir() if (
-            entry.is_file() and entry.name.endswith(".fasta")
-        )
-    ]
-
-    if len(file_list) == 0:
-        logger.error(
-            f"Found 0 fasta files in {args.input_dir}\n"
-            "Check the path is correct. Terminating program"
-        )
-        sys.exit(1)
-
-    logger.warning(f"Retrieved {len(file_list)} FASTA files")
-
-    return files_in_entries, len(file_list)
 
 
 def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):

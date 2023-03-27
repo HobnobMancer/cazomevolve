@@ -99,7 +99,9 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     logger.warning(f"Retrieved {len(fasta_files_paths)} FASTA files")
 
+    print("Parsing CAZy db Genbanks table into dict")
     gbk_table_dict = get_gbk_table_dict(connection)
+    print("Loading the GenBanks annotations into dict")
 
     for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
@@ -126,11 +128,11 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
 
     # extract genomic accession from the file name
     try:
-        genomic_accession = re.findall(r"GCF_\d+\.\d+\.", fasta_path.name)[0]
+        genomic_accession = re.findall(r"GCF_\d+\.\d+\.\d+", fasta_path.name)[0]
         genomic_accession = genomic_accession
     except IndexError:
         try:
-            genomic_accession = re.findall(r"GCA_\d+\.\d+\.", fasta_path.name)[0]
+            genomic_accession = re.findall(r"GCA_\d+\.\d+\.\d+", fasta_path.name)[0]
             genomic_accession = genomic_accession
         except IndexError:
             logger.warning(

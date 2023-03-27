@@ -143,16 +143,15 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
 
     genomic_accession = genomic_accession[:-1]
 
-    in_cazy, not_in_cazy = set(), []
-
     cazy_accessions = set(list(gbk_table_dict.keys()))  # gbk accessions in the local db
 
+    # load sequences in proteome FASTA file into dict
     fasta_seqs = {}  # {protein acc: seq record}
     for record in SeqIO.parse(fasta_path, "fasta"):
         fasta_seqs[record.id] = record
 
     fasta_accessions = set(list(fasta_seqs.keys()))
-    print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path}")
+    print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path.name}")
 
     acc_in_cazy = cazy_accessions & fasta_accessions
     print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
@@ -160,13 +159,15 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
     acc_not_in_cazy = fasta_accessions.difference(in_cazy)
     print(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
 
-    if len(not_in_cazy) != 0:
+    if len(acc_not_in_cazy) != 0:
+        # gather seqs of prot not in cazy and write to a FASTA file
         not_in_cazy_seqs = []
         for acc in acc_not_in_cazy:
             not_in_cazy_seqs.append(fasta_seqs[acc])
         SeqIO.write(not_in_cazy_seqs, output_path, "fasta")
 
-    if len(in_cazy) != 0:
+    if len(acc_in_cazy) != 0:
+        # compile data to write the tab delimited lists
         fam_genome_data = ""
         fam_genome_protein_data = ""
         
@@ -182,6 +183,7 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
                     fam_genome_data += f"{fam}\t{genomic_accession}\n"
                     fam_genome_protein_data += f"{fam}\t{genomic_accession}\t{prot_acc}\n"
 
+        # write out data
         with open(args.fam_genome_list, "a") as fh:
             fh.write(fam_genome_data)
         

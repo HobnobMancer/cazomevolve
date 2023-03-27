@@ -42,6 +42,9 @@
 
 from typing import List, Optional
 
+# ENTREZ
+# ENTREZ.email
+
 from saintBioutils.utilities.logger import config_logger
 
 
@@ -65,20 +68,6 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         )
         sys.exit(1)
 
-    gtdb_df = load_gtdb_df(args)
-
-    # gather tax info
-
-    closing_message('Add taxs')
-
-
-def load_gtdb_df(args):
-    """Loading in the GTDB database dump (TSV file) into a pandas dataframe.
-
-    :param args: CLI-args parser
-
-    Return pandas dataframe
-    """
     col_names = ['Genome']
     if args.kingdom:
         col_names.append('Kingdom')
@@ -95,6 +84,29 @@ def load_gtdb_df(args):
     if args.species:
         col_names.append('Species')
 
+    gtdb_df = load_gtdb_df(col_names, args)
+
+    # gather tax info
+    # genomes_tax_dict set of genomic acc to query ncbi with to get the latest tax classification
+    # genomes_to_query, dict {genome: f"genome_{tax}_{tax}"}
+    genomes_tax_dict, genomes_to_query = add_gtdb_taxs(gtdb_df, col_names, args)
+
+    if len(genomes_to_query) > 0:
+        genomes_tax_dict = add_ncbi_taxs(genomes_to_query)
+
+    write_tab_lists(args, genomes_tax_dict)
+
+    closing_message('Add taxs')
+
+
+def load_gtdb_df(col_names, args):
+    """Loading in the GTDB database dump (TSV file) into a pandas dataframe.
+
+    :param col_names: list of column names, genomes and all tax levels of interest
+    :param args: CLI-args parser
+
+    Return pandas dataframe
+    """
     if args.gtdb is None:
         logger.warning("No GTDB tsv file provided.\nRetrieving all classifications from NCBI")
         # build an empty dataframe with the desired column names
@@ -107,7 +119,7 @@ def load_gtdb_df(args):
         gtdb_data = []
         dl_gtdb_df = pd.read_tsv(args.gtdb)
         dl_gtdb_df.columns = ['Genome', 'Tax']
-        
+
         # separate output tax into genus and species
         for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
             genome_taxonomy = [dl_gtdb_df.iloc[ri]['Genome']]
@@ -139,6 +151,66 @@ def load_gtdb_df(args):
             gtdb_df = pd.DataFrame(gtdb_data, columns=col_names)
     
     return gtdb_df
+
+
+
+def add_gtdb_taxs(gtdb_df, col_names, args):
+    """
+    Build dict of genome: tax using GTDB data 
+    AND identify genomes to query ncbi with to get the latest tax classification
+
+    :param gtdb_df: pandas df with a genome col, and one col per tax level of interest
+    :param col_names: list of col names, including Genomes and one col per tax level of interest
+    :param args: CLI args parser
+
+    Return
+        :var genomes_tax_dict: dict {genome: f'{genome}_{tax}'}
+        :var genomes_to_query: set, genomes accs to query ncbi with
+    """
+    all_genomes = []
+
+    if args.fgp_file is not None:
+        df = pd.read_table(args.fgp_file, header=None)
+        df.columns = ['Fam', 'Genome', 'Protein']
+        all_genomes += list(df['Protein'])
+
+    if args.fg_file is not None:
+        df = pd.read_table(args.fg_file, header=None)
+        df.columns = ['Fam', 'Genome']
+        all_genomes += list(df['Protein'])
+
+    all_genomes = set(all_genomes)
+
+    genome_tax_dict = {}
+    genomes_to_query = set()
+
+    if len(gtdb_df) == 0:
+        return {}, all_genomes  # query all genomes against NCBI
+
+    for genome in tqdm(all_genomes, desc="Getting GTDB tax"):
+        g_rows = gtdb_df[gtdb_df['Genome'] == genome]
+        if len(g_rows) == 0:
+            # try alternative acc
+            if genome.startswith('GCA'):
+                alt_genome = genome.replace('GCA_', 'GCF_')
+            else:
+                alt_genome = genome.replace('GCF_', 'GCA_')
+
+            g_rows = gtdb_df[gtdb_df['Genome'] == alt_genome]
+            if len(g_rows) == 0:
+                # genome not in gtdb df
+                genomes_to_query.add(genome)
+                continue
+        
+        tax = f"{genome}_"
+        for col_name in col_names:
+            tax_info = g_rows.iloc[0][col_name]
+            tax += f"{tax_info}_"
+
+        genome_tax_dict[genome] = tax[:-1]  # drop terminal '_' underscore
+
+    return genome_tax_dict, genomes_to_query
+        
 
 # path to each tab delimited list
 # if both missing close

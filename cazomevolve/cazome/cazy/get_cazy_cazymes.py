@@ -128,12 +128,12 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
 
     # extract genomic accession from the file name
     try:
-        genomic_accession = re.findall(r"GCF_\d+\.\d+", fasta_path.name)[0]
-        genomic_accession = genomic_accession
+        genomic_accession = re.findall(r"GCF_\d+\.\d{1,5}", fasta_path.name)[0]
+        print(genomic_accession)
     except IndexError:
         try:
-            genomic_accession = re.findall(r"GCA_\d+\.\d+", fasta_path.name)[0]
-            genomic_accession = genomic_accession
+            genomic_accession = re.findall(r"GCA_\d+\.\d{1,5}", fasta_path.name)[0]
+            print(genomic_accession)
         except IndexError:
             logger.warning(
                 f"Could not retrieve genomic accession from\n{fasta_path}\n"

@@ -141,8 +141,6 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
             )
             return
 
-    genomic_accession = genomic_accession[:-1]
-
     cazy_accessions = set(list(gbk_table_dict.keys()))  # gbk accessions in the local db
 
     # load sequences in proteome FASTA file into dict

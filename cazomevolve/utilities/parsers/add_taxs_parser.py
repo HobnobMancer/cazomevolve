@@ -105,8 +105,8 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
-        "--family",
-        dest="family",
+        "--tax_family",
+        dest="tax_family",
         action="store_true",
         default=False,
         help="Retrieve and add (tax) family lineage",

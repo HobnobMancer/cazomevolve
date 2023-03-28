@@ -90,6 +90,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if args.species:
         col_names.append('Species')
 
+    logger.warning(f"Will be retrieving the following data:\n{col_names}")
+
     if len(col_names) == 1:
         logger.warning("Must specify at least one rank of lineage to be included")
         sys.exit(1)

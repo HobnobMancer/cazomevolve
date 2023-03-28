@@ -73,6 +73,21 @@ def build_parser(argv: Optional[List] = None):
     )
 
     parser.add_argument(
+        "--gtdb",
+        type=Path,
+        help="Path to gtdb database download TSV file (from https://data.gtdb.ecogenomic.org/)",
+    )
+
+    parser.add_argument(
+        "--outpath",
+        type=Path,
+        help=(
+            "Path to write out CSV of retrieved tax data.\n"
+            "Else, writes out to taxomines.csv\n"
+            "in the same dir as --FGP_FILE/--FG_FILE",
+    )
+
+    parser.add_argument(
         "--kingdom",
         dest="kingdom",
         action="store_true",

@@ -46,6 +46,7 @@ from Bio import Entrez
 from saintBioutils.utilities.logger import config_logger
 
 from cazomevolve.taxs.ncbi import add_ncbi_taxs
+from cazomevolve.utilities.parsers.add_taxs_parser import build_parser
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -62,10 +63,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     Entrez.email = args.email
 
-    if (args.fgm_file is None) and (args.fg_file is None):
+    if (args.FGP_FILE is None) and (args.FG_FILE is None):
         logger.warning(
             "No tab delimited files provided\nPlease provide at least one file:\n"
-            "--fgm_file - tab delimited file with Fam Genome Protein \n"
+            "--fgp_file - tab delimited file with Fam Genome Protein \n"
             "--fg_file - tab delimited file with Fam Genome"
         )
         sys.exit(1)
@@ -86,6 +87,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if args.species:
         col_names.append('Species')
 
+    if len(col_names) == 1:
+        logger.warning("Must specify at least one rank of lineage to be included")
+        sys.exit(1)
+
     gtdb_df = load_gtdb_df(col_names, args)
 
     # gather tax info
@@ -94,13 +99,13 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     genomes_tax_dict, genomes_to_query = add_gtdb_taxs(gtdb_df, col_names, args)
 
     if len(genomes_to_query) > 0:
-        genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names)
+        genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args)
 
-    if args.fgp_file is not None:
-        write_tab_lists(args.fgp_file, genomes_tax_dict, col_names)
+    if args.FGP_FILE is not None:
+        write_tab_lists(args.FGP_FILE, genomes_tax_dict, col_names)
 
-    if args.fg_file is not None:
-        write_tab_lists(args.fg_file, genomes_tax_dict, col_names)
+    if args.FG_FILE is not None:
+        write_tab_lists(args.FG_FILE, genomes_tax_dict, col_names)
 
     # write out CSV file as well
     write_out_csv(genomes_tax_dict, col_names, args)
@@ -177,13 +182,13 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
     """
     all_genomes = []
 
-    if args.fgp_file is not None:
-        df = pd.read_table(args.fgp_file, header=None)
+    if args.FGP_FILE is not None:
+        df = pd.read_table(args.FGP_FILE, header=None)
         df.columns = ['Fam', 'Genome', 'Protein']
         all_genomes += list(df['Protein'])
 
-    if args.fg_file is not None:
-        df = pd.read_table(args.fg_file, header=None)
+    if args.FG_FILE is not None:
+        df = pd.read_table(args.FG_FILE, header=None)
         df.columns = ['Fam', 'Genome']
         all_genomes += list(df['Protein'])
 
@@ -264,10 +269,10 @@ def write_out_csv(genomes_tax_dict, col_names, args):
     df = pd.DataFrame(df_data, columns=col_names)
 
     if args.outpath is None:
-        if args.fgp_file is not None:
-            parent_dir = args.fgp_file.parent
-        if args.fg_file is not None:
-            parent_dir = args.fg_file.parent
+        if args.FGP_FILE is not None:
+            parent_dir = args.FGP_FILE.parent
+        if args.FG_FILE is not None:
+            parent_dir = args.FG_FILE.parent
         
         outpath = parent_dir / "genome_taxs.csv"
 

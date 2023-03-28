@@ -42,10 +42,10 @@
 
 from typing import List, Optional
 
-# ENTREZ
-# ENTREZ.email
-
+from Bio import Entrez
 from saintBioutils.utilities.logger import config_logger
+
+from cazomevolve.taxs.ncbi import add_ncbi_taxs
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -59,6 +59,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)
+
+    Entrez.email = args.email
 
     if (args.fgm_file is None) and (args.fg_file is None):
         logger.warning(
@@ -92,7 +94,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     genomes_tax_dict, genomes_to_query = add_gtdb_taxs(gtdb_df, col_names, args)
 
     if len(genomes_to_query) > 0:
-        genomes_tax_dict = add_ncbi_taxs(genomes_to_query)
+        genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names)
 
     write_tab_lists(args, genomes_tax_dict)
 

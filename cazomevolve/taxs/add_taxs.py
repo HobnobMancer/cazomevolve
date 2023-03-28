@@ -41,6 +41,7 @@
 
 
 import logging
+import pandas as pd
 import sys
 
 from typing import List, Optional
@@ -126,6 +127,8 @@ def load_gtdb_df(col_names, args):
 
     Return pandas dataframe
     """
+    logger = logging.getLogger(__name__)
+
     if args.gtdb is None:
         logger.warning("No GTDB tsv file provided.\nRetrieving all classifications from NCBI")
         # build an empty dataframe with the desired column names
@@ -190,12 +193,12 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
     if args.FGP_FILE is not None:
         df = pd.read_table(args.FGP_FILE, header=None)
         df.columns = ['Fam', 'Genome', 'Protein']
-        all_genomes += list(df['Protein'])
+        all_genomes += list(df['Genome'])
 
     if args.FG_FILE is not None:
         df = pd.read_table(args.FG_FILE, header=None)
         df.columns = ['Fam', 'Genome']
-        all_genomes += list(df['Protein'])
+        all_genomes += list(df['Genome'])
 
     all_genomes = set(all_genomes)
 

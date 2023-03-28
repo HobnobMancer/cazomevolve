@@ -83,7 +83,7 @@ def main():
 
         invoke_dbcan(fasta_path, output_dir, args)
 
-    closing_message('Invoke dbCAN')
+    closing_message('Invoke dbCAN', args)
 
 
 def invoke_dbcan(input_path, out_dir, args):

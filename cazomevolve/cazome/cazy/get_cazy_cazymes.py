@@ -106,7 +106,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations"):
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
 
-    closing_message('Get CAZy CAZymes')
+    closing_message('Get CAZy CAZymes', args)
 
 
 def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):

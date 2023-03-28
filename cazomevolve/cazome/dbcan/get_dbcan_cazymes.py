@@ -82,7 +82,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     for output_dir in tqdm(output_dirs, desc="Parsing dbCAN output dirs"):
         get_family_annotations(output_dir, args)
 
-    closing_message('Get dbCAN CAZymes')
+    closing_message('Get dbCAN CAZymes', args)
 
 
 def get_family_annotations(output_dir, args):

@@ -1,0 +1,22 @@
+# Distribution files
+build/
+dist/
+cazy_webscraper.egg-info/
+distribute/
+.vscode/
+
+# Compiled Python modules
+*.pyc
+
+# RTD documentation building
+docs/_build/
+docs/make.bat
+
+# MyPy cache
+.mypy_cache/
+
+# Coverage test output
+cover/
+htmlcov/
+.coverage
+.coverage.*

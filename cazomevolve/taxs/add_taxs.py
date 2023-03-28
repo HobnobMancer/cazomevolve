@@ -96,7 +96,14 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if len(genomes_to_query) > 0:
         genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names)
 
-    write_tab_lists(args, genomes_tax_dict)
+    if args.fgp_file is not None:
+        write_tab_lists(args.fgp_file, genomes_tax_dict, col_names)
+
+    if args.fg_file is not None:
+        write_tab_lists(args.fg_file, genomes_tax_dict, col_names)
+
+    # write out CSV file as well
+    write_out_csv(genomes_tax_dict, col_names, args)
 
     closing_message('Add taxs')
 
@@ -153,7 +160,6 @@ def load_gtdb_df(col_names, args):
             gtdb_df = pd.DataFrame(gtdb_data, columns=col_names)
     
     return gtdb_df
-
 
 
 def add_gtdb_taxs(gtdb_df, col_names, args):
@@ -214,9 +220,64 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
     return genome_tax_dict, genomes_to_query
         
 
-# path to each tab delimited list
-# if both missing close
+def write_tab_lists(file_path, genomes_tax_dict, col_names):
+    """Write out data to tad delimited lists
 
-# path to gtdb file
-# if not provided only get NCBI info
+    :param file_path: path to tab delimited list
+    :param genomes_tax_dict: dict {genome: f'{genome}_{tax}'}
+    :param col_names: list, lineage ranks
+
+    Return nothing
+    """
+    logger = logging.getLogger(__name__)
+
+    with open(file_path, 'r') as fh:
+        data_lines = fh.read().splitlines()
+
+    new_data = []
+    for line in data_lines:
+        new_data = line.split("\t")
+        try:
+            new_data[0] = genomes_tax_dict[new_data[0]]
+        except KeyError:
+            logger.warning(f"Could not retrieve tax data for {genome}")
+            genome = f"{genome}_"
+            for rank in col_names:
+                genome += f"NaN_"
+            new_data[0] = genome[:-1]
+
+    output_path = file_path.parent / f"{file_path.name}_taxs"
+
+
+def write_out_csv(genomes_tax_dict, col_names, args):
+    """Write out CSV file of taxonomy information.
+
+    :param genomes_tax_dic: {genomes: f'genomes_tax'}
+    :param col_names: list of lineage ranks
+    :param args: cli args parser
+
+    Return nothing
+    """
+    df_data = []
+    for genome in tqdm(genomes_tax_dict, desc="Building tax df"):
+        df_data.append(genomes_tax_dict[genome].split("_"))
+    df = pd.DataFrame(df_data, columns=col_names)
+
+    if args.outpath is None:
+        if args.fgp_file is not None:
+            parent_dir = args.fgp_file.parent
+        if args.fg_file is not None:
+            parent_dir = args.fg_file.parent
+        
+        outpath = parent_dir / "genome_taxs.csv"
+
+    else:
+        outpath = args.outpath
+
+    df.to_csv(outpath)
+
+
+if __name__ = '__main__':
+    main()
+
 

@@ -41,6 +41,8 @@
 
 
 import logging
+import sys
+
 from typing import List, Optional
 
 from Bio import Entrez

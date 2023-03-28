@@ -46,12 +46,13 @@ from saintBioutils.genbank import entrez_retry
 from tqdm.notebook import tqdm
 
 
-def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names):
+def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args):
     """Query NCBI to get the taxonomic classification and add to {genome: f"{genome}_{tax}"}
 
     :param genomes_tax_dict: dict, {genome: f"{genome}_{tax}"}  - genomes with tax classification in gtdb
     :param genomes_to_query: set of genomic acc to query ncbi with to get tax classification
     :param col_names: list of lineage ranks
+    :param args: cli args parser
 
     Return genomes_tax_dict
     """
@@ -68,10 +69,11 @@ def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names):
     return genomes_tax_dict
 
 
-def get_tax_ids(genomes):
+def get_tax_ids(genomes, args):
     """Get NCBI Tax IDs for  genomes.
 
     :param genomes: list of genomic assembly accessions
+    :param args: cli args parser
 
     Return dict of {tax id: {genomes}} and list of genomes for which tax records could not be retrieved
     """
@@ -83,7 +85,7 @@ def get_tax_ids(genomes):
         # retrieve the ID of corresponding record in NCBI Assembly
         try:
             with entrez_retry(
-                10,
+                args.retries,
                 Entrez.esearch,
                 db="Assembly",
                 term=genome,
@@ -99,7 +101,7 @@ def get_tax_ids(genomes):
         # Fetch the record from the Assembly db, by querying by the record ID
         try:
             with entrez_retry(
-                10,
+                args.retries,
                 Entrez.efetch,
                 db="Assembly",
                 id=genome_record_id,
@@ -119,20 +121,16 @@ def get_tax_ids(genomes):
             taxids_genomes[taxid] = {genome}
 
     return taxids_genomes, failed_genomes
-    
-    # See notebook in download
-    # Sabrina get ncbi taxs
-    # look at what tax data is in the record - notebook
-    # if only g and s can use genome i think, else I need to get the tax record -- need to check this
 
 
-def get_ncbi_taxs(taxids_genomes, genomes_tax_dict, failed_genomes, col_names):
+def get_ncbi_taxs(taxids_genomes, genomes_tax_dict, failed_genomes, col_names, args):
     """Retrieve lineage data from NCBI Taxonomy db
 
     :param taxid_genomes: dict {taxid: {genomes}}
     :param genomes_tax_dict: dict, {genome: f"{genome}_{tax}"}  - genomes with tax classification in gtdb
     :param failed_genomes: list of genomes for which tax data could not be retrieved from NCBI
     :param col_names: list of lineage ranks to retrieve
+    :param args: cli args parser
 
     Return genomes_tax_dict {genome: f"{genome}_{tax}"}
     """
@@ -156,7 +154,7 @@ def get_ncbi_taxs(taxids_genomes, genomes_tax_dict, failed_genomes, col_names):
     for taxid in tqdm(taxids_genomes, desc="Getting taxonomies"):
         try:
             with entrez_retry(
-                10,
+                args.retries,
                 Entrez.efetch,
                 db="Taxonomy",
                 id=taxid,

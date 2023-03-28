@@ -40,6 +40,7 @@
 """Add taxonomic classifications to tab delimited lists"""
 
 
+import logging
 from typing import List, Optional
 
 from Bio import Entrez

@@ -173,7 +173,7 @@ def get_ncbi_taxs(taxids_genomes, genomes_tax_dict, failed_genomes, col_names, a
             added = False
             for feature in tax_record[0]['LineageEx']:
                 if feature['Rank'] == rank:
-                    tax_info[rank] = feature['Rank']
+                    tax_info[rank] = feature['ScientificName']
                     added = True
                     break
             if added is False:

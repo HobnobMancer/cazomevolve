@@ -48,9 +48,11 @@ from typing import List, Optional
 
 from Bio import Entrez
 from saintBioutils.utilities.logger import config_logger
+from tqdm import tqdm
 
 from cazomevolve.taxs.ncbi import add_ncbi_taxs
 from cazomevolve.utilities.parsers.add_taxs_parser import build_parser
+from cazomevolve import closing_message
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
@@ -116,7 +118,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # write out CSV file as well
     write_out_csv(genomes_tax_dict, col_names, args)
 
-    closing_message('Add taxs')
+    closing_message('Add taxs', args)
 
 
 def load_gtdb_df(col_names, args):
@@ -139,12 +141,14 @@ def load_gtdb_df(col_names, args):
     
     else:
         gtdb_data = []
-        dl_gtdb_df = pd.read_tsv(args.gtdb)
+        dl_gtdb_df = pd.read_table(args.gtdb)
         dl_gtdb_df.columns = ['Genome', 'Tax']
 
         # separate output tax into genus and species
-        for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
+        for ri in tqdm(range(100), desc="Parsing GTDB data"):
+        # for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
             genome_taxonomy = [dl_gtdb_df.iloc[ri]['Genome']]
+            genome_taxonomy = [_.replace("RS_","").replace("GB","") for _ in genome_taxonomy]
             tax_info = dl_gtdb_df.iloc[ri]['Tax'].split(";")
             for data in tax_info:
                 if args.kingdom and (data.strip().startswith('d__')):
@@ -165,7 +169,7 @@ def load_gtdb_df(col_names, args):
                 elif args.genus and (data.strip().startswith('g__')):
                     genome_taxonomy.append(data.replace('g__','').strip())
 
-                elif args.speces and (data.strip().startswith('s__')):
+                elif args.species and (data.strip().startswith('s__')):
                     species = " ".join(data.strip().split(" ")[1:])  # remove genus from species name
                     genome_taxonomy.append(species)
 
@@ -242,24 +246,36 @@ def write_tab_lists(file_path, genomes_tax_dict, col_names):
 
     Return nothing
     """
+    # FGP or FG
     logger = logging.getLogger(__name__)
 
     with open(file_path, 'r') as fh:
         data_lines = fh.read().splitlines()
 
-    new_data = []
+    all_data = []
     for line in data_lines:
         new_data = line.split("\t")
         try:
-            new_data[0] = genomes_tax_dict[new_data[0]]
+            # fam = new_data[0]
+            # genome_acc = new_data[1]
+            # protein = new_data[2]
+            new_data[1] = genomes_tax_dict[new_data[1]]  # get tax info for the genomic acc
         except KeyError:
-            logger.warning(f"Could not retrieve tax data for {genome}")
-            genome = f"{genome}_"
+            logger.warning(f"Could not retrieve tax data for {new_data[1]}")
+            genome = f"{new_data[1]}_"
             for rank in col_names:
                 genome += f"NaN_"
-            new_data[0] = genome[:-1]
+            new_data[1] = genome[:-1]  # replace the acc with f'{genome}_{tax}_{tax}'
+        all_data.append(new_data)
 
     output_path = file_path.parent / f"{file_path.name}_taxs"
+
+    logger.warning(f"Writing to {output_path}")
+
+    with open(output_path, 'w') as fh:
+        for line in all_data:
+            data = '\t'.join(line)
+            fh.write(f"{data}\n")
 
 
 def write_out_csv(genomes_tax_dict, col_names, args):
@@ -273,7 +289,7 @@ def write_out_csv(genomes_tax_dict, col_names, args):
     """
     df_data = []
     for genome in tqdm(genomes_tax_dict, desc="Building tax df"):
-        df_data.append(genomes_tax_dict[genome].split("_"))
+        df_data.append(([genome] + genomes_tax_dict[genome].split("_")[2:]))
     df = pd.DataFrame(df_data, columns=col_names)
 
     if args.outpath is None:

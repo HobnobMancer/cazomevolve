@@ -69,8 +69,8 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if (args.FGP_FILE is None) and (args.FG_FILE is None):
         logger.warning(
             "No tab delimited files provided\nPlease provide at least one file:\n"
-            "--fgp_file - tab delimited file with Fam Genome Protein \n"
-            "--fg_file - tab delimited file with Fam Genome"
+            "--FGP_FILE - tab delimited file with Fam Genome Protein \n"
+            "--FG_FILE - tab delimited file with Fam Genome"
         )
         sys.exit(1)
 

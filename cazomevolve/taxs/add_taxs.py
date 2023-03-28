@@ -282,7 +282,5 @@ def write_out_csv(genomes_tax_dict, col_names, args):
     df.to_csv(outpath)
 
 
-if __name__ = '__main__':
+if __name__ == "__main__":
     main()
-
-

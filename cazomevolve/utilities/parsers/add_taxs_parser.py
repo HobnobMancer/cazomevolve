@@ -85,7 +85,7 @@ def build_parser(argv: Optional[List] = None):
             "Path to write out CSV of retrieved tax data.\n"
             "Else, writes out to taxomines.csv\n"
             "in the same dir as --FGP_FILE/--FG_FILE",
-    )
+    ))
 
     parser.add_argument(
         "--kingdom",

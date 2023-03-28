@@ -42,6 +42,8 @@
 
 import logging
 
+from Bio import Entrez
+
 from saintBioutils.genbank import entrez_retry
 from tqdm.notebook import tqdm
 
@@ -56,9 +58,9 @@ def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args):
 
     Return genomes_tax_dict
     """
-    taxids_genomes, failed_genomes = get_tax_ids(genomes_to_query)
+    taxids_genomes, failed_genomes = get_tax_ids(genomes_to_query, args)
 
-    genomes_tax_dict, failed_genomes = get_ncbi_taxs(taxids_genomes, failed_genomes)
+    genomes_tax_dict, failed_genomes = get_ncbi_taxs(taxids_genomes, genomes_tax_dict, failed_genomes, col_names, args)
 
     for genome in failed_genomes:
         genomes_tax_dict[genome] = f"{genome}_"

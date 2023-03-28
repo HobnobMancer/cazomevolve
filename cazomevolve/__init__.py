@@ -43,7 +43,7 @@
 import logging
 
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
 def closing_message(job):

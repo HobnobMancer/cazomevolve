@@ -99,9 +99,9 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     logger.warning(f"Retrieved {len(fasta_files_paths)} FASTA files")
 
-    print("Parsing CAZy db Genbanks table into dict")
+    logger.warning("Parsing CAZy db Genbanks table into dict")
     gbk_table_dict = get_gbk_table_dict(connection)
-    print("Loading the GenBanks annotations into dict")
+    logger.warning("Loading the GenBanks annotations into dict")
 
     for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations"):
         get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
@@ -132,7 +132,6 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
     except IndexError:
         try:
             genomic_accession = re.findall(r"GCA_\d+\.\d{1,5}", fasta_path.name)[0]
-            print(genomic_accession)
         except IndexError:
             logger.warning(
                 f"Could not retrieve genomic accession from\n{fasta_path}\n"
@@ -148,15 +147,15 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
         fasta_seqs[record.id] = record
 
     fasta_accessions = set(list(fasta_seqs.keys()))
-    print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path.name}")
+    logger.warning(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path.name}")
 
     acc_in_cazy, acc_not_in_cazy = set(), set()  # ensure they are reset to 0
 
     acc_in_cazy = cazy_accessions & fasta_accessions
-    print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
+    logger.warning(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
 
     acc_not_in_cazy = fasta_accessions.difference(acc_in_cazy)
-    print(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
+    logger.warning(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
 
     if len(acc_not_in_cazy) != 0:
         # gather seqs of prot not in cazy and write to a FASTA file

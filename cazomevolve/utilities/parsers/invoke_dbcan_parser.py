@@ -70,7 +70,7 @@ def build_parser():
     )
 
     parser.add_argument(
-        "-V2"
+        "-V2",
         "--version_2",
         dest="version_2",
         action="store_true",

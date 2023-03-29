@@ -67,13 +67,16 @@ def main():
         # define path to output dir that will house output for this specific input FASTA file
         # extract genomic accession from the file name, and name output dir after the accession
         try:
-            genomic_accession = re.findall(r"GCa_\d+\.\d+", fasta_path.name)[0]
+            genomic_accession = re.findall(r"GCF_\d+\.\d{1,5}", fasta_path.name)[0]
         except IndexError:
             try:
-                genomic_accession = re.findall(r"GCF_\d+\.\d+", fasta_path.name)[0]
+                genomic_accession = re.findall(r"GCA_\d+\.\d{1,5}", fasta_path.name)[0]
             except IndexError:
-                print(f"Could not get find genomic accession in {fasta_path.name}\nSkipping assembly\n")
-                continue
+                logger.warning(
+                    f"Could not retrieve genomic accession from\n{fasta_path}\n"
+                    "Skipping FASTA file"
+                )
+                return
         
         output_dir = args.output_dir / genomic_accession
 

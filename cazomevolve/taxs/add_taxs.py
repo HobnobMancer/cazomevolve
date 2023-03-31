@@ -303,7 +303,7 @@ def write_out_csv(genomes_tax_dict, col_names, args):
         tax_data = genome_tax_data[4:]
 
         for i in range((len(col_names)-1)):  # -1 because the first col name is 'Genomes'
-            if (i+1) == len(col_names):  # last column name
+            if (i+2) == len(col_names):  # last column name
                 # take all items remaining in tax data
                 data = " ".join(tax_data[i:])
                 if len(data) != 0:

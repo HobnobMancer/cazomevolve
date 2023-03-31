@@ -106,8 +106,6 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # genomes_to_query, dict {genome: f"genome_{tax}_{tax}"}
     genomes_tax_dict, genomes_to_query = add_gtdb_taxs(gtdb_df, col_names, args)
 
-    print(genomes_tax_dict)
-    print(genomes_to_query)
     if len(genomes_to_query) > 0:
         logger.warning(f"Retrieving taxonomic lineages from NCBI for {len(genomes_to_query)} genomes")
         genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args)
@@ -299,10 +297,24 @@ def write_out_csv(genomes_tax_dict, col_names, args):
     """
     df_data = []
     for genome in tqdm(genomes_tax_dict, desc="Building tax df"):
-        tax_data = genomes_tax_dict[genome].split("_")
-        df_data.append(([genome] + tax_data[2:]))
-    print(df_data)
-    print(col_names)
+        new_row = [genome]
+
+        genome_tax_data = genomes_tax_dict[genome].split("_")
+        tax_data = genome_tax_data[4:]
+
+        for i in range((len(col_names)-1)):  # -1 because the first col name is 'Genomes'
+            if (i+1) == len(col_names):  # last column name
+                # take all items remaining in tax data
+                data = " ".join(tax_data[i:])
+                if len(data) != 0:
+                    new_row.append(data)
+            else:
+                data = tax_data[i]
+                if len(data) != 0:
+                    new_row.append(data)
+                    
+        df_data.append(new_row)
+        
     df = pd.DataFrame(df_data, columns=col_names)
 
     if args.outpath is None:

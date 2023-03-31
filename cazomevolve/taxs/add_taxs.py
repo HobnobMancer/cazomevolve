@@ -317,13 +317,16 @@ def write_out_csv(genomes_tax_dict, col_names, args):
         
     df = pd.DataFrame(df_data, columns=col_names)
 
+    prefix = ""
     if args.outpath is None:
         if args.FGP_FILE is not None:
             parent_dir = args.FGP_FILE.parent
+            prefix = "fgp_"
         if args.FG_FILE is not None:
             parent_dir = args.FG_FILE.parent
+            prefix = "fg_"
         
-        outpath = parent_dir / "genome_taxs.csv"
+        outpath = parent_dir / f"{prefix}genome_taxs.csv"
 
     else:
         outpath = args.outpath

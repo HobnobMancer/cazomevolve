@@ -106,7 +106,10 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # genomes_to_query, dict {genome: f"genome_{tax}_{tax}"}
     genomes_tax_dict, genomes_to_query = add_gtdb_taxs(gtdb_df, col_names, args)
 
+    print(genomes_tax_dict)
+    print(genomes_to_query)
     if len(genomes_to_query) > 0:
+        logger.warning(f"Retrieving taxonomic lineages from NCBI for {len(genomes_to_query)} genomes")
         genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args)
 
     if args.FGP_FILE is not None:
@@ -145,10 +148,11 @@ def load_gtdb_df(col_names, args):
         dl_gtdb_df.columns = ['Genome', 'Tax']
 
         # separate output tax into genus and species
-        for ri in tqdm(range(100), desc="Parsing GTDB data"):
+        for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
         # for ri in tqdm(range(len(dl_gtdb_df)), desc="Parsing GTDB data"):
             genome_taxonomy = [dl_gtdb_df.iloc[ri]['Genome']]
-            genome_taxonomy = [_.replace("RS_","").replace("GB","") for _ in genome_taxonomy]
+            genome_taxonomy = [_.replace("RS_","").replace("GB_","").strip() for _ in genome_taxonomy]
+
             tax_info = dl_gtdb_df.iloc[ri]['Tax'].split(";")
             for data in tax_info:
                 if args.kingdom and (data.strip().startswith('d__')):
@@ -174,7 +178,8 @@ def load_gtdb_df(col_names, args):
                     genome_taxonomy.append(species)
 
             gtdb_data.append(genome_taxonomy)
-            gtdb_df = pd.DataFrame(gtdb_data, columns=col_names)
+            
+        gtdb_df = pd.DataFrame(gtdb_data, columns=col_names)
     
     return gtdb_df
 
@@ -192,6 +197,7 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
         :var genomes_tax_dict: dict {genome: f'{genome}_{tax}'}
         :var genomes_to_query: set, genomes accs to query ncbi with
     """
+    logger = logging.getLogger(__name__)
     all_genomes = []
 
     if args.FGP_FILE is not None:
@@ -224,6 +230,10 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
             g_rows = gtdb_df[gtdb_df['Genome'] == alt_genome]
             if len(g_rows) == 0:
                 # genome not in gtdb df
+                logger.info(
+                    f"GenBank and RefSeq version of accession {genome} was not in the GTDB database\n"
+                    "Will retrieve taxonomic classifications from NCBI"
+                )
                 genomes_to_query.add(genome)
                 continue
         
@@ -289,7 +299,10 @@ def write_out_csv(genomes_tax_dict, col_names, args):
     """
     df_data = []
     for genome in tqdm(genomes_tax_dict, desc="Building tax df"):
-        df_data.append(([genome] + genomes_tax_dict[genome].split("_")[2:]))
+        tax_data = genomes_tax_dict[genome].split("_")
+        df_data.append(([genome] + tax_data[2:]))
+    print(df_data)
+    print(col_names)
     df = pd.DataFrame(df_data, columns=col_names)
 
     if args.outpath is None:

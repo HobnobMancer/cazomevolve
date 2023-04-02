@@ -42,7 +42,10 @@
 
 import pandas as pd
 import numpy as np
+import re
 
+from Bio import SeqIO
+from saintBioutils.utilities.file_io.get_paths import get_file_paths
 from tqdm import tqdm
 
 
@@ -55,7 +58,7 @@ def count_items_in_cazome(gfp_df, item, grp, round_by=None):
     :param round_by: int, number of figures to round mean and sd by. If None do not round
     
     Return
-    * dict of {genus: {genome: {'families': {families}, 'numOffamilies': int(num of fams)}}}
+    * dict of {grp: {genome: {'items': {items}, 'numOfItems': int(num of items)}}}
     * df, cols = []
     """
     cazome_sizes = {}  # {genus: {genome: {'proteins': unique prot acc, 'numOfcazymes': int(num of prots)}}}
@@ -99,7 +102,7 @@ def count_items_in_cazome(gfp_df, item, grp, round_by=None):
         new_row = [grp_name, mean_items, sd_items, num_genomes]
         cazyme_size_data.append(new_row)
     
-    cols = ['Genome', f'Mean{item}s', f'Sd{item}s', 'NumOfGenomes']
+    cols = [grp, f'Mean{item}s', f'Sd{item}s', 'NumOfGenomes']
     cazome_size_df = pd.DataFrame(cazyme_size_data, columns=cols)
     
     return cazome_sizes, cazome_size_df
@@ -154,6 +157,81 @@ def get_proteome_sizes(proteome_dir, gfp_df, grp):
         proteome_sizes[tax_group][genome] = {'numOfProteins': num_of_proteins}
 
     return proteome_sizes
+
+
+def calc_proteome_representation(proteome_dict, cazome_sizes_dict, grp, round_by=None):
+    """Calculate the percentage of the proteome represented by the CAZome per genome
+    and the mean per tax group ('grp')
+    
+    :param proteome_dict: dict {grp: {genome: {'numOfproteins': int()}}}
+    :param cazome_sizes_dict: dict {grp: {genome: {'Proteins': {prots}, 'numOfProteins': int(num of prots)}}}
+    :param grp: str, name of column (tax_rank) to group genomes by, e.g. 'Genus'
+    :param round_by: int, num of dp to round means and sd to, if none does not round
+    
+    Return
+    * df with columns [grp, 'MeanProteomeSize', 'SdProteomeSize', 'MeanProteomePerc', 'SdProteomePerc', 'NumOfGenomes']
+    """
+    proteome_perc_dict = {}  # {grp_name: {genome: {'numOfProteins': int(num prot ids)}}}
+
+    for grp_name in tqdm(cazome_sizes_dict, desc='Getting proteome size'):
+        for genome in cazome_sizes_dict[grp_name]:
+            # gather num of proteins in CAZome and in the proteome
+            cazome_size = cazome_sizes_dict[grp_name][genome]['numOfProteins']
+            try:
+                proteome_size = proteome_dict[grp_name][genome]['numOfProteins']
+            except KeyError:
+                print(f"Not proteome size available for {genome}.\nSkipping this genome")
+                continue
+
+            percentage = (cazome_size / proteome_size) * 100
+            
+            # check if grp name is in dict
+            try:
+                proteome_perc_dict[grp_name]
+            except KeyError:
+                proteome_perc_dict[grp_name] = {}
+            
+            # add percentage of the proteome to the dict
+            # round only when calc mean
+            proteome_perc_dict[grp_name][genome] = percentage
+    
+    # calculate the mean proteome size and percentage per tax group (grp)
+    # cazome_sizes_dict = {grp: {genome: {'Proteins': {prots}, 'numOfProteins': int(num of prots)}}}
+
+    df_data = []  # [[grp_name, mean proteome size, sd proteome size, mean perc, sd perc]]
+
+    for grp_name in tqdm(proteome_perc_dict, desc='Calc proteome perc'):
+        # gather proteome sizes and perc for the grp
+        grp_proteome_size = []
+        grp_proteome_perc = []
+        
+        for genome in proteome_perc_dict[grp_name]:
+            grp_proteome_size.append(proteome_dict[grp_name][genome]['numOfProteins'])
+            grp_proteome_perc.append(proteome_perc_dict[grp_name][genome])
+
+        # calc means and sd
+        mean_proteome = np.mean(grp_proteome_size)
+        sd_proteome = np.std(grp_proteome_size)
+
+        mean_perc = np.mean(grp_proteome_perc)
+        sd_perc = np.std(grp_proteome_perc)
+
+        if round_by is not None:
+            mean_proteome = round(mean_proteome, 2)
+            sd_proteome = round(sd_proteome, 2)
+            mean_perc = round(mean_perc, 2)
+            sd_perc = round(sd_perc, 2)
+
+        num_of_genomes = len(list(proteome_perc_dict[grp_name].keys()))
+
+        df_data.append(
+            [grp_name, mean_proteome, sd_proteome, mean_perc, sd_perc, num_of_genomes]
+        )
+
+    col_names = [grp, 'MeanProteomeSize', 'SdProteomeSize', 'MeanProteomePerc', 'SdProteomePerc', 'NumOfGenomes']
+    df = pd.DataFrame(df_data, columns=col_names)
+    
+    return df
 
 
 #

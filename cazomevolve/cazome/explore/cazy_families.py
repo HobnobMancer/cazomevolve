@@ -42,6 +42,9 @@
 
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
+
+from matplotlib.patches import Patch
 
 from tqdm import tqdm
 
@@ -101,20 +104,99 @@ def build_fam_freq_df(gfp_df, tax_ranks):
     return fam_freq_df
 
 
-def build_row_colours(fam_freq_df, grp, palette):
+def build_row_colours(df, grp, palette):
     """Build map of colour to member of grp (e.g. genus)
+
+    The dataframe that is parsed to `build_row_colours()` must be the dataframe that is used to 
+    generate a clustermap, otherwise Seaborn will not be able to map the row oclours correctly 
+    and no row colours will be produced.
+
+    The dataframe used to generate the clustermap when passed to the function, must include the 
+    column to be used to define the row colours, e.g. a 'Genus' column. This column (named by `grp`)
+    is removed within the function.
     
-    :param fam_freq_df: matrix of genome x fam, with fam freq
+    :param df: matrix of genome x fam, with fam freq
     :param grp: str, name of col to map colour scheme onto, e.g. 'Genus' or 'Species'
     :param palette: str, name of seaborn colour scheme to use, e.g. Set1
     
-    Return map
+    Return map and lut
     """
-    series = fam_freq_df.pop(grp)
+    series = df.pop(grp)
     lut = dict(zip(
         series.unique(),
         sns.color_palette(palette, n_colors=len(list(series.unique())))
     ))
     row_colours = series.map(lut)
     
-    return row_colours
+    return row_colours, lut
+
+
+def build_family_clustermap(
+    df,
+    row_colours=None,
+    fig_size=None,
+    file_path=None,
+    file_format='png',
+    font_scale=1,
+    dpi=300,
+    dendrogram_ratio=None,
+    lut=None,
+    legend_title='',
+    title_fontsize='2',
+    legend_fontsize='2',
+    bbox_to_anchor=(1,1),
+    cmap=sns.cubehelix_palette(dark=1, light=0, reverse=True, as_cmap=True),
+):
+    """Build a clustermap of the CAZy family frequencies per genome
+    
+    :param df: df of CAZy family frequencies per genome
+    :param row_colours: pandas map - used to define additional row colours. or list of maps for 
+        multiple sets of row colours. If None, additional row colours are not plotted
+    :param fig_size: tuple (width, height) of final figure. If None, decided by Seaborn
+    :param file_path: path to save image to. If None, the figure is not written to a file
+    :param file_format: str, file format to save figure to. Default 'png'
+    :param font_scale: int, scale text - use if text is overlapping. <1 to reduce 
+        text size
+    :param dpi: dpi of saved figure
+    :param dendrogram_ratio: Proportion of the figure size devoted to the dendrograms.
+        If a pair is given, they correspond to (row, col) ratios.
+    :param lut: lut from generating colour scheme, add to include legend in the plot7
+    :param legend_title: str, title of legend for row colours
+    :title_fontsize: int or {'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'}
+        The font size of the legend's title.
+    :legend_fontsize: int or {'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large', 'xx-large'}
+    :param bbox_to_anchor: tuple, coordinates to place legend
+    :param cmap: Seaborn cmap to be used for colour scheme of the heat/clustermap
+    
+    Return nothing
+    """
+    sns.set(font_scale=font_scale)
+    
+    fam_clustermap = sns.clustermap(
+        df,
+        cmap=cmap,
+        figsize=fig_size,
+        row_colors=row_colours,
+        dendrogram_ratio=dendrogram_ratio,
+        yticklabels=True,
+    );
+    
+    if lut is not None:
+        handles = [Patch(facecolor=lut[name]) for name in lut]
+        plt.legend(
+            handles,
+            lut,
+            title=legend_title,
+            bbox_to_anchor=bbox_to_anchor,
+            bbox_transform=plt.gcf().transFigure,
+            loc='upper center',
+            title_fontsize=title_fontsize,
+            fontsize=legend_fontsize,
+        )
+        
+    if file_path is not None:
+        fam_clustermap.savefig(
+            file_path,
+            dpi=dpi,
+            bbox_inches='tight',
+        )

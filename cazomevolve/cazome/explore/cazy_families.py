@@ -41,6 +41,7 @@
 
 
 import pandas as pd
+import seaborn as sns
 
 from tqdm import tqdm
 
@@ -98,3 +99,22 @@ def build_fam_freq_df(gfp_df, tax_ranks):
     fam_freq_df = pd.DataFrame(fam_df_data, columns=col_names)
     
     return fam_freq_df
+
+
+def build_row_colours(fam_freq_df, grp, palette):
+    """Build map of colour to member of grp (e.g. genus)
+    
+    :param fam_freq_df: matrix of genome x fam, with fam freq
+    :param grp: str, name of col to map colour scheme onto, e.g. 'Genus' or 'Species'
+    :param palette: str, name of seaborn colour scheme to use, e.g. Set1
+    
+    Return map
+    """
+    series = fam_freq_df.pop(grp)
+    lut = dict(zip(
+        series.unique(),
+        sns.color_palette(palette, n_colors=len(list(series.unique())))
+    ))
+    row_colours = series.map(lut)
+    
+    return row_colours

@@ -115,6 +115,11 @@ def calculate_class_sizes(gfp_df, grp, round_by=None):
                 
             mean_cazy_class = np.mean(cazy_class_sizes)
             sd_cazy_class = np.std(cazy_class_sizes)
+
+            if round_by is not None:
+                mean_cazy_class = round(mean_cazy_class, round_by)
+                sd_cazy_class = round(sd_cazy_class, round_by)
+
             num_genomes = len(list(cazy_class_size_dict[cazy_class][grp_name].keys()))
             
             cazy_class_data.append(

@@ -263,7 +263,7 @@ def plot_fam_boxplot(
         )
 
 
-def build_fam_mean_freq_df(df, grp):
+def build_fam_mean_freq_df(df, grp, round_by=None):
     """Build two dataframes of fam frequencies from a wide fam freq df
     
     DF 1: Family, tax rank (i.e. group), genome, freq
@@ -274,6 +274,7 @@ def build_fam_mean_freq_df(df, grp):
         and index includes the genomic accession
     :param grp: str, name of tax rank to group data by, and matches a name of one 
         of the columns in the dataframe (e.g. a 'Genus' column)
+    :param round_by: int, number of decimal points to round by. If None, does not round
     
     Return two dataframes
     """
@@ -305,6 +306,10 @@ def build_fam_mean_freq_df(df, grp):
             fam_grp_rows = grp_rows[grp_rows['Family'] == fam]
             mean = np.mean(fam_grp_rows['Frequency'])
             sd = np.std(fam_grp_rows['Frequency'])
+
+            if round_by is not None:
+                mean = round(mean, round_by)
+                sd = round(sd, round_by)
             
             df_2_data.append([fam, grp_name, mean, sd])
         

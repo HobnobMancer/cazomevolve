@@ -217,10 +217,10 @@ def calc_proteome_representation(proteome_dict, cazome_sizes_dict, grp, round_by
         sd_perc = np.std(grp_proteome_perc)
 
         if round_by is not None:
-            mean_proteome = round(mean_proteome, 2)
-            sd_proteome = round(sd_proteome, 2)
-            mean_perc = round(mean_perc, 2)
-            sd_perc = round(sd_perc, 2)
+            mean_proteome = round(mean_proteome, round_by)
+            sd_proteome = round(sd_proteome, round_by)
+            mean_perc = round(mean_perc, round_by)
+            sd_perc = round(sd_perc, round_by)
 
         num_of_genomes = len(list(proteome_perc_dict[grp_name].keys()))
 

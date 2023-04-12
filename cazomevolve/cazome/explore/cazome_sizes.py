@@ -234,6 +234,68 @@ def calc_proteome_representation(proteome_dict, cazome_sizes_dict, grp, round_by
     return df
 
 
+def count_cazyme_fam_ratio(fgp_df, grp, round_by=None):
+    """Calculate the mean (and SD) CAZyme to CAZy family ratio across the genomes for each group e.g. genus
+    
+    :param fgp_df: panda df, cols = ['Family', 'Genome', 'Protein', 'tax grp', 'tax grp'...]
+    :param grp: str, name of column to group genomes by
+    :param round_by: int, number of figures to round mean and sd by. If None do not round
+    
+    Return
+    * dict of {grp: {genome: {'items': {items}, 'numOfItems': int(num of items)}}}
+    * df, cols = []
+    """
+    cazome_sizes = {}  # {genus: {genome: {'proteins': unique prot acc, 'numOfcazymes': int(num of prots)}}}
+    
+    for ri in tqdm(range(len(fgp_df)), desc="Gathering CAZymes and CAZy families per genome"):
+        row = fgp_df.iloc[ri]
+        genome = row['Genome']
+        fam = row['Family']
+        protein = row['Protein']
+        grp_name = row[grp]
+
+        try:
+            cazome_sizes[grp_name]
+        except KeyError:
+            cazome_sizes[grp_name] = {}
+
+        try:
+            cazome_sizes[grp_name][genome]['Proteins'].add(protein)
+            cazome_sizes[grp_name][genome]['Families'].add(fam)
+        except KeyError:
+            cazome_sizes[grp_name][genome] = {'Proteins': {protein}, 'Families': {fam}}
+            
+    cazyme_ratio_data = []
+
+    for grp_name in tqdm(cazome_sizes, desc=f"Calculating CAZyme/CAZy family ratio"):
+        for genome in cazome_sizes[grp_name]:
+            num_of_cazymes = len(cazome_sizes[grp_name][genome]['Proteins'])
+            num_of_families = len(cazome_sizes[grp_name][genome]['Families'])
+            cazyme_fam_ratio = num_of_cazymes / num_of_families
+            cazome_sizes[grp_name][genome]['ratio'] =cazyme_fam_ratio
+            
+        ratios = []
+        for genome in cazome_sizes[grp_name]:
+            ratios.append(cazome_sizes[grp_name][genome]['ratio'])
+
+        mean_ratio = np.mean(ratios)
+        sd_ratio = np.std(ratios)
+        
+        if round_by is not None:
+            mean_ratio = mean_ratio.round(decimals = round_by)
+            sd_ratio = sd_ratio.round(decimals = round_by)
+        
+        num_genomes = len(list(cazome_sizes[grp_name].keys()))
+        
+        new_row = [grp_name, mean_ratio, sd_ratio, num_genomes]
+        cazyme_ratio_data.append(new_row)
+    
+    cols = [grp, 'MeanCAZymeToFamRatio', 'SdCAZymeToFamRatio', 'NumOfGenomes']
+    cazome_ratio_df = pd.DataFrame(cazyme_ratio_data, columns=cols)
+    
+    return cazome_sizes, cazome_ratio_df
+
+
 #
 ##
 #

@@ -88,6 +88,8 @@ setuptools.setup(
         "biopython",
         "pandas",
         "tqdm",
+        "sklearn",
+        "scikit-learn",
         "saintbioutils",
         "numpy",
         "seaborn",

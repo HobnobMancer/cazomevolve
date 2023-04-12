@@ -4,4 +4,9 @@ biopython
 numpy
 pandas
 saintBioutils>=0.0.19
+sklearn
+scikit-learn
 sqlalchemy==1.4.20
+upsetplot
+scipy
+jupyter

@@ -41,6 +41,7 @@
 
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -49,20 +50,20 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-def perform_pca(fam_df, group_by, nComp):
+def perform_pca(df, nComp):
     """Perform PCA on family freq df
     
-    :param fam_df: df, rows=genomes, cols=fam freqs
-    :param group_by: str, tax grouping, genus or species
+    :param df: df, rows=genomes, cols=fam freqs
+        Only contains columns with CAZy family frequency data
+        Recommend placing the tax data in the index or leaving out
     :param nComp: int, number of components
      
-    Return PCA object and object for scaling PCA"""
-    group = f"{group_by[0].upper()}{group_by[1:]}"
-
+    Return PCA object and object for scaling PCA
+    """
     # scale the data
     scaler = StandardScaler()
-    scaler.fit(fam_df.loc[:, fam_df.columns!=group])
-    X_scaled = scaler.transform(fam_df.loc[:, fam_df.columns!=group])
+    scaler.fit(df.loc[:, df.columns])
+    X_scaled = scaler.transform(df.loc[:, df.columns])
 
     cazome_pca = PCA(n_components=nComp)
     cazome_pca.fit(X_scaled)
@@ -70,42 +71,78 @@ def perform_pca(fam_df, group_by, nComp):
     return cazome_pca, X_scaled
 
 
-def plot_explained_variance(pca, nComp, figsize=(10, 5)):
-    """Plot explained variance.
+def plot_explained_variance(
+    pca,
+    nComp,
+    threshold=0.95,
+    figsize=(10, 5),
+    file_path=None,
+    file_format='png',
+    dpi=300,
+):
+    """Plot the cumlative explained variance.
     
     :param pca: sklearn pca object
     :param nComp: int, number of PCs
+    :param threshold: int (float), calc the number of PCs needed to capture this degree of the variance 
+        in the dataset
+    :param file_path: str/Path, path to write out figure. If none, image is not written to a file
+    :param file_format: str, format to write out the image. Default, png
+    :param dpi: int, resolution for saved figure
     
-    Retrun nothing
+    Retrun numpy array with the explained variance per PC
     """
     cumExpVar = np.cumsum(pca.explained_variance_ratio_)
+
+    keepPC = [pc for pc in range(nComp) if cumExpVar[pc] >= threshold][0]
+    print(
+        'Number of features needed to explain {:1.2f} fraction of total variance is {:2d}. '.format(threshold, keepPC)
+    )
+
     fig = plt.figure(figsize=figsize)
     im = plt.plot( range(nComp), cumExpVar )
     plt.xticks(np.arange(0,nComp,5));
     plt.xlabel( 'Number of PCs', fontsize=14);
     plt.ylabel('Cumulative explained variance', fontsize=14);
     plt.show;
+
+    if file_path is not None:
+        plt.savefig(
+            file_path,
+            bbox_inches='tight',
+            format=file_format,
+            dpi=dpi,
+        )
+
+    return cumExpVar
     
     
-def plot_spree(pca, nComp=10, savefig=None, dpi=300):
-    """Generate spree plot for PCA
+def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300):
+    """Generate scree plot for PCA, plotting the amount of variance captured by each pc, for the
+    first nComp PCs
     
     :param pca: sklearn pca object
     :param nComp: int, number of PCs to plot
+    :param file_path: str/Path, path to write out figure. If none, image is not written to a file
+    :param file_format: str, format to write out the image. Default, png
+    :param dpi: int, resolution for saved figure
     
     Return nothing
     """
     PC_values = np.arange(nComp) + 1
-    plt.plot(PC_values, pca.explained_variance_ratio_[0:10], 'o-', linewidth=2, color='blue')
+    plt.plot(PC_values, pca.explained_variance_ratio_[0:nComp], 'o-', linewidth=2, color='blue')
     plt.xlabel('Principal Component')
     plt.ylabel('Variance Explained')
-    if savefig is not None:
+    if file_path is not None:
         plt.savefig(
-            savefig,
+            file_path,
             bbox_inches='tight',
             dpi=dpi,
         )
     plt.show();
+
+    for i in range(nComp):
+        print(f"Explained variance for {i+1}PC: {pca.explained_variance_ratio_[i]}")
     
 
 def plot_pca(
@@ -115,12 +152,18 @@ def plot_pca(
     first_pc,
     second_pc,
     group_by,
-    style=False,
+    file_path=None,
+    style=None,
+    style_order=None,
+    hue_order=None,
     font_scale=1.15,
     figsize=None, 
     xlim=None,
     ylim=None,
+    dpi=300,
     loc='upper left',
+    marker_size=100,
+    markers=True,
 ):
     """Project genomes onto the PCs
     
@@ -131,6 +174,20 @@ def plot_pca(
     :param second_pc: int, number of the second PC
     :param group_by: how to group/colour data, genus or species
     
+    OPTIONS
+    :param file_path: path to write out fig, if none no file saved
+    :param style: str, name of column to use to define style/marker style
+    :param style_order: list order to list styles
+    :param hue_order: list to write/assign categories of colours
+    :param font_scale: float, scale font. >1 increases font size
+    :param xlim: tuple, limits of the x axis
+    :param ylim: tuple, limits of the y axis
+    :param dpi: int, dpi to write out figure
+    :param loc: str, location of key
+    :param marker_size: int, scale of markers
+    :param markers: dict, pass dict to map each level style to a marker 
+        defined in matplotlib
+    
     Return plot
     """
     grouping = f"{group_by[0].upper()}{group_by[1:]}"
@@ -138,23 +195,103 @@ def plot_pca(
     
     if figsize is not None:
         plt.figure(figsize=figsize)
+        
     sns.set(font_scale=font_scale)
-    
-    if style:
-        g = sns.scatterplot(
-            x=X_pca[:,first_pc-1],
-            y=X_pca[:, second_pc-1],
-            data=fam_df,
-            hue=grouping,
-            style=grouping,
-        )
-    else:
-        g = sns.scatterplot(
-            x=X_pca[:,first_pc-1],
-            y=X_pca[:, second_pc-1],
-            data=fam_df,
-            hue=grouping,
-        )
+
+    if hue_order is not None:
+        print('Applying hue order')
+        
+        if style is not None:
+            print('Applying style')
+            
+            if style_order is not None:
+                print('Applying style order')
+                # all options specified
+                # apply style order
+                g = sns.scatterplot(
+                    x=X_pca[:,first_pc-1],
+                    y=X_pca[:, second_pc-1],
+                    data=fam_df,
+                    hue=group_by,
+                    s=marker_size,
+                    hue_order=hue_order,
+                    style=style,
+                    style_order=style_order,
+                    markers=markers,
+                )
+                
+            else:
+                print('Not applying style order')
+                # use default style order
+                g = sns.scatterplot(
+                    x=X_pca[:,first_pc-1],
+                    y=X_pca[:, second_pc-1],
+                    data=fam_df,
+                    hue=group_by,
+                    s=marker_size,
+                    hue_order=hue_order,
+                    style=style,
+                    markers=markers,
+                )                
+            
+        else:
+            print('Not applying style')
+            # hue order only
+            g = sns.scatterplot(
+                x=X_pca[:,first_pc-1],
+                y=X_pca[:, second_pc-1],
+                data=fam_df,
+                hue=group_by,
+                s=marker_size,
+                hue_order=hue_order,
+                markers=markers,
+            )  
+        
+    else:  # using default hue order - i.e. order data is presented in df
+        print('Not applying hue order')
+        
+        if style is not None:  # use different markers for catagroies in provided col
+            print('Applying style')
+            
+            if style_order is not None:  # define the order of the marker styles
+                print('Applying style order')
+                # apply style order
+                g = sns.scatterplot(
+                    x=X_pca[:,first_pc-1],
+                    y=X_pca[:, second_pc-1],
+                    data=fam_df,
+                    hue=group_by,
+                    s=marker_size,
+                    style=style,
+                    style_order=style_order,
+                    markers=markers,
+                )
+                
+            else:
+                print('Not applying style order')
+                # use default style order
+                g = sns.scatterplot(
+                    x=X_pca[:,first_pc-1],
+                    y=X_pca[:, second_pc-1],
+                    data=fam_df,
+                    hue=group_by,
+                    s=marker_size,
+                    style=style,
+                    markers=markers,
+                )
+        
+        else:
+            print('Not Applying style')
+            # no options specified
+            # do not apply style
+            g = sns.scatterplot(
+                x=X_pca[:,first_pc-1],
+                y=X_pca[:, second_pc-1],
+                data=fam_df,
+                hue=group_by,
+                s=marker_size,
+                markers=markers,
+            )
     
     if xlim is not None:
         g.set(xlim=xlim);
@@ -168,7 +305,15 @@ def plot_pca(
     plt.xlabel(f"PC{first_pc} {100 * pca.explained_variance_ratio_[(first_pc - 1)]:.2f}%");
     plt.legend(bbox_to_anchor=(1.02, 1), loc=loc, borderaxespad=0);
     
-    return g
+    if file_path is not None:
+        plt.savefig(
+            file_path,
+            bbox_inches='tight',
+            dpi=dpi,
+        )
+    plt.show();
+    
+    return plt
 
 
 def plot_loadings(
@@ -179,8 +324,10 @@ def plot_loadings(
     threshold=0.7,
     font_scale=1.15,
     font_size=12,
+    dpi=300,
     fig_size=(16,16),
-    save_fig=None,
+    file_path=None,
+    marker_size=100,
 ):
     """Build loadings plot
     
@@ -194,7 +341,7 @@ def plot_loadings(
     :param font_scale: scale font
     :param font_size: font size of family labels
     :param fig_size: tuple (width, height) of final plot
-    :param save_fig: str, path to write out a figure.
+    :param file_path: str, path to write out a figure.
         If None, no figure is saved
     
     Return nothing"""
@@ -238,7 +385,7 @@ def plot_loadings(
     loadings_df['cazy_class'] = cazy_class
 
     plt.figure(figsize=fig_size)
-    g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class);
+    g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size);
     g.axhline(0, linestyle='--', color='grey', linewidth=1.25);
     g.axvline(0, linestyle='--', color='grey', linewidth=1.25);
     g.set(xlim=(-1,1),ylim=(-1,1));
@@ -259,6 +406,5 @@ def plot_loadings(
     ]
     adjustText.adjust_text(texts, arrowprops=dict(arrowstyle='-', color='black'));
     
-    if save_fig is not None:
-        plt.savefig(save_fig, dpi=dpi, bbox_inches='tight')
-
+    if file_path is not None:
+        plt.savefig(file_path, dpi=dpi, bbox_inches='tight')

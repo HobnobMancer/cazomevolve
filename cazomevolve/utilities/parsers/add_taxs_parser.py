@@ -53,6 +53,7 @@ def build_parser(argv: Optional[List] = None):
         description="Add taxonomic information to tab delimited files",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+
     # Add positional arguments to parser
     parser.add_argument(
         "email",
@@ -84,8 +85,9 @@ def build_parser(argv: Optional[List] = None):
         help=(
             "Path to write out CSV of retrieved tax data.\n"
             "Else, writes out to taxomines.csv\n"
-            "in the same dir as --FGP_FILE/--FG_FILE",
-    ))
+            "in the same dir as --FGP_FILE/--FG_FILE"
+        ),
+    )
 
     parser.add_argument(
         "--kingdom",

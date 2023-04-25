@@ -172,7 +172,7 @@ def build_family_clustermap(
     :param cbar_pos: from seaborn.clustermap, position and size of colour scale key/bar
         seaborn default=(0.02, 0.8, 0.05, 0.18) - left, bottom, width, height
     
-    Return nothing
+    Return clustermap object
     """
     sns.set(font_scale=font_scale)
     
@@ -206,6 +206,8 @@ def build_family_clustermap(
             dpi=dpi,
             bbox_inches='tight',
         )
+
+    return fam_clustermap
 
 
 def build_family_clustermap_multi_legend(
@@ -250,7 +252,7 @@ def build_family_clustermap_multi_legend(
     :param cbar_pos: from seaborn.clustermap, position and size of colour scale key/bar
         seaborn default=(0.02, 0.8, 0.05, 0.18) - left, bottom, width, height
     
-    Return nothing
+    Return clustermap object
     """
     if legend_cols is None:
         legend_cols = [1] * len(luts)
@@ -314,8 +316,11 @@ def build_family_clustermap_multi_legend(
             bbox_inches='tight',
         )
 
+    return fam_clustermap
+
 
 ## For the core CAZome
+
 
 def identify_core_cazome(df):
     """Identify families that are present in every genome
@@ -326,7 +331,7 @@ def identify_core_cazome(df):
     core_cazome = set()
 
     for fam in tqdm(df.columns, desc="Identifying core CAZome"):
-            if 0 not in list(df[fam]):
+            if 0 not in set(df[fam]):
                 core_cazome.add(fam)
 
     return core_cazome

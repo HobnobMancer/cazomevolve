@@ -114,7 +114,7 @@ def calculate_class_sizes(fgp_df, grp, round_by=None):
                 # cazy class is not in any genomes from the grp_name
                 num_genomes = len(set(fgp_df[fgp_df[grp] == grp_name]['Genome']))  # sample size
                 cazy_class_data.append(
-                    [cazy_class, grp_name, 0, 0, num_genomes]
+                    [cazy_class, grp_name, 0, 0, 0, 0, num_genomes]
                 )
                 continue
                 

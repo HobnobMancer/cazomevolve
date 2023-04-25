@@ -49,6 +49,8 @@ from tqdm import tqdm
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
+import adjustText
+
 
 def perform_pca(df, nComp):
     """Perform PCA on family freq df
@@ -304,6 +306,7 @@ def plot_pca(
     plt.ylabel(f"PC{second_pc} {100 * pca.explained_variance_ratio_[(second_pc - 1)]:.2f}%");
     plt.xlabel(f"PC{first_pc} {100 * pca.explained_variance_ratio_[(first_pc - 1)]:.2f}%");
     plt.legend(bbox_to_anchor=(1.02, 1), loc=loc, borderaxespad=0);
+    sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
     
     if file_path is not None:
         plt.savefig(
@@ -348,7 +351,7 @@ def plot_loadings(
     sns.set(font_scale=font_scale)
 
     # calculate loading = variables x loadings, returns an array
-    loadings = pca.components_.T * np.sqrt(cazome_pca.explained_variance_)
+    loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
     # get labels of variables, i.e. cazy families
     loadings_labels = list(fam_df.columns)
     try:
@@ -401,10 +404,12 @@ def plot_loadings(
             va='center',
             fontsize=font_size,
         ) for (xval, yval, lbl) in zip(
-            loadings[:,(first_pc-1)], loadings[:,(second_pc-1)], loadings_labels
+            loadings_x, loadings_y, loadings_labels
         ) if abs(xval) > threshold or abs(yval) > threshold
     ]
     adjustText.adjust_text(texts, arrowprops=dict(arrowstyle='-', color='black'));
+
+    sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
     
     if file_path is not None:
         plt.savefig(file_path, dpi=dpi, bbox_inches='tight')

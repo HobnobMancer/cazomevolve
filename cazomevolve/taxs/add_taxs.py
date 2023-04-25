@@ -109,7 +109,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     if len(genomes_to_query) > 0:
         logger.warning(f"Retrieving taxonomic lineages from NCBI for {len(genomes_to_query)} genomes")
         genomes_tax_dict = add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args)
-
+    
     if args.FGP_FILE is not None:
         write_tab_lists(args.FGP_FILE, genomes_tax_dict, col_names)
 
@@ -300,7 +300,7 @@ def write_out_csv(genomes_tax_dict, col_names, args):
         new_row = [genome]
 
         genome_tax_data = genomes_tax_dict[genome].split("_")
-        tax_data = genome_tax_data[4:]
+        tax_data = genome_tax_data[2:]
 
         for i in range((len(col_names)-1)):  # -1 because the first col name is 'Genomes'
             if (i+2) == len(col_names):  # last column name

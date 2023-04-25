@@ -1,3 +1,4 @@
+adjustText
 cazy_webscraper
 tqdm
 biopython

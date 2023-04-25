@@ -52,7 +52,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 setuptools.setup(
     name="cazomevolve",
-    version="0.0.3",
+    version="0.0.4",
     # Metadata
     author="Emma E. M. Hobbs",
     author_email="eemh1@st-andrews.ac.uk",
@@ -84,6 +84,7 @@ setuptools.setup(
         'cazomevolve/seq_diversity/run_diamond.sh',
     ],
     install_requires=[
+        "adjustText",
         "cazy_webscraper",
         "biopython",
         "pandas",

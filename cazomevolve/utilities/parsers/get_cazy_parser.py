@@ -66,7 +66,7 @@ def build_parser(argv: Optional[List] = None):
         "database",
         type=Path,
         default=None,
-        help="Path CAZy JSON file, keyed by protein accessions, valued by list of families",
+        help="Path to local CAZyme database (SQLite3) compiled by cazy_webscraper",
     )
 
     parser.add_argument(

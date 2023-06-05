@@ -52,7 +52,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 setuptools.setup(
     name="cazomevolve",
-    version="0.0.4",
+    version="0.1.0",
     # Metadata
     author="Emma E. M. Hobbs",
     author_email="eemh1@st-andrews.ac.uk",
@@ -74,10 +74,20 @@ setuptools.setup(
         ]
     },
     scripts=[
-        'cazevolve_download_acc_genomes = cazomevolve/genomes/download_acc_genomes.sh',
-        'cazevolve_get_fam_seqs = cazomevolve/seq_diversity/get_fam_seqs.sh',
-        'cazevolve_run_blastp = cazomevolve/seq_diversity/run_blastp.sh',
-        'cazevolve_run_diamond = cazomevolve/seq_diversity/run_diamond.sh',
+        'cazomevolve/genomes/download_acc_genomes.sh',
+        'cazomevolve/seq_diversity/get_fam_seqs.sh',
+        'cazomevolve/seq_diversity/run_blastp.sh',
+        'cazomevolve/seq_diversity/run_diamond.sh',
+        'cazomevolve/cazome/cazy/build_db.sh',
+        'cazomevolve/scripts/tree/phylo/align_scos.sh',
+        'cazomevolve/scripts/tree/phylo/annotate_genomes.sh',
+        'cazomevolve/scripts/tree/phylo/backtranslates.sh',
+        'cazomevolve/scripts/tree/phylo/concatenate_cds.py',
+        'cazomevolve/scripts/tree/phylo/extract_cds.py',
+        'cazomevolve/scripts/tree/phylo/find_orthologues.sh',
+        'cazomevolve/scripts/tree/phylo/raxml_ng_build_tree.sh',
+        'cazomevolve/scripts/tree/ani/run_anim.sh',
+        'cazomevolve/scripts/tree/ani/build_anim_tree.R',
     ],
     install_requires=[
         "adjustText",

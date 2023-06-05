@@ -152,7 +152,7 @@ def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False):
     - returns set of frequencies in case different numbers are produced for each inital pair 
     of co-occurring families
     """
-    cooccuring_fams_dict = identify_cooccurring_fam_pairs(df, all_families, exclude_core_cazome=False)
+    cooccuring_fams_dict = identify_cooccurring_fam_pairs(df, all_families, exclude_core_cazome=exclude_core_cazome)
     
     cooccurring_groups = {}
     grp_num = 0

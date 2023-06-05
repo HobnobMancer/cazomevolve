@@ -40,19 +40,20 @@
 """Build CLI for invoke_dbcan.py"""
 
 
-import argparse
-
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
+from cazomevolve.cazome.dbcan import invoke_dbcan
 
-def build_parser():
+
+def build_parser(
+    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
+) -> None:
     """Return ArgumentParser parser for script."""
     # Create parser object
-    parser = argparse.ArgumentParser(
-        prog="run_dbcan",
-        description="Invoke dbCAN",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    parser = subps.add_parser(
+        "run_dbcan", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser
@@ -117,6 +118,5 @@ def build_parser():
         default=False,
         help="Set logger level to 'INFO'",
     )
-
-    return parser
+    parser.set_defaults(func=invoke_dbcan.main)
 

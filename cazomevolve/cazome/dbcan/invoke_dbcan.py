@@ -42,20 +42,18 @@
 
 import re
 import subprocess
+import logging
 
 from tqdm import tqdm
+from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io import get_paths
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.invoke_dbcan_parser import build_parser
 
 
-def main():
-    parser = build_parser()
-    args = parser.parse_args()
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
     # get the path to every FASTA to be parsed by dbCAN

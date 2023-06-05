@@ -49,24 +49,11 @@ from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths
-from saintBioutils.utilities.logger import config_logger
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.get_dbcan_parser import build_parser
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args
-    
-    if logger is None:
-        config_logger(args)
-    logger = logging.getLogger(__name__)
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     # make output dir if necessary
     if str(args.fam_genome_list.parent) != ".":
         make_output_directory(args.fam_genome_list.parent, args.force, args.nodelete)

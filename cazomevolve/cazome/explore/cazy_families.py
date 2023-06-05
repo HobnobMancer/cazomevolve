@@ -306,7 +306,7 @@ def build_family_clustermap_multi_legend(
                 loc='center',
                 title_fontsize=title_fontsize,
                 fontsize=legend_fontsize,
-                ncols=ncols,
+                ncol=ncols,
             )
         
     if file_path is not None:

@@ -45,6 +45,8 @@ import logging
 
 __version__ = "0.0.3"
 
+__citation__ = "???"
+
 
 def closing_message(job, args):
     """Write closing messsage to terminal

@@ -51,9 +51,10 @@ from typing import List, Optional
 
 from cazomevolve import __version__, __citation__
 from cazomevolve.utilities.parsers import (
-    get_fam_seqs,
-    run_fam_blast,
-    run_fam_diamond,
+    get_fam_seqs_parser,
+    run_blast_parser,
+    run_diamond_parser,
+    dl_acc_genomes_parser,
 )
 
 
@@ -95,9 +96,12 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
     # add subcommand parser
 
     # Seq diversity subcommands
-    get_fam_seqs.build_parser(subparsers)
-    run_fam_blast.build_parser(subparsers)
-    run_fam_diamond.build_parser(subparsers)
+    get_fam_seqs_parser.build_parser(subparsers)
+    run_blast_parser.build_parser(subparsers)
+    run_diamond_parser.build_parser(subparsers)
+
+    # annotate the cazome
+    dl_acc_genomes_parser.build_parser(subparsers)
 
     # Parse arguments
     # The list comprehension is to allow PosixPaths to be defined and passed in testing

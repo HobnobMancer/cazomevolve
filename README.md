@@ -137,23 +137,17 @@ Optionally, redundant protein sequences can be removed, and proteins of interest
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 
+# Annotate the CAZome
 
+## Download genomes
 
+The genomes to be download can be specified by [A] their genomic accessions, or [B] by specifying a taxa of interest (using a taxa of any level).
 
+### [A] Genomic accessions
 
+If you have a list of genomic version accessions in a plain text file, `cazomevolve` can use the Python package `ncbi-genome-download` to download the genomic assemblies genomic (`.fna`) and proteome (`.faa`) sequence files.
 
-
-
-
-# Download genomes
-
-To download the genomic assemblies, use either method [A] or [B]
-
-## [A] Already have a list of genomic version accessions
-
-If you already have a list of genomic version accessions in a plain text file, using the Python package `ncbi-genome-download` to download the genomic assemblies genomic (`.fna`) and proteome (`.faa`) sequence files.
-
-The `cazevolve_download_acc_genomes` configures using `ncbi-genome-download`. The command takes 4 positional arguments and 1 optional argument:
+Using the `download_acc_genomes` subcommand, which takes 4 positional arguments and 1 optional argument:
 
 **Positional arguments:**
 1. Path to file containing list of accessions (with a unique genome accession per row)
@@ -164,13 +158,12 @@ The `cazevolve_download_acc_genomes` configures using `ncbi-genome-download`. Th
 **Optional arguments:**
 1. Assembly level. Default 'all'. Comma separated list. Choose from: ['all', 'complete', 'chromosome', 'scaffold', 'contig']
 
-**Download the genomes in `.fna` and `faa` format.**
+**Downloads the genomes in `.fna` and `faa` format.**
 
-## [B] Retrieve all genomic assemblies associated with a specific term
+### [B] Taxa
 
-To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the command`cazevolve_download_genomes`.
+To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the subcommand `download_genomes`, which takes 4 arguments:
 
-**The command takes 4 requires arguments:**
 1. User email address (required by NCBI)
 2. The terms of interest. Comma-separated list, e.g. 'Pectobacterium,Dickeya'
 3. The file formats to download the genomic assemblies in. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]"
@@ -190,6 +183,17 @@ By default if the output directory exists, `cazomevolve` will crash. To write to
 ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
 ``--timeout`` TIMEOUT - time in seconds before connection times out (default: 30)
 ``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
+
+
+
+
+
+
+
+
+
+
+
 
 # Annotate CAZomes
 

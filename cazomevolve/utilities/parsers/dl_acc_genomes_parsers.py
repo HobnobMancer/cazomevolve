@@ -37,14 +37,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Build args parser for run_fam_diamond"""
+"""Build args parser for get_cazy_cazymes.py"""
 
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
-from cazomevolve.scripts import run_fam_diamond
+from cazomevolve.scripts import download_acc_genomes
 
 
 def build_parser(
@@ -53,22 +53,35 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "run_fam_diamond", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "download_acc_genomes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
-        "fasta",
+        "accessions",
         type=str,
-        help="Path to fasta file of protein seqs",
+        help="Path to file listing the accessions, with a unique genome accession per row",
     )
     parser.add_argument(
-        "fasta",
+        "outdir",
         type=str,
-        help="Path to create diamond DB",
+        help="output directory to write out the genomes to",
     )
     parser.add_argument(
-        "outfile",
+        "file_opts",
         type=str,
-        help="Path to write out output file",
+        help=(
+            "A comma-separated list of formats is also possible. For example: 'fasta,assembly-report'. Choose from:\n"
+            "['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']"
+        ),
     )
-    parser.set_defaults(func=run_fam_diamond.main)
+    parser.add_argument(
+        "database",
+        type=str,
+        help="Choose which NCBI db to get genomes from: refseq or genbank",
+    )
+    parser.add_argument(
+        "level",
+        type=str,
+        help="assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']",
+    )
+    parser.set_defaults(func=download_acc_genomes.main)

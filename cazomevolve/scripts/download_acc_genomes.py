@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# (c) University of St Andrews 2022
-# (c) University of Strathclyde 2022
-# (c) James Hutton Institute 2022
+# (c) University of St Andrews 2020-2021
+# (c) University of Strathclyde 2020-2021
 # Author:
 # Emma E. M. Hobbs
 
@@ -37,38 +36,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Build args parser for run_fam_diamond"""
+"""Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
+import argparse
+import sys
+import subprocess
+
 from pathlib import Path
 from typing import List, Optional
 
-from cazomevolve.scripts import run_fam_diamond
+
+# $1 path to file listing the accessions, with a unique genome accession per row
+# $2 output directory to write out the genomes to
+# $3 file options - A comma-separated list of formats is also possible. For example: "fasta,assembly-report". Choose from:
+# ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
+# $4 refseq or genbank
+# $5 assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']
 
 
-def build_parser(
-    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
-) -> None:
-    """Return ArgumentParser parser for script."""
-    # Create parser object
-    parser = subps.add_parser(
-        "run_fam_diamond", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
-    )
+def main(args: argparse.Namespace) -> int:
+    theproc = subprocess.Popen([
+        "./genomes/downooad_acc_genomes.sh",
+        args.accessions,
+        args.outdir,
+        args.file_opts,
+        args.database,
+        args.level
+    ], shell=True)
+    theproc.communicate()   
 
-    parser.add_argument(
-        "fasta",
-        type=str,
-        help="Path to fasta file of protein seqs",
-    )
-    parser.add_argument(
-        "fasta",
-        type=str,
-        help="Path to create diamond DB",
-    )
-    parser.add_argument(
-        "outfile",
-        type=str,
-        help="Path to write out output file",
-    )
-    parser.set_defaults(func=run_fam_diamond.main)
+    return 0
+
+if __name__ == "__main__":
+    main()

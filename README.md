@@ -5,79 +5,181 @@
 ![Python](https://img.shields.io/badge/Python-v3.9.---orange)
 ![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
 
-**Cazome** **Evolve** (`cazomevolve`) invetigates the evolution of CAZomes by:
-* searching for CAZy families that associated more than expected from their lineage
-* projecting the CAZome composition onto a plot
-* building a dendogram using distances calculated from the CAZome composition 
+`cazomevolve` ('cazome-evolve') is an application and Python3 package for the automated annotation and exploratory analysis of CAZyme complements (CAZomes) for a set of species and/or genomes of interest. Carbohydrate Active enZymes are a subset of proteins that generate, modify and/or degrade carbohydrates. CAZy (www.cazy.org) is the most comprehensive CAZyme database, grouping proteins by sequence similarity into CAZy families.
 
-This repo houses all scripts required for calculating, exploring and visually representing the covariance of CAZy family annotations within genomic assemblies.
+Use `cazomevolve` to explore:
+
+**CAZome sizes:**
+* Compare the number of CAZymes and CAZy families
+* Calculate the proportion of the proteome encompassed by the CAZome
+* Compute the CAZy family to CAZyme ratio
+
+**CAZy class frequencies:**
+* Calculate the number of CAZymes per CAZy class
+* Plot a proportional area plot of CAZy class frequency broken down by CAZy class and user defined group deliniations (e.g. by genus or species)
+
+**CAZy families:**
+* Explore **sequence diversity** within a set of CAZy families:
+  * Run all-vs-all sequence comparison analyses
+  * Cluster the sequences by degree of sequence similarity
+  * Generate clustermaps of sequence identity, BLAST-score ratio, and coverage
+* Explore **CAZy family frequencies**:
+  * Compute the number of CAZymes per CAZy family
+  * Identify **lineage or group specific families** - e.g. genus or species specific families
+  * Identify **core CAZomes** - families that appear in all genomes
+  * Cluster genomes by CAZy family frequencies using **hierarchical clustering:**
+    * Generate annotated clustermaps of CAZy family frequencies
+    * Build a dendogram using distances calculated from the CAZome composition
+    * Construct tanglegrams to compare CAZy family dendrogram to a ANI-dendrogram or phylogenetic tree
+
+**Always co-occurring families:**
+* Identity CAZy families that are always present in the CAZome together
+* Find lineage or group specific groups of co-occurring families 
+* Construct an upset plot of co-occurring families
+* Calculate the number of genomes each group of co-occurring families appear in
+
+**Principal component analysis (PCA):**
+* Use PCA to idenify overal trends in the large and complex data set
+* Project genomes onto use selected principal components (PCs)
+* Construct loadings plots to explore correlation between CAZy families and PCs
+* Identify relationships between groups of CAZy families
+* Explore associations between CAZy families and lineage, phenotype, and niche adaptation
+
+**Co-evolving CAZy families:**
+* Generate the input file tab delimited list of genomes and CAZy families required by [`coinfinder`]() (Whelan _et al._)
+* Optionally add taxonomic data to the tab delimited list, to include taxa in the `coinfinder` output
+* Reconstruct phylogenetic trees to be used as input by `coinfinder`:
+  * Reconstruct a multi-gene phylogenetic tree using [`RaxML-ng`]()
+  * Construct an ANI-based dendrogram
+* Use `coinfinder` to identify CAZy families that appear together in a genome **more often than expected by lienage and chance**
+
+> Kozlov AM, Darriba D, Flouri T, Morel B, Stamatakis A. RAxML-NG: a fast, scalable and user-friendly tool for maximum likelihood phylogenetic inference. Bioinformatics. 2019 Nov 1;35(21):4453-4455. doi: 10.1093/bioinformatics/btz305.
+> Whelan FJ, Rusilowicz M, McInerney JO. Coinfinder: detecting significant associations and dissociations in pangenomes. Microb Genom. 2020 Mar;6(3):e000338. doi: 10.1099/mgen.0.000338. Epub 2020 Feb 24.
+
+## Documentation
+
+`cazomevolve` uses bash-script based workflow management. A summary of this workflow is provided in this README.
+
+Please see the [full documeentation including tutorials at ReadTheDocs]().
+
+An analysis using `cazomevolve` can be found [here](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto), which includes a README-walkthrough and all output files.
 
 ## Contents
 
-1. [Overview](#Overview)
-2. [Installation](#Installation)
-    - [Requirements](#Requirements)
-3. [Current Developments](#Current)
-3. [Directories](#Directories)
-        
-## Overview
-
-Carbohydrate Active enZymes are a subset of proteins that generate, modify and/or degrade carbohydrates. CAZy (www.cazy.org) is the most comprehensive CAZyme database, grouping proteins by sequence similarity into CAZy families. **C**azy **F**amily co**V**ariance **investigator** (`cfv_investigator`) investigates the covariance of CAZy family annotations within proteomes across all species annotated by CAZy, and evaluates taxonomic specific covaraince of CAZy families.
-
-`cazomevolve` is a bioinformatic package (still in development) for:
-1. Retrieving of genomic accessions from which proteins catalogued within CAZy are derived from, and the associated taxonomic data of the source organism
-2. Tracking frequency of CAZy family annotations for all genomic assemblies identified in step 1
-3. Calculation of covariance of CAZy family annotations across all genomic assemblies identified in step 1, and for taxonomic specific groups (at the kingdom, genus and species taxonomic level)
-4. Generating dataframes of the number of CAZymes per CAZy family for each genomic assembly
-5. Generating a presence/absence matrix for each CAZy family in each genomic assembly
-
-<p>&nbsp;</p>
+1. [cazomevolve](#cazomevolve)
+2. [Documentation](#documentation)
+3. [Installation](#installation)
 
 ## Installation
 
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
-`conda create -n <venv_name> python=3.9`   
-`conda activate <venv_name>`
+```bash
+conda create -n cazomevolve python=3.9
+conda activate cazomevolve
+```
 
 2. Clone the repository
-`git clone https://github.com/HobnobMancer/cazomevolve.git`
+```bash
+git clone https://github.com/HobnobMancer/cazomevolve.git
+```
 
 3. Install pyrewton
-`pip3 install -e <path to directory containing setup.py file>`   
-Do not forget to use the **-e** option when install using pip3, otherwise each time pyrewton is invoked a ModuleNotFound error will be raised. Pass the path to the **directory** containign the setup.py file not the path to the setup.py file; if you are currently in the root directory of the repoistory where the file is located, simply use '.' to indicate the current working directory.
+```
+pip3 install -e <path to directory containing setup.py file>
+```
+Do not forget to use the **-e** option when install using pip3.  
+
+Pass the path to the **directory** containing the setup.py file not the path to the setup.py file; if you are currently in the root directory of the repoistory where the file is located, simply use '.' to indicate the current working directory.
 
 <p>&nbsp;</p>
 
 ## Requirements
 
+### Essential
+
 POISx or Mac OS, or linux emulator   
-Python version 3.8+   
+Python version 3.8+
 Miniconda3 or Anaconda managed microenvironment, incorporated code checkers are included in list form in 'requirements.txt'.   
 Miniconda3 environment file is also available in the GitHub repository: 'environment.yml'.   
 For all required Python libraries please read 'requirements.txt'. 
 
-* [`ncbi-genome-download`](https://github.com/kblin/ncbi-genome-download/)
+The following packages are required by the core `cazomevolve` application, and their installation is handled by the `setup.py` file:
+* [`adjustText`](https://adjusttext.readthedocs.io/en/latest/)
+* [`biopython`](https://biopython.org/)
+* [`cazy_webscraper`](https://github.com/HobnobMancer/cazy_webscraper)
+* [`jupyter](https://jupyter.org/)
+* [`ncbi-genome-download`](https://pypi.org/project/ncbi-genome-download/)
+* [`numpy`](https://numpy.org/)
+* [`pandas`](https://pandas.pydata.org/)
 * [`saintBioutils`](https://github.com/HobnobMancer/saintBioutils)
+* [`seaborn`](https://seaborn.pydata.org/)
+* [`sklearn`](https://scikit-learn.org/stable/index.html) / `scikit-learn`
+* [`tqdm`](https://pypi.org/project/tqdm/)
+* [`upsetplot`](https://pypi.org/project/UpSetPlot/)
+
+### Optional
+
+The following packages are optional can installation instructions can be found in their respective repositories:
+
+**dbCAN:**
+
+To expand the data set beyond those CAZomes only listed in CAZy (**highly recommended!**) `dbCAN` must also be installed.
+
+Note: _`dbCAN` and `cazomevolve` can be installed in the same or separate virtual environments._
+
+**dbCAN version 3 and 4:**
+The CAZyme classifier `dbCAN` versions >= 3.0.6 can be installed via Conda (recommended). The full installation instructions are found [here](https://github.com/linnabrown/run_dbcan/tree/c9bad4835b2bc1a9685d693237f1d6a9d56ff3a1), and must be followed to ensure all additional database files are downloaded and compiled correctly.
+
+**dbCAN version 2:**
+The installation instructions for dbCAN v==2.0.11 can be found [here](https://github.com/linnabrown/run_dbcan/tree/fde6d7225441ef3d4cb29ea29e39cfdcc41d8b19).
+
+
+**`coinfinder`: Identify CAZy families that co-occurr more often than expected by lineage and chance:**
+* [`coinfinder`](https://github.com/fwhelan/coinfinder) >= v1.2.0
+
+Note: _`coinfinder` requires Python v3.6, we recommend installing and running `coinfinder` in a separate venv to `cazomevolve`
+
+**Construct an ANI-based dendrogram:**
+* [`pyani`](https://github.com/widdowquinn/pyani) >= version 0.3.0-alpha
+* [`R`](https://www.r-project.org/)
+
+**Reconstruct a multi-gene phylogenetic tree:**
+* [`MAFFT`](https://mafft.cbrc.jp/alignment/software/)
+* [`Orthofinder`](https://github.com/davidemms/OrthoFinder)
+* [`Prodigal`](https://github.com/hyattpd/Prodigal)
+* [`RaxML-ng`](https://github.com/amkozlov/raxml-ng)
+* [`T-coffee`](https://tcoffee.crg.eu/)
 
 <p>&nbsp;</p>
 
-
-
 # Method
 
-# Explore sequence diversity in CAZy families
+## Construct a local CAZyme database
+
+Download all CAZyme records from CAZy, and compile the records into a local SQLite3 database using `cazy_webscraper`:
+```bash
+cazy_webscraper <user-email-address> -o <desired-path-for-db>
+```
+
+## Explore sequence diversity in CAZy families
 
 Presuming a local CAZyme database has already been generated using `cazy_webscraper`:
 
-1. Generate a multisequence FASTA file for each CAZy family of interest using the bash script `get_fam_seqs.sh`, which 
-takes 4 positional arguments:
+1. Generate a multisequence FASTA file for each CAZy family of interest using the bash script `get_fam_seqs.sh`, which takes 4 positional arguments:
 
 * email address
 * path to a local cazyme db
 * name(s) of families of interest (separate with a single comma)
 * path to an output dir (do not include terminal /)
 
-Or use `cazy_webscraper` directly to create a multisequence FASTA file containing the protein sequences of interst
+```bash
+
+```
+
+Or use `cazy_webscraper` directly to create a multisequence FASTA file containing the protein sequences of interest.
+
+
+
 
 2. Run all-vs-all sequence analysis for each multisequence FASTA file. Use the `run_blastp.sh` script to use BLASTP+ or the `run_diamond.sh` script to use DIAMOND (recommend for large families of >1000 proteins sequences)
 

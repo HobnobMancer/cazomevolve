@@ -78,10 +78,10 @@ setuptools.setup(
         ]
     },
     scripts=[
-        'cazomevolve/genomes/download_acc_genomes.sh',
-        'cazomevolve/seq_diversity/get_fam_seqs.sh',
-        'cazomevolve/seq_diversity/run_blastp.sh',
-        'cazomevolve/seq_diversity/run_diamond.sh',
+        'cazevolve_download_acc_genomes = cazomevolve/genomes/download_acc_genomes.sh',
+        'cazevolve_get_fam_seqs = cazomevolve/seq_diversity/get_fam_seqs.sh',
+        'cazevolve_run_blastp = cazomevolve/seq_diversity/run_blastp.sh',
+        'cazevolve_run_diamond = cazomevolve/seq_diversity/run_diamond.sh',
     ],
     install_requires=[
         "adjustText",
@@ -98,6 +98,7 @@ setuptools.setup(
         "upsetplot",
         "scipy",
         "jupyter",
+        "ncbi-genome-download",
     ],
     packages=setuptools.find_packages(),
     package_data={

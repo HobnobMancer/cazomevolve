@@ -297,12 +297,35 @@ def add_to_upsetplot_membership(upsetplot_membership, cooccurring_fams_dict):
     return upsetplot_membership
 
 
-def build_upsetplot(upsetplot_membership, file_path=None, file_format='svg'):
+def build_upsetplot(
+    upsetplot_membership,
+    file_path=None,
+    file_format='svg',
+    sort_by='degree',
+    sort_categories_by='cardinality',
+):
     """Use the upsetplot package to build an upsetplot of co-occurring families
     
     :param upsetplot_membership: list of lists, one nested list per instance of co-occurring families group
     :param file_path, str/Path, path to write out figure. If none, file is not written out
     :param file_format: str, format to write out file, e.g. svg or png, default, svg
+    :param sort_by: str, method to sort subsets 
+        From Upsetplot:
+            sort_by : {'cardinality', 'degree', '-cardinality', '-degree',
+                    'input', '-input'}
+                If 'cardinality', subset are listed from largest to smallest.
+                If 'degree', they are listed in order of the number of categories
+                intersected. If 'input', the order they appear in the data input is
+                used.
+                Prefix with '-' to reverse the ordering.
+
+                Note this affects ``subset_sizes`` but not ``data``.
+    :param sort_categories_by: str, 
+        From UpsetPlot:
+            sort_categories_by : {'cardinality', '-cardinality', 'input', '-input'}
+                Whether to sort the categories by total cardinality, or leave them
+                in the input data's provided order (order of index levels).
+                Prefix with '-' to reverse the ordering.
     
     Return upsetplot
     """
@@ -310,7 +333,8 @@ def build_upsetplot(upsetplot_membership, file_path=None, file_format='svg'):
     coocurring_upset_plot = upsetplot.UpSet(
         upset_data,
         subset_size='sum',
-        sort_by='degree',
+        sort_categories_by=sort_categories_by,
+        sort_by=sort_by,
     )
     coocurring_upset_plot.plot();
     

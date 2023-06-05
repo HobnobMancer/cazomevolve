@@ -40,6 +40,7 @@
 """Build CLI for invoke_dbcan.py"""
 
 
+from asyncio import subprocess
 import sys
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, Namespace
@@ -52,6 +53,7 @@ from cazomevolve import __version__, __citation__
 from cazomevolve.utilities.parsers import (
     get_fam_seqs,
     run_fam_blast,
+    run_fam_diamond,
 )
 
 
@@ -93,6 +95,7 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
     # add subcommand parser
     get_fam_seqs.build_parser(subparsers)
     run_fam_blast.build_parser(subparsers)
+    run_fam_diamond.build_parser(subparsers)
 
     # Parse arguments
     # The list comprehension is to allow PosixPaths to be defined and passed in testing

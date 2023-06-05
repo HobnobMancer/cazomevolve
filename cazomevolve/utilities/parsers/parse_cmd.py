@@ -93,6 +93,8 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
     )
 
     # add subcommand parser
+
+    # Seq diversity subcommands
     get_fam_seqs.build_parser(subparsers)
     run_fam_blast.build_parser(subparsers)
     run_fam_diamond.build_parser(subparsers)

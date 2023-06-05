@@ -37,14 +37,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Build args parser for get_cazy_cazymes.py"""
+"""Build args parser for run_fam_diamond"""
 
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
-from cazomevolve.scripts import get_fam_seqs
+from cazomevolve.scripts import run_fam_blast
 
 
 def build_parser(
@@ -53,27 +53,22 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "get_fam_seqs", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "run_fam_diamond", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
-        "email",
+        "fasta",
         type=str,
-        help="User email address (Required by NCBI)",
+        help="Path to fasta file of protein seqs",
     )
     parser.add_argument(
-        "cazy",
+        "fasta",
         type=str,
-        help="Path to local CAZyme db",
+        help="Path to create diamond DB",
     )
     parser.add_argument(
-        "families",
+        "outfile",
         type=str,
-        help="Families to retrieve, separated by single comma e.g 'GH1,PL2,CE3",
+        help="Path to write out output file",
     )
-    parser.add_argument(
-        "outdir",
-        type=str,
-        help="Path to dir to write out FASTA file",
-    )
-    parser.set_defaults(func=get_fam_seqs.main)
+    parser.set_defaults(func=run_fam_blast.main)

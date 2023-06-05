@@ -58,12 +58,12 @@ def build_parser(
 
     parser.add_argument(
         "fasta",
-        type=Path,
+        type=str,
         help="Path to fasta file of protein seqs",
     )
     parser.add_argument(
         "outfile",
-        type=Path,
+        type=str,
         help="Path to write out output file",
     )
     parser.set_defaults(func=run_fam_blast.main)

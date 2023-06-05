@@ -40,12 +40,10 @@
 """Retrieve CAZy canoncial CAZyme classifications"""
 
 
-import json
 import logging
 import re
 import sys
 
-from pathlib import Path
 from typing import List, Optional
 
 from Bio import SeqIO
@@ -53,25 +51,12 @@ from cazy_webscraper.sql.sql_orm import get_db_connection, Session, Genbank, Caz
 from cazy_webscraper.sql.sql_interface.get_data.get_table_dicts import get_gbk_table_dict
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_file_paths
-from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.get_cazy_parser import build_parser
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args()
-
-    if logger is None:
-        config_logger(args)
-    logger = logging.getLogger(__name__)
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     if str(args.output_dir.parent) != ".":
         make_output_directory(args.output_dir, args.force, args.nodelete)
 

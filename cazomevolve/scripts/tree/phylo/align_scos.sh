@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# (c) University of St Andrews 2020-2021
-# (c) University of Strathclyde 2020-2021
-# (c) James Hutton Institute 2020-2021
+# (c) University of St Andrews 2023
+# (c) University of Strathclyde 2023
+# (c) James Hutton Institute 2023
 #
 # Author:
 # Emma E. M. Hobbs
@@ -39,28 +39,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# run_diamond.sh
+# align_scos.sh
+#
+# Align single-copy orthologue sequences using MAFFT
 
-# $1 input FASTA file
-# $2 diamond db to be created
-# $3 output file
+# $1 directoty containing SCO sequences from orthofinder, e.g. orthologues/Results_May28/Single_Copy_Orthologue_Sequences/
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+# Create output directory
+mkdir -p data/pecto_dic/tree/sco_proteins_aligned
 
-# build db
-echo 'Building database'
-diamond makedb \
-    --in $1 \
-    --db $2
-
-# run diamond
-echo 'Running DIAMOND'
-diamond blastp \
-    --db $2 \
-    --query $1 \
-    --out $3 \
-    --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
-    --evalue 10 \
-    --max-target-seqs 0
-
+# Align each set of SCOs
+for fname in $1/*.fa
+do
+    mafft --thread 12 ${fname} > data/pecto_dic/tree/sco_proteins_aligned/`basename ${fname%%.fa}`_aligned.fasta
+done

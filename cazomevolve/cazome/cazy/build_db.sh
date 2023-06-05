@@ -1,15 +1,14 @@
-#!/usr/bin/env bash
-#
-# (c) University of St Andrews 2020-2021
-# (c) University of Strathclyde 2020-2021
-# (c) James Hutton Institute 2020-2021
-#
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# (c) University of St Andrews 2022
+# (c) University of Strathclyde 2022
+# (c) James Hutton Institute 2022
 # Author:
 # Emma E. M. Hobbs
-#
+
 # Contact
 # eemh1@st-andrews.ac.uk
-#
+
 # Emma E. M. Hobbs,
 # Biomolecular Sciences Building,
 # University of St Andrews,
@@ -18,7 +17,7 @@
 # KY16 9ST
 # Scotland,
 # UK
-#
+
 # The MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,10 +26,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-#
+
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-#
+
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,28 +38,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# run_diamond.sh
+# build_db
 
-# $1 input FASTA file
-# $2 diamond db to be created
-# $3 output file
+# build a local cazyme db
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+# $1 user email address
+# $2 path to write out db
 
-# build db
-echo 'Building database'
-diamond makedb \
-    --in $1 \
-    --db $2
-
-# run diamond
-echo 'Running DIAMOND'
-diamond blastp \
-    --db $2 \
-    --query $1 \
-    --out $3 \
-    --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
-    --evalue 10 \
-    --max-target-seqs 0
-
+cazy_webscraper \
+    $1 \
+    -o $2

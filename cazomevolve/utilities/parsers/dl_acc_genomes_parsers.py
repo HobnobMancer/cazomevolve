@@ -37,14 +37,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Build CLI for invoke_dbcan.py"""
+"""Build args parser for get_cazy_cazymes.py"""
 
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
-from cazomevolve.cazome.dbcan import invoke_dbcan
+from cazomevolve.scripts import download_acc_genomes
 
 
 def build_parser(
@@ -53,70 +53,35 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "run_dbcan", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
-    )
-
-    # Add positional arguments to parser
-
-    parser.add_argument(
-        "input_dir",
-        type=Path,
-        help="Path to directory containing FASTAs to be parsed by dbCAN",
+        "download_acc_genomes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(
-        "output_dir",
-        type=Path,
-        help="Path to directory to write out genomic assemblies",
+        "accessions",
+        type=str,
+        help="Path to file listing the accessions, with a unique genome accession per row",
     )
-
     parser.add_argument(
-        "-V2",
-        "--version_2",
-        dest="version_2",
-        action="store_true",
-        default=False,
-        help="Use dbCAN version 2 NOT 3",
+        "outdir",
+        type=str,
+        help="output directory to write out the genomes to",
     )
-
-    # Add option to force file over writting
     parser.add_argument(
-        "-f",
-        "--force",
-        dest="force",
-        action="store_true",
-        default=False,
-        help="Force file over writting",
+        "file_opts",
+        type=str,
+        help=(
+            "A comma-separated list of formats is also possible. For example: 'fasta,assembly-report'. Choose from:\n"
+            "['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']"
+        ),
     )
-
-    # Add option to specific directory for log to be written out to
     parser.add_argument(
-        "-l",
-        "--log",
-        type=Path,
-        metavar="log file name",
-        default=None,
-        help="Defines log file name and/or path",
+        "database",
+        type=str,
+        help="Choose which NCBI db to get genomes from: refseq or genbank",
     )
-    # Add option to prevent over writing of existing files
-    # and cause addition of files to output directory
     parser.add_argument(
-        "-n",
-        "--nodelete",
-        dest="nodelete",
-        action="store_true",
-        default=False,
-        help="enable/disable deletion of exisiting files",
+        "level",
+        type=str,
+        help="assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']",
     )
-
-    # Add option to specify verbose logging
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        dest="verbose",
-        action="store_true",
-        default=False,
-        help="Set logger level to 'INFO'",
-    )
-    parser.set_defaults(func=invoke_dbcan.main)
-
+    parser.set_defaults(func=download_acc_genomes.main)

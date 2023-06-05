@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# (c) University of St Andrews 2020-2021
-# (c) University of Strathclyde 2020-2021
-# (c) James Hutton Institute 2020-2021
+# (c) University of St Andrews 2023
+# (c) University of Strathclyde 2023
+# (c) James Hutton Institute 2023
 #
 # Author:
 # Emma E. M. Hobbs
@@ -39,28 +39,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# run_diamond.sh
+# backtranslate.sh
+#
+# Backtranslate CDS sequences onto aligned proteins using T-Coffee
 
-# $1 input FASTA file
-# $2 diamond db to be created
-# $3 output file
+# $1 dir of aligned protien seqs
+# $2 output dir
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+# Prepare output directory
+mkdir -p $2
 
-# build db
-echo 'Building database'
-diamond makedb \
-    --in $1 \
-    --db $2
-
-# run diamond
-echo 'Running DIAMOND'
-diamond blastp \
-    --db $2 \
-    --query $1 \
-    --out $3 \
-    --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
-    --evalue 10 \
-    --max-target-seqs 0
-
+# Backtranslate each single-copy orthologue set
+for fname in data/pecto_dic/tree/sco_cds/*.fasta
+do
+  t_coffee -other_pg seq_reformat \
+    -in ${fname} \
+    -in2 $1/`basename ${fname%%.fasta}_aligned.fasta` \
+    -action +thread_dna_on_prot_aln \
+    -output fasta \
+    > $2/`basename ${fname%%.fasta}_aligned.fasta`
+done

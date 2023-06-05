@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# (c) University of St Andrews 2020-2021
-# (c) University of Strathclyde 2020-2021
-# (c) James Hutton Institute 2020-2021
+# (c) University of St Andrews 2023
+# (c) University of Strathclyde 2023
+# (c) James Hutton Institute 2023
 #
 # Author:
 # Emma E. M. Hobbs
@@ -39,28 +39,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# run_diamond.sh
+# find_orthologues
 
-# $1 input FASTA file
-# $2 diamond db to be created
-# $3 output file
+# Find orthologues using orthofinder
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+# Change soft limit on simultaneously open files
+ulimit -n 5000
 
-# build db
-echo 'Building database'
-diamond makedb \
-    --in $1 \
-    --db $2
+# $1 path to reannotated proteome FASTA files
+# $2 output dir
 
-# run diamond
-echo 'Running DIAMOND'
-diamond blastp \
-    --db $2 \
-    --query $1 \
-    --out $3 \
-    --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
-    --evalue 10 \
-    --max-target-seqs 0
-
+# Run orthofinder
+orthofinder -f data/pecto_dic/tree/genomes/proteins \
+  -o data/pecto_dic/tree/orthologues

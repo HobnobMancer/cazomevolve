@@ -44,6 +44,9 @@
 # $1 input FASTA file
 # $2 output file
 
+FILE_NAME=${2##*/}
+mkdir -p "${2%$FILE_NAME}"
+
 blastp \
   -query $1 \
   -subject $1 \

@@ -195,7 +195,7 @@ def get_dbcan_fams_data(dbcan_dir, fam_g_path, fam_g_p_path):
     * cazome_sizes: Dict {genomic_acc: {'CAZymes': (num of CAZymes (num unique protein acc))}}
     """
     # get paths to all dbCAN output dirs
-    dbcan_dir_paths = get_dir_paths(dbcan_output_dir)
+    dbcan_dir_paths = get_dir_paths(dbcan_dir)
     
     all_fams = set()
     fam_freqs = {}  # genomic acc: Counter objects

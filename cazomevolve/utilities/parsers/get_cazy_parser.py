@@ -39,19 +39,21 @@
 # SOFTWARE.
 """Build args parser for get_cazy_cazymes.py"""
 
-import argparse
 
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
+from cazomevolve.scripts import build_cazy_db
 
-def build_parser(argv: Optional[List] = None):
+
+def build_parser(
+    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
+) -> None:
     """Return ArgumentParser parser for script."""
     # Create parser object
-    parser = argparse.ArgumentParser(
-        prog="identify_cazy_cazymes.py",
-        description="Retrieve CAZy annotations of CAZymes",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    parser = subps.add_parser(
+        "get_cazy_cazymes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser

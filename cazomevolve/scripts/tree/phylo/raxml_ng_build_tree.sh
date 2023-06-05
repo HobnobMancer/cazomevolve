@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# (c) University of St Andrews 2020-2021
-# (c) University of Strathclyde 2020-2021
-# (c) James Hutton Institute 2020-2021
+# (c) University of St Andrews 2023
+# (c) University of Strathclyde 2023
+# (c) James Hutton Institute 2023
 #
 # Author:
 # Emma E. M. Hobbs
@@ -39,28 +39,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# run_diamond.sh
+# build_tree.sh
+#
+# Build maximum parsimony tree using raxml-ng, with
+# bootstrap support
 
-# $1 input FASTA file
-# $2 diamond db to be created
-# $3 output file
+# $1 $CONCAT_FASTA e.g "data/pecto_dic/tree/concatenated_cds/concatenated.fasta"
+# $2 $CONCAT_PART e.g. "data/pecto_dic/tree/concatenated_cds/concatenated.part"
+# $3 output dir
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+mkdir -p $3
 
-# build db
-echo 'Building database'
-diamond makedb \
-    --in $1 \
-    --db $2
+raxml-ng --check \
+  --msa $1 \
+  --model $2 \
+  --prefix $3/01_check
 
-# run diamond
-echo 'Running DIAMOND'
-diamond blastp \
-    --db $2 \
-    --query $1 \
-    --out $3 \
-    --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
-    --evalue 10 \
-    --max-target-seqs 0
+raxml-ng --parse \
+  --msa $1 \
+  --model $2 \
+  --prefix $3/02_parse
 
+raxml-ng \
+  --msa $1 \
+  --model $2 \
+  --threads 8 \
+  --seed 38745 \
+  --prefix $3/03_infer
+
+raxml-ng --bootstrap \
+  --msa $1 \
+  --model $2 \
+  --threads 8 \
+  --seed 38745 \
+  --bs-trees 100 \
+  --prefix $3/04_bootstrap

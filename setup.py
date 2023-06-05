@@ -70,11 +70,7 @@ setuptools.setup(
     platforms="Posix, MacOS X",
     entry_points={
         "console_scripts": [
-            "cazevolve_download_genomes = cazomevolve.genomes.download_genomes:main",
-            "cazevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
-            "cazevolve_invoke_dbcan = cazomevolve.cazome.dbcan.invoke_dbcan:main",
-            "cazevolve_get_dbcan_cazymes = cazomevolve.cazome.dbcan.get_dbcan_cazymes:main",
-            "cazevolve_add_taxs = cazomevolve.taxs.add_taxs:main",
+            "cazomevolve = cazomevolve.scripts.cazomevolve_script:main",
         ]
     },
     scripts=[

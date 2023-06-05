@@ -324,6 +324,7 @@ def plot_loadings(
     fam_df,
     first_pc,
     second_pc,
+    style=False,
     threshold=0.7,
     font_scale=1.15,
     font_size=12,
@@ -338,6 +339,7 @@ def plot_loadings(
     :param fam_df: cazy family frequncy df
     :param first_pc: int, number of the first PC, e.g. PC1 == 1
     :param second_pc: int, number of the second PC e.g. PC2 == 2
+    :param style: boolean, change shape of points depending on CAZy class
     :param threshold: correlation cut off for showing labels
         Only families with a value greater than the threshold
         will be annotated
@@ -388,7 +390,125 @@ def plot_loadings(
     loadings_df['cazy_class'] = cazy_class
 
     plt.figure(figsize=fig_size)
-    g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size);
+    if style:
+        g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size, style=cazy_class);
+    else:
+        g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size);
+    g.axhline(0, linestyle='--', color='grey', linewidth=1.25);
+    g.axvline(0, linestyle='--', color='grey', linewidth=1.25);
+    g.set(xlim=(-1,1),ylim=(-1,1));
+    plt.ylabel(f"PC{second_pc}") 
+    plt.xlabel(f"PC{first_pc}")
+
+    texts = [
+        plt.text(
+            xval,
+            yval,
+            lbl,
+            ha='center',
+            va='center',
+            fontsize=font_size,
+        ) for (xval, yval, lbl) in zip(
+            loadings_x, loadings_y, loadings_labels
+        ) if abs(xval) > threshold or abs(yval) > threshold
+    ]
+    adjustText.adjust_text(texts, arrowprops=dict(arrowstyle='-', color='black'));
+
+    sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
+    
+    if file_path is not None:
+        plt.savefig(file_path, dpi=dpi, bbox_inches='tight')
+
+
+def plot_ie_loadings(
+    pca,
+    fam_df,
+    first_pc,
+    second_pc,
+    style=False,
+    threshold=0.7,
+    font_scale=1.15,
+    font_size=12,
+    dpi=300,
+    fig_size=(16,16),
+    file_path=None,
+    marker_size=100,
+):
+    """Build loadings plot
+    
+    Modified from cazomevolve - styles points using intracellular/extracellular classification
+    
+    :param pca: sklearn pca object
+    :param fam_df: cazy family frequncy df
+    :param first_pc: int, number of the first PC, e.g. PC1 == 1
+    :param second_pc: int, number of the second PC e.g. PC2 == 2
+    :param threshold: correlation cut off for showing labels
+        Only families with a value greater than the threshold
+        will be annotated
+    :param font_scale: scale font
+    :param font_size: font size of family labels
+    :param fig_size: tuple (width, height) of final plot
+    :param file_path: str, path to write out a figure.
+        If None, no figure is saved
+    
+    Return nothing"""
+    sns.set(font_scale=font_scale)
+
+    # calculate loading = variables x loadings, returns an array
+    loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+    # get labels of variables, i.e. cazy families
+    loadings_labels = list(fam_df.columns)
+    try:
+        loadings_labels.remove('Species')
+    except (KeyError, ValueError):
+        pass
+    try:
+        loadings_labels.remove('Genus')
+    except (KeyError, ValueError):
+        pass
+
+    loadings_x = loadings[:,(first_pc-1)]
+    loadings_y = loadings[:,(second_pc-1)]
+
+    loadings_df = pd.DataFrame()
+    loadings_df['loadings_x'] = loadings_x
+    loadings_df['loadings_y'] = loadings_y
+
+    cazy_class = []
+    for lbl in loadings_labels:
+        if lbl.find('GH') != -1:
+            cazy_class.append('GH')
+        elif lbl.find('GT') != -1:
+            cazy_class.append('GT')
+        elif lbl.find('PL') != -1:
+            cazy_class.append('PL')
+        elif lbl.find('CE') != -1:
+            cazy_class.append('CE')
+        elif lbl.find('AA') != -1:
+            cazy_class.append('AA')
+        else:
+            cazy_class.append('CBM')
+
+    loadings_df['cazy_class'] = cazy_class
+    
+    ie_classifications = []
+    for lbl in loadings_labels:
+        if lbl.startswith("i_"):
+            ie_classifications.append('Intracellular')
+        else:
+            ie_classifications.append('Extracellular')
+    loadings_df['ie_classification'] = ie_classifications
+
+    plt.figure(figsize=fig_size)
+    g = sns.scatterplot(
+        x=loadings_x,
+        y=loadings_y,
+        data=loadings_df,
+        hue=cazy_class,
+        s=marker_size,
+        style=ie_classifications,
+    );
+    
     g.axhline(0, linestyle='--', color='grey', linewidth=1.25);
     g.axvline(0, linestyle='--', color='grey', linewidth=1.25);
     g.set(xlim=(-1,1),ylim=(-1,1));

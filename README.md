@@ -184,20 +184,9 @@ By default if the output directory exists, `cazomevolve` will crash. To write to
 ``--timeout`` TIMEOUT - time in seconds before connection times out (default: 30)
 ``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
 
+## Annotate CAZomes
 
-
-
-
-
-
-
-
-
-
-
-# Annotate CAZomes
-
-To retrieve the most comprehensive annotation of the CAZome, the (widely considered) canonical classifications from CAZy retrieved using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) (Hobbs _et al.,_ 2022), combined with predicted CAZy family annotations from [`dbCAN`](https://github.com/linnabrown/run_dbcan) (Zhang _et al._ 2018).
+To retrieve the most comprehensive annotation of the CAZome, we recommend using the (widely considered) canonical classifications from CAZy retrieved using [`cazy_webscraper`](https://hobnobmancer.github.io/cazy_webscraper/) (Hobbs _et al.,_ 2022), combined with predicted CAZy family annotations from [`dbCAN`](https://github.com/linnabrown/run_dbcan) (Zhang _et al._ 2018).
 
 > Emma E. M. Hobbs, Tracey M. Gloster, Leighton Pritchard; cazy_webscraper: local compilation and interrogation of comprehensive CAZyme datasets, BioRxiv, 3 December 2022, https://doi.org/10.1101/2022.12.02.518825
 
@@ -211,6 +200,14 @@ To include 'canonical' CAZy family classifications from CAZy, download all data 
 Emma E. M. Hobbs, Tracey M. Gloster, Leighton Pritchard
 bioRxiv 2022.12.02.518825; doi: https://doi.org/10.1101/2022.12.02.518825
 
+The `cazomevolve` subcommand `build_cazy_db` to coordinate uisng `cazy_webscraper`:
+```bash
+cazomevolve build_cazy_db \
+  <email> \
+  <desired db path>
+```
+
+Or you can use `cazy_webscraper` directly
 ```bash
 cazy_webscraper \
     <email> \
@@ -219,10 +216,10 @@ cazy_webscraper \
 
 ## Retrieve CAZy annotations
 
-Use `cazomevolve` to query the protein version accessions in the downloaded protein FASTA files against the local CAZyme db, to retrieve the 'canonical' CAZy family classifications, using the `cazevolve_get_cazy_cazymes` command.
+The `get_cazy_cazymes` subcommand to coordinate `cazomevolve` to query the protein version accessions in the downloaded protein FASTA files against the local CAZyme db, to retrieve the 'canonical' CAZy family classifications:
 
 ```bash
-cazevolve_get_cazy_cazymes \
+cazomevolve get_cazy_cazymes \
     <path to dir containing protein FASTA files> \
     <path to local cazyme database> \
     <path to dir to write out protein sequences NOT in the local db> \

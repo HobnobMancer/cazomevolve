@@ -96,18 +96,33 @@ Or use `cazy_webscraper` directly to create a multisequence FASTA file containin
 
 ## Run all-vs-all analysis
 
-Run all-vs-all sequence analysis for each multisequence FASTA file. Use the `run_blastp.sh` script to use BLASTP+ or the `run_diamond.sh` script to use DIAMOND (recommend for large families of >1000 proteins sequences)
+Run all-vs-all sequence analysis for each multisequence FASTA file, using BLAST or DIAMOND (recommend for large families of >1000 proteins sequences).
 
-`run_blastp.sh` takes 2 positional arguments:
+The output directories will be created by `cazomevolve` - existing data in the existing output directories will **not** be deleted.
+
+**Using BLASTP:**
+Use the `run_fam_blast` subcommand, which takes 2 positional arguments:
 * Path to the input FASTA file
 * Path for the output TSV file
 
-`run_diamond.sh` takes 3 positional arguments:
-* Path to the input FASTA file
-* Path to build the DIAMOND database at
-* Path for the output TSV file
+```bash
+cazomevolve run_fam_blast \
+  <input fasta file> \
+  <output TSV file> 
+```
 
-Both scripts are located in `cazomevolve/seq_diversity/` directory.
+**Using DIAMOND: (recommended for large datasets):**
+Use the `run_fam_diamond` subcommand, which takes 3 positional arguments:
+* Path to the input FASTA file
+* Path where to create a diamond db 
+* Path to write out output matrix
+
+```bash
+cazomevolve run_fam_diamond \
+  <input fasta file> \
+  <diamond db path> \
+  <output TSV file> 
+```
 
 ## Visualise the sequence diversity
 

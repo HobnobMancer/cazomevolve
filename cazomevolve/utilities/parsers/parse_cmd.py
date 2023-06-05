@@ -55,6 +55,7 @@ from cazomevolve.utilities.parsers import (
     run_blast_parser,
     run_diamond_parser,
     dl_acc_genomes_parser,
+    download_genomes_parser,
 )
 
 
@@ -100,8 +101,9 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
     run_blast_parser.build_parser(subparsers)
     run_diamond_parser.build_parser(subparsers)
 
-    # annotate the cazome
+    # download genomes
     dl_acc_genomes_parser.build_parser(subparsers)
+    download_genomes_parser.build_parser(subparsers)
 
     # Parse arguments
     # The list comprehension is to allow PosixPaths to be defined and passed in testing

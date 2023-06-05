@@ -50,7 +50,8 @@ from typing import List, Optional
 
 from cazomevolve import __version__, __citation__
 from cazomevolve.utilities.parsers import (
-    get_fam_seqs
+    get_fam_seqs,
+    run_fam_blast,
 )
 
 
@@ -91,6 +92,7 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
 
     # add subcommand parser
     get_fam_seqs.build_parser(subparsers)
+    run_fam_blast.build_parser(subparsers)
 
     # Parse arguments
     # The list comprehension is to allow PosixPaths to be defined and passed in testing

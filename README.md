@@ -257,23 +257,25 @@ options:
 
 ## Invoke dbCAN
 
-_`eCAMI` is memory intensive. We recommend using the maximum availalbe RAM. 445 Pseudomonas proteomes on 64GB RAM, 8-core XX processor takes 4 days to run dbCAN._
+_`eCAMI` is memory intensive. We recommend using the maximum availalbe RAM._
 
-`dbCAN` can be automated to parse all FASTA files in a directory (e.g. all download protein FASTA files or FASTA files of proteins not in a local CAZyme database), using `cazomveolve`, specifically, the `cazevolve_run_dbcan` command.
+`dbCAN` can be automated to parse all FASTA files in a directory (e.g. all download protein FASTA files or FASTA files of proteins not in a local CAZyme database), using the `cazomveolve`, subcommand `run_dbcan` command.
 
 ```bash
-cazevolve_run_dbcan \
+cazomevolve run_dbcan \
     <path to dir containing FASTA files> \
     <path to output directory> 
 ```
 
-The ouput directory will be created by `cazevolve_run_dbcan`. Inside the output directory, for each FASTA file parsed by `dbCAN` an output subdirectory will be created (named after the genomic version accession) and will contain the output from `dbCAN` for the respective protein FASTA file.
+The ouput directory will be created by `run_dbcan`. 
+
+Inside the output directory, for each FASTA file parsed by `dbCAN` an output subdirectory will be created (named after the genomic version accession) and will contain the output from `dbCAN` for the respective protein FASTA file.
 
 Optional args:
 ```bash
 options:
   -h, --help            show this help message and exit
-  -V2--version_2        Use dbCAN version 2 NOT 3 (default: False)
+  -V2--version_2        Use dbCAN version 2 NOT 3/4 (default: False)
   -f, --force           Force file over writting (default: False)
   -l log file name, --log log file name
                         Defines log file name and/or path (default: None)
@@ -283,7 +285,8 @@ options:
 
 ## Retrieve dbCAN annotations
 
-After running dbCAN, `cazomevolve` can iterate through the output subdirectories created by `cazevolve_run_dbcan` and compile the data into two tab delimited lists, containing:
+After running dbCAN, use the `cazomevolve` subcommand `get_dbcan_cazymes` to iterate through the output subdirectories created by `cazomevolve run_dbcan` and compile the data into two tab delimited lists, containing:
+
 1. Listing the CAZy family accession and genomic accession per line
 ```bash
 fam1    genome1
@@ -299,7 +302,7 @@ fam1    genome2 protein2
 fam3    genome2 protein3
 ```
 
-If paths to the tab delimited lists created by `cazevolve_get_cazy_cazymes` are provided, the dbCAN classifications will be **added** the existing tab delimited lists, and will not **overwrite** the data in the files (make sure to include the `-f`/`--force` and `-n`/`--nodelete` flags when wanting to add data to existing tab delimited files).
+If paths to the tab delimited lists created by `cazomevolve get_cazy_cazymes` are provided, the dbCAN classifications will be **added** the existing tab delimited lists, and will not **overwrite** the data in the files (make sure to include the `-f`/`--force` and `-n`/`--nodelete` flags when wanting to add data to existing tab delimited files).
 
 ```bash
 cazevolve_get_dbcan_cazymes \
@@ -321,63 +324,73 @@ options:
   -v2, --version_2      Parse the data from dbCAN version 2 (default: False, parse data from dbCAN version 3)
 ```
 
-# Reconstruct a phylogenetic tree using a baysian approach
-
-# Calculate ANI and construct a dendrogram
-
 # Explore the CAZome composition
 
 The module `cazomevolve.cazome.explore` contains functions for exploring the CAZome annotated by `cazomevolve`. These are:
 
 ```python
-from cazomevolve.cazome.explore import (
-    cazome_sizes,
-    identify_families,
-    parse_data,
-    pca,
-    plot,
-    taxonomies,
+# loading and parsing data
+from cazomevolve.cazome.explore.parse_data import (
+    load_fgp_data,
+    load_tax_data,
+    add_tax_data_from_tax_df,
+    add_tax_column_from_row_index,
 )
 
-# parse the output from cazomevolve tab delimited lists
-parse_data.get_dbcan_fams_data()
-parse_data.build_fam_freq_df()
-parse_data.index_df()  # index genome, genus and species to be row names
+# functions for exploring the sizes of CAZomes
+from cazomevolve.cazome.explore.cazome_sizes import (
+    calc_proteome_representation,
+    count_items_in_cazome,
+    get_proteome_sizes,
+    count_cazyme_fam_ratio,
+)
 
-# add taxonomic information for taxonomic context
-taxonomies.add_tax_info()
-taxonomies.get_gtdb_db_tax_dict()  # in development
-taxonomies.get_gtdb_search_tax_dict()
-taxonomies.get_ncbi_tax_dict()  # in development
-taxonomies.get_group_sample_sizes()  # returns the number of genomes per group (genus or species)
+# explore the frequency of CAZymes per CAZy class
+from cazomevolve.cazome.explore.cazy_classes import calculate_class_sizes
 
-# summarise the size of the cazomes
-cazome_sizes.get_cazome_size_df()
-cazome_sizes.get_proteome_size()
-cazome_sizes.get_cazome_proportion_df()
-cazome_sizes.get_num_of_fams_per_group()
+# explore the frequencies of CAZy families and identify the co-cazome
+from cazomevolve.cazome.explore.cazy_families import (
+    build_fam_freq_df,
+    build_row_colours,
+    build_family_clustermap,
+    identify_core_cazome,
+    plot_fam_boxplot,
+    build_fam_mean_freq_df,
+    get_group_specific_fams,
+    build_family_clustermap_multi_legend,
+)
 
-# identify the core CAZome, i.e. families that appear in every genome
-identify_families.identify_core_cazome()
-identify_families.get_core_fam_freqs()
+# functions to identify and explore CAZy families that are always present together
+from cazomevolve.cazome.explore.cooccurring_families import (
+    identify_cooccurring_fams_corrM,
+    calc_cooccuring_fam_freqs,
+    identify_cooccurring_fam_pairs,
+    add_to_upsetplot_membership,
+    build_upsetplot,
+    get_upsetplot_grps,
+    add_upsetplot_grp_freqs,
+    build_upsetplot_matrix,
+)
 
-# identify families that are specific to a group (i.e. genus or species)
-identify_families.get_group_specific_fams()
-
-# identity families that always appear together 
-identify_families.get_cooccurring_fams()  # across all genomes
-identify_families.get_grps_cooccurring_fams()  # in a specific group (i.e. genus or species)
-
-# visually summarise the data
-plot.get_clustermap()  # clustermap of cazy family freqs - potentially add clustering by cazy class freqs
-
-# perform and visualise PCA
-pca.perform_pca()
-pca.plot_explained_variance()
-pca.plot_spree()
-pca.plot_pca()  # project genomes onto PCs
-pca.plot_loadings()
+# functions to perform PCA
+from cazomevolve.cazome.explore.pca import (
+    perform_pca,
+    plot_explained_variance,
+    plot_scree,
+    plot_pca,
+    plot_loadings,
+)
 ```
+
+Two example jupyter notebooks are available which demonstrate using `cazomevolve` to explore, interogate, compare and visualise the CAZyme complement:
+
+1. Notebook exploring the CAZomes of _Pectobacteriaceae_
+    * [Notebook](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto/blob/master/notebooks/explore_pectobact_cazomes.ipynb)
+    * [Website](https://hobnobmancer.github.io/SI_Hobbs_et_al_2023_Pecto/notebooks/explore_pectobact_cazomes.html)
+2. Notebook exploring the CAZomes of _Pectobacterium_ and _Dickeya_
+    * [Notebook](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto/blob/master/notebooks/explore_pecto_dic_cazomes.ipynb)
+    * [Website](https://hobnobmancer.github.io/SI_Hobbs_et_al_2023_Pecto/notebooks/explore_pecto_dic_cazomes.html)
+
 
 # Identify networks of co-evolving CAZy families using `coinfinder`
 

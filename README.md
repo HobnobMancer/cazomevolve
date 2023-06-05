@@ -60,26 +60,43 @@ For all required Python libraries please read 'requirements.txt'.
 * [`saintBioutils`](https://github.com/HobnobMancer/saintBioutils)
 
 <p>&nbsp;</p>
-
+<p>&nbsp;</p>
 
 
 # Method
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 
 # Explore sequence diversity in CAZy families
 
 Presuming a local CAZyme database has already been generated using `cazy_webscraper`:
 
-1. Generate a multisequence FASTA file for each CAZy family of interest using the bash script `get_fam_seqs.sh`, which 
-takes 4 positional arguments:
+## Get CAZy family protein sequences
+
+Generate a multisequence FASTA file for each CAZy family of interest using the `get_fam_seqs` subcommand, takes 4 positional arguments:
 
 * email address
 * path to a local cazyme db
 * name(s) of families of interest (separate with a single comma)
 * path to an output dir (do not include terminal /)
 
+```bash
+cazomevolve get_fam_seqs \
+  <email> \
+  <cazy_db> \
+  <fam1,fam2,fam3> \
+  <path to outdir>
+```
+
+* The output dir will be created by `cazy_webscraper` - it will not delete exsiting content in the outdir unless their is a FASTA file with the same name
+* Creates one output FASTA file per CAZy family
+
 Or use `cazy_webscraper` directly to create a multisequence FASTA file containing the protein sequences of interst
 
-2. Run all-vs-all sequence analysis for each multisequence FASTA file. Use the `run_blastp.sh` script to use BLASTP+ or the `run_diamond.sh` script to use DIAMOND (recommend for large families of >1000 proteins sequences)
+## Run all-vs-all analysis
+
+Run all-vs-all sequence analysis for each multisequence FASTA file. Use the `run_blastp.sh` script to use BLASTP+ or the `run_diamond.sh` script to use DIAMOND (recommend for large families of >1000 proteins sequences)
 
 `run_blastp.sh` takes 2 positional arguments:
 * Path to the input FASTA file
@@ -92,11 +109,24 @@ Or use `cazy_webscraper` directly to create a multisequence FASTA file containin
 
 Both scripts are located in `cazomevolve/seq_diversity/` directory.
 
-3. Visualise the results using the `jupyter notebook` template located at `cazomevolve/seq_diversity/explore_seq_diversity.ipynb`. This generates clustermaps and heatmaps that plot the proteins in the same order as the generated clustermap.
+## Visualise the sequence diversity
+
+Visualise the results using the `jupyter notebook` template located at `cazomevolve/seq_diversity/explore_seq_diversity.ipynb`. This generates clustermaps and heatmaps that plot the proteins in the same order as the generated clustermap.
 
 We recommend using the [BLAST Score Ratio (BSR)](https://widdowquinn.github.io/2018-03-06-ibioic/02-sequence_databases/05-blast_for_rbh.html#Normalised-bit-score,-and-coverage) to generate a clustermap, then generate heatmaps of the percentage identity (pident) and query coverage (qcov) so the proteins are plotted in the same order for the 3 plots and thus facilitates comparing between the three.
 
 Optionally, redundant protein sequences can be removed, and proteins of interest (mannually defined by the user) and functionally/structurally characterised proteins can be annotated on the plots, to facilitate identifying the degree of characterisation across a family.
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+
+
+
+
 
 # Download genomes
 

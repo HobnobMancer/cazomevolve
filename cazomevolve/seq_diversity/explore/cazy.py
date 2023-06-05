@@ -64,7 +64,7 @@ def get_cazy_proteins(fasta_file):
     return list(set(prot_accs))
 
 
-def get_cazy__db_prots(cazy_family, characterised=False, structured=False):
+def get_cazy_db_prots(cazy_family, characterised=False, structured=False):
     """Get the NCBI protein accessions for proteins in the structure or characterised tables
     from the CAZy website.
     

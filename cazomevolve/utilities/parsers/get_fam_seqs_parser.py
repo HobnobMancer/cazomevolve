@@ -76,4 +76,20 @@ def build_parser(
         type=str,
         help="Path to dir to write out FASTA file",
     )
+    parser.add_argument(
+        "-f",
+        "--force",
+        dest="force",
+        action="store_true",
+        default=False,
+        help="Force file over writting",
+    )
+    parser.add_argument(
+        "-n",
+        "--nodelete",
+        dest="nodelete",
+        action="store_true",
+        default=False,
+        help="enable/disable deletion of exisiting files",
+    )
     parser.set_defaults(func=get_fam_seqs.main)

@@ -18,6 +18,9 @@ Build Information
    :target: https://zenodo.org/badge/latestdoi/367898306
 .. image:: https://img.shields.io/badge/Licence-MIT-brightgreen
    :target: https://img.shields.io/badge/Licence-MIT-brightgreen
+.. image:: https://readthedocs.org/projects/cazomevolve/badge/?version=latest
+    :target: https://cazomevolve.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 ``cazomevolve`` ("cazome-evolve") is a Python3 package for the automated annotation and exploratory 
 analysis of the CAZyme complements (CAZomes) for a set of species and/or genomes of interest.
@@ -36,7 +39,9 @@ across a set of genomes in order to identify groups of CAZy families of biologic
 or across a set of CAZy families of interest. This enables the systematic identification of CAZymes that are potnetially not yet functionally 
 or structurally represented in CAZy, as well as exploring relationships across CAZy families.
 
-**Use ``cazomevolve`` to explore:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Use ``cazomevolve`` to explore:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **CAZome sizes:**
 * Compare the number of CAZymes and CAZy families

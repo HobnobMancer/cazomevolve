@@ -52,11 +52,9 @@ from cazomevolve.utilities.parsers.parse_cmd import build_parser
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
+        args = build_parser()
     else:
-        parser = build_parser(argv)
-        args = parser.parse_args
+        args = build_parser(argv)
 
     if args.citation:
         sys.stderr.write(f"{__version__}\n")

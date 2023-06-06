@@ -40,20 +40,70 @@
 
 
 import argparse
+import logging
 import subprocess
+import sys
+import time
 
 from pathlib import Path
 from typing import List, Optional
 
+from saintBioutils.utilities.file_io import make_output_directory
+
 
 def main(args: argparse.Namespace) -> int:
-    theproc = subprocess.Popen([
-        "./seq_diversity/get_fam_seqs.sh",
-        args.email,
-        args.cazy,
-        args.families,
-        args.outdir,
-    ], shell=True)
-    theproc.communicate()
+    logger = logging.getLogger(__name__)
+
+    if str(Path(args.outdir).parent) != ".":
+        make_output_directory(Path(args.outdir), args.force, args.nodelete)
+
+    families = args.families.split(",")
+
+    for fam in families:
+
+        # get the fam seqs from NCBI
+        cmd = [
+            f"cw_get_genbank_seqs",
+            f"{args.cazy}",
+            f"{args.email}",
+            "--families",
+            f"{fam}",
+        ]
+        
+        sys.stderr.write(
+            f"Running command: {' '.join(cmd)}"
+        )
+        time.sleep(0.5)
+
+        theproc = subprocess.run(args=" ".join(cmd), shell=True)
+
+        # extract fam seqs to FASTA
+        cmd = [
+            f"cw_extract_db_seqs",
+            f"{args.cazy}",
+            "genbank",
+            f"{fam}",
+            "--fasta_file",
+            f"{args.outdir}/{fam}.seqs.fasta",
+            "-n",
+            "-f",
+        ]
+        
+        sys.stderr.write(
+            f"Running command: {' '.join(cmd)}"
+        )
+        time.sleep(0.5)
+
+        theproc = subprocess.run(args=" ".join([
+            f"cw_extract_db_seqs",
+            f"{args.cazy}",
+            "genbank",
+            "--families",
+            f"{fam}",
+            "--fasta_file",
+            f"{args.outdir}/{fam}.seqs.fasta",
+            "-n",
+            "-f",
+        ]), shell=True)
 
     return 0

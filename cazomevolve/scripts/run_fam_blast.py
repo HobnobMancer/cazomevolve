@@ -41,14 +41,29 @@
 
 import argparse
 import subprocess
+import os
+
+from inspect import getsourcefile
+from os.path import abspath
 
 
 def main(args: argparse.Namespace) -> int:
-    theproc = subprocess.Popen([
-        "./seq_diversity/run_blastp.sh",
-        args.fasta,
-        args.outfile,
-    ], shell=True)
-    theproc.communicate()
+    user_cwd = os.getcwd()
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/run_fam_blast.py","seq_diversity/run_blastp.sh"))
+
+    cmd = [
+            cazevolve_path,
+            args.fasta,
+            args.outfile,
+        ]
+    print(f"Running command: {' '.join(cmd)}")
+
+    theproc = subprocess.call(
+        [
+            cazevolve_path,
+            args.fasta,
+            args.outfile,
+        ],
+    )
 
     return 0

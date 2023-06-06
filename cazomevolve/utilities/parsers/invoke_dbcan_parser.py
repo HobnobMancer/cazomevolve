@@ -53,7 +53,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "run_dbcan", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "run_dbcan", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser

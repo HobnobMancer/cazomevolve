@@ -53,7 +53,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "get_fam_seqs", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "get_fam_seqs", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(

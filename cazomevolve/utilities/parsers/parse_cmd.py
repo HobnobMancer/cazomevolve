@@ -60,6 +60,7 @@ from cazomevolve.utilities.parsers import (
     get_cazy_parser,
     invoke_dbcan_parser,
     get_dbcan_parser,
+    common_parser,
 )
 
 
@@ -81,7 +82,7 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     subparsers = parser_main.add_subparsers(
-        title="subcommands", description="valid subcommands", help="additional help"
+        title="subcommands", description="Valid subcommands",
     )
 
     # add args to the main parser
@@ -96,6 +97,23 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
         action="store_true",
         default=False,
         help="Print citation information"
+    )
+    parser_main.add_argument(
+        "-l",
+        "--log",
+        dest="log",
+        action="store",
+        default=None,
+        type=Path,
+        help="logfile location",
+    )
+    parser_main.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        default=False,
+        help="report verbose progress to log",
     )
 
     # add subcommand parser

@@ -53,7 +53,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "build_cazy_db", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "build_cazy_db", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     parser.add_argument(

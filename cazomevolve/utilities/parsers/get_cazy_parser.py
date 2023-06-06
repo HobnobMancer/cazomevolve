@@ -53,7 +53,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "get_cazy_cazymes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "get_cazy_cazymes", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser
@@ -134,10 +134,4 @@ def build_parser(
         default=False,
         help="Set logger level to 'INFO'",
     )
-
-    if argv is None:
-        # parse command-line
-        return parser
-    else:
-        # return namespace
-        return parser.parse_args(argv)
+    parser.set_defaults(func=build_cazy_db.main)

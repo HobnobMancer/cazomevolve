@@ -52,7 +52,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "get_dbcan_cazymes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "get_dbcan_cazymes", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser

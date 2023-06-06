@@ -89,7 +89,7 @@ def build_parser(
     """Return ArgumentParser parser for script."""
     # Create parser object
     parser = subps.add_parser(
-        "download_genomes", parents=parents, formatter_class=ArgumentDefaultsHelpFormatter
+        "download_genomes", formatter_class=ArgumentDefaultsHelpFormatter
     )
     # Add positional arguments to parser
     parser.add_argument(

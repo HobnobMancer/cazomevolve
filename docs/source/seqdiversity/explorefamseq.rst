@@ -1,7 +1,23 @@
+===========================================
+Explore sequence diversity in CAZy families
+===========================================
+
+To visualise the data generated from an all-versus-all sequence alignemnt analysis (from DIAMOND or BLAST), 
+``cazomevolve`` includes several functions that can be imported into a Python script of jupyter notebook.
+
+These functions, including their imports and use, are described below.
+http://www.cazy.org/PL1_characterized.html
+
+
+---------------------------------------
 Load and parse DIAMOND and BLAST output
 ---------------------------------------
 
-First load the data into a dataframe, and calculate the BLAST Score Ratio
+First load the data into a dataframe, and calculate the BLAST Score Ratio (BSR).
+
+The BSR is the bitscore normalised for protein length, and enables us to compare alignments of pairs of proteins of different lengths.
+
+    Rasko DA, Myers GS, Ravel J. Visualization of comparative genomic analyses by BLAST score ratio. BMC Bioinformatics. 2005 Jan 5;6:2. doi: 10.1186/1471-2105-6-2. PMID: 15634352; PMCID: PMC545078.
 
 Import from ``cazomevolve.seq_diversity.explore.data``.
 
@@ -138,12 +154,14 @@ structure and characterised table in CAZy, see the section "Get CAZy family data
 
 
 
+--------------------
 Get CAZy family data
 --------------------
 
 The functions for retrieving data about the CAZy family are imported from the ``cazomevolve.seq_diversity.explore.cazy`` module.
 
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Get CAZy family protein accessions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -165,6 +183,7 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
         return list(set(prot_accs))
 
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Get CAZy characterised proteins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -185,9 +204,9 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
         """
         urls = []  # [ [url, data type, col index for cazy website] ]
         if characterised:
-            urls.append([f"www.cazy.org/{cazy_family}_characterized.html", 'characterised', 3])
+            urls.append([f"http://www.cazy.org/{cazy_family}_characterized.html", 'characterised', 4])  # url, type, col index in cazy with ncbi acc
         if structured:
-            urls.append([f"www.cazy.org/{cazy_family}_structure.html", "structured", 4])
+            urls.append([f"http://www.cazy.org/{cazy_family}_structure.html", "structured", 3])
 
         all_proteins = []
 
@@ -205,7 +224,7 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
 
             gbk_bs_elements = []
 
-            for row in cazyme_table.select("tr"):
+            for row in tqdm(cazyme_table.select("tr"), desc=f"Parsing {url[1]} table for {cazy_family}"):
                 try:
                     if (row.attrs["class"] == ['royaume']) and (row.text.strip() != 'Top'):
                         continue
@@ -230,9 +249,11 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
         return all_proteins
 
 
+-----------
 Build plots
 -----------
 
+^^^^^^^^^^
 Clustermap
 ^^^^^^^^^^
 

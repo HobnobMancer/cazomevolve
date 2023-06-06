@@ -601,7 +601,28 @@ scripts/tree/phylo/raxml_ng_build_tree.sh \
 
 The output directory is created by the script
 
-### A distance based approach
+## A distance based approach
+
+An alternative approach is to calculate genome distances from the Average Nucleotide Identity (ANI).
+
+The software package `pyani` [Pritchard et al.](https://doi.org/10.1039/C5AY02550H) can be used to calculate the ANI between all possible pairs of genomes, for a set of given genomes.
+
+> Pritchard et al. (2016) "Genomics and taxonomy in diagnostics for food security: soft-rotting enterobacterial plant pathogens" Anal. Methods 8, 12-24
+
+An example of using `pyani` to generate a ANI-based dendrogram can be found in [Hobbs et al.](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto/)
+
+The installation instructions for [`pyani`](https://github.com/widdowquinn/pyani)can be found in its [GitHub repo](https://github.com/widdowquinn/pyani). We recommend using >= version 0.3.0-alpha.
+
+`cazomevolve` includes bash scripts to coordinate using `pyani`:
+
+```bash
+scripts/tree/ani/run_anim.sh \
+  <pyani and log file output directory> \
+  <dir containing genome .faa seqs> \
+  <plot and matrix output dir>
+```
+
+The R script `build_anim_tree.R` (in `scripts/tree/ani/`) can be used and modified to create to infer genome distances from the all-vs-all ANI analysis and construct a dendrogram from the distances.
 
 ## Find networks of co-evolving CAZy families
     
@@ -617,4 +638,4 @@ An example of where this is done can be found in [Hobbs _et al._ SI information 
 
 # Build dendograms based upon CAZome compositions, and compare against the phylogenetic tree
 
-## 
+....

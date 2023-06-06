@@ -6,7 +6,7 @@
 # Author:
 # Emma E. M. Hobbs
 
-# Contact
+# ContactC                                    
 # eemh1@st-andrews.ac.uk
 
 # Emma E. M. Hobbs,
@@ -17,7 +17,7 @@
 # KY16 9ST
 # Scotland,
 # UK
-
+#
 # The MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,6 +41,7 @@
 
 
 import logging
+import pandas as pd
 import re
 
 from tqdm import tqdm
@@ -48,24 +49,11 @@ from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io.get_paths import get_dir_paths
-from saintBioutils.utilities.logger import config_logger
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.get_dbcan_parser import build_parser
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args
-    
-    if logger is None:
-        config_logger(args)
-    logger = logging.getLogger(__name__)
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     # make output dir if necessary
     if str(args.fam_genome_list.parent) != ".":
         make_output_directory(args.fam_genome_list.parent, args.force, args.nodelete)
@@ -82,7 +70,7 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     for output_dir in tqdm(output_dirs, desc="Parsing dbCAN output dirs"):
         get_family_annotations(output_dir, args)
 
-    closing_message('Get dbCAN CAZymes')
+    closing_message('Get dbCAN CAZymes', args)
 
 
 def get_family_annotations(output_dir, args):
@@ -101,30 +89,33 @@ def get_family_annotations(output_dir, args):
     fam_annotations = {}  # {protein accession: {fams}} -- a single protein can appear on multiple lines
 
     try:
-        with open((output_dir/"overview.txt"), "r") as fh:
-            overview_file = fh.read().splitlines()
+        df = pd.read_table(output_dir/"overview.txt")
     except FileNotFoundError:
         logger.error(f"Could not find overview.txt file in {output_dir.name}\nSkipping output dir")
         return
+
+    # drop rows were #ofTools = 1
+    df = df[df['#ofTools'] != 1]
     
-    for line in tqdm(overview_file[1:], desc=f"Parsing {output_dir.name}"):
-        line = line.split("\t")
+    for ri in tqdm(range(len(df)), desc=f"Parsing {output_dir.name}"):
+        row = df.iloc[ri]
 
-        protein_accession = line[0]
+        protein_accession = row['Gene ID']
 
-        hmmer_fams = get_tool_fams(line[1])
-        hotpep_fams = get_tool_fams(line[2])
-        diamond_fams = get_tool_fams(line[3])
+        hmmer_fams = get_tool_fams(row[1])
+        hotpep_fams = get_tool_fams(row[2])
+        diamond_fams = get_tool_fams(row[3])
 
         # get the fams at least two tools agreed upon
         dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
 
-        try:
-            fam_annotations[protein_accession]
-            for fam in dbcan_fams:
-                fam_annotations[protein_accession].add(fam)
-        except KeyError:
-            fam_annotations[protein_accession] = dbcan_fams
+        if len(dbcan_fams) > 0:
+            try:
+                fam_annotations[protein_accession]
+                for fam in dbcan_fams:
+                    fam_annotations[protein_accession].add(fam)
+            except KeyError:
+                fam_annotations[protein_accession] = dbcan_fams
     
     with open(args.fam_genome_list, 'a') as fh:
         for protein_acc in tqdm(fam_annotations, desc="Adding fam-genome annotations to tab delim list"):
@@ -178,11 +169,7 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     hotpep_diamond = hotpep_fams & diamond_fams
     all_tools = hmmer_fams & diamond_fams & hotpep_fams
 
-    dbcan_consensus = list(
-        set(
-            list(all_tools) + list(hotpep_diamond) + list(hmmer_diamond) + list(hmmer_hotpep)
-            )
-        )
+    dbcan_consensus = list(all_tools.union(hmmer_hotpep, hmmer_diamond, hotpep_diamond))
     
     return dbcan_consensus
 

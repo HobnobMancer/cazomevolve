@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#!/usr/bin/ bash
 #
 # (c) University of St Andrews 2020-2021
 # (c) University of Strathclyde 2020-2021
@@ -41,24 +42,34 @@
 
 # run_diamond.sh
 
-# $1 cazy family
-# $2 input FASTA file
-# $3 diamond db to be created
-# $4 output file
+# $1 input FASTA file
+# $2 diamond db to be created
+# $3 output file
+
+echo "$1**$2***$3"
+
+FILE_NAME=${3##*/}
+mkdir -p "${3%$FILE_NAME}"
+echo "***********$FILE_NAME"
+FILE_NAME=${2##*/}
+mkdir -p "${2%$FILE_NAME}"
+echo "**************************$FILE_NAME"
+
 
 # build db
 echo 'Building database'
 diamond makedb \
-    --in $2 \
-    --db $3
+    --in $1 \
+    --db $2
 
 # run diamond
 echo 'Running DIAMOND'
 diamond blastp \
-    --db $3 \
-    --query $2 \
-    --out $4 \
+    --db $2 \
+    --query $1 \
+    --out $3 \
     --outfmt 6 qseqid sseqid qlen slen length pident evalue bitscore \
     --evalue 10 \
     --max-target-seqs 0
 
+echo "Done"

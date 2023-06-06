@@ -39,19 +39,21 @@
 # SOFTWARE.
 """Build args parser for get_cazy_cazymes.py"""
 
-import argparse
 
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
+from cazomevolve.scripts import build_cazy_db
 
-def build_parser(argv: Optional[List] = None):
+
+def build_parser(
+    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
+) -> None:
     """Return ArgumentParser parser for script."""
     # Create parser object
-    parser = argparse.ArgumentParser(
-        prog="identify_cazy_cazymes.py",
-        description="Retrieve CAZy annotations of CAZymes",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    parser = subps.add_parser(
+        "get_cazy_cazymes", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser
@@ -66,7 +68,7 @@ def build_parser(argv: Optional[List] = None):
         "database",
         type=Path,
         default=None,
-        help="Path CAZy JSON file, keyed by protein accessions, valued by list of families",
+        help="Path to local CAZyme database (SQLite3) compiled by cazy_webscraper",
     )
 
     parser.add_argument(
@@ -132,10 +134,4 @@ def build_parser(argv: Optional[List] = None):
         default=False,
         help="Set logger level to 'INFO'",
     )
-
-    if argv is None:
-        # parse command-line
-        return parser
-    else:
-        # return namespace
-        return parser.parse_args(argv)
+    parser.set_defaults(func=build_cazy_db.main)

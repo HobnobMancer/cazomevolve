@@ -38,6 +38,7 @@
 # SOFTWARE.
 """Retrieve all genomic assembly accessions descendent from a taxonomy node"""
 
+
 import logging
 import re
 import time
@@ -47,31 +48,18 @@ from typing import List, Optional
 from socket import timeout
 from Bio import Entrez
 from saintBioutils.utilities.file_io import make_output_directory
-from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.download_genomes_parser import build_parser
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     """Coordinate the retrieval of protein annotations from GenBank (.gbff) files.
     Including building parser, logger and output directory.
     Return dataframe of protein data.
     """
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args()
-
-    if logger is None:
-        config_logger(args)
-    logger = logging.getLogger(__name__)
-
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
     Entrez.email = args.email

@@ -55,5 +55,5 @@ IFS=',' read -ra user_families <<< "$3"
 
 for FAM in "${user_families[@]}"
 do
-    cw_extract_db_seqs $2 genbank $FAM --fasta_file $4/$FAM".seqs.fasta"
+    cw_extract_db_seqs $2 genbank $FAM --fasta_file $4/$FAM".seqs.fasta" -n
 done

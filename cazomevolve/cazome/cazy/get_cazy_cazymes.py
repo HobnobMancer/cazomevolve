@@ -40,37 +40,23 @@
 """Retrieve CAZy canoncial CAZyme classifications"""
 
 
-import json
 import logging
 import re
 import sys
 
-from pathlib import Path
 from typing import List, Optional
 
 from Bio import SeqIO
 from cazy_webscraper.sql.sql_orm import get_db_connection, Session, Genbank, CazyFamily
 from cazy_webscraper.sql.sql_interface.get_data.get_table_dicts import get_gbk_table_dict
 from saintBioutils.utilities.file_io import make_output_directory
-from saintBioutils.utilities.logger import config_logger
+from saintBioutils.utilities.file_io.get_paths import get_file_paths
 from tqdm import tqdm
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.get_cazy_parser import build_parser
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args()
-
-    if logger is None:
-        config_logger(args)
-    logger = logging.getLogger(__name__)
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     if str(args.output_dir.parent) != ".":
         make_output_directory(args.output_dir, args.force, args.nodelete)
 
@@ -87,46 +73,25 @@ def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     connection = get_db_connection(args.database, args.sql_echo, False)
 
     # retrieve path to protein FASTA files
-    fasta_files_paths, number_of_files = get_fasta_paths(args)
+    fasta_files_paths = get_file_paths(args.input_dir, suffixes=['.fasta', '.faa'])
 
-    gbk_table_dict = get_gbk_table_dict(connection)
-
-    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations", total=number_of_files):
-        get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
-
-    closing_message('Get CAZy CAZymes')
-
-
-def get_fasta_paths(args):
-    """Retrieve paths to fasta files created by extract_proteins_genomes.py.
-    :param args: cmd-line args parser
-    Return two lists, one of path to FASTA files contain sequences, one of empty FASTA files.
-    """
-    logger = logging.getLogger(__name__)
-
-    # retrieve all files from directory
-    files_in_entries = (
-        entry for entry in Path(args.input_dir).iterdir() if (
-            entry.is_file() and entry.name.endswith(".fasta")
-        )
-    )
-
-    file_list = [
-        entry for entry in Path(args.input_dir).iterdir() if (
-            entry.is_file() and entry.name.endswith(".fasta")
-        )
-    ]
-
-    if len(file_list) == 0:
+    if len(fasta_files_paths) == 0:
         logger.error(
             f"Found 0 fasta files in {args.input_dir}\n"
             "Check the path is correct. Terminating program"
         )
         sys.exit(1)
 
-    logger.warning(f"Retrieved {len(file_list)} FASTA files")
+    logger.warning(f"Retrieved {len(fasta_files_paths)} FASTA files")
 
-    return files_in_entries, len(file_list)
+    logger.warning("Parsing CAZy db Genbanks table into dict")
+    gbk_table_dict = get_gbk_table_dict(connection)
+    logger.warning("Loading the GenBanks annotations into dict")
+
+    for fasta_path in tqdm(fasta_files_paths, desc="Getting CAZy annotations"):
+        get_cazy_annotations(fasta_path, gbk_table_dict, args, connection)
+
+    closing_message('Get CAZy CAZymes', args)
 
 
 def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
@@ -148,12 +113,10 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
 
     # extract genomic accession from the file name
     try:
-        genomic_accession = re.findall(r"GCF_\d+\.\d+\.", fasta_path.name)[0]
-        genomic_accession = genomic_accession
+        genomic_accession = re.findall(r"GCF_\d+\.\d{1,5}", fasta_path.name)[0]
     except IndexError:
         try:
-            genomic_accession = re.findall(r"GCA_\d+\.\d+\.", fasta_path.name)[0]
-            genomic_accession = genomic_accession
+            genomic_accession = re.findall(r"GCA_\d+\.\d{1,5}", fasta_path.name)[0]
         except IndexError:
             logger.warning(
                 f"Could not retrieve genomic accession from\n{fasta_path}\n"
@@ -161,36 +124,37 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
             )
             return
 
-    genomic_accession = genomic_accession[:-1]
-
-    in_cazy, not_in_cazy = set(), []
-
     cazy_accessions = set(list(gbk_table_dict.keys()))  # gbk accessions in the local db
 
+    # load sequences in proteome FASTA file into dict
     fasta_seqs = {}  # {protein acc: seq record}
     for record in SeqIO.parse(fasta_path, "fasta"):
         fasta_seqs[record.id] = record
 
     fasta_accessions = set(list(fasta_seqs.keys()))
-    print(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path}")
+    logger.warning(f"Loaded {len(fasta_accessions)} seq IDs from {fasta_path.name}")
+
+    acc_in_cazy, acc_not_in_cazy = set(), set()  # ensure they are reset to 0
 
     acc_in_cazy = cazy_accessions & fasta_accessions
-    print(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
+    logger.warning(f"Found {len(acc_in_cazy)} proteins in local CAZyme db")
 
-    acc_not_in_cazy = fasta_accessions.difference(in_cazy)
-    print(f"{len(acc_not_in_cazy)} proteins no in the local CAZyme db")
+    acc_not_in_cazy = fasta_accessions.difference(acc_in_cazy)
+    logger.warning(f"{len(acc_not_in_cazy)} proteins not in the local CAZyme db")
 
-    if len(not_in_cazy) != 0:
+    if len(acc_not_in_cazy) != 0:
+        # gather seqs of prot not in cazy and write to a FASTA file
         not_in_cazy_seqs = []
         for acc in acc_not_in_cazy:
             not_in_cazy_seqs.append(fasta_seqs[acc])
         SeqIO.write(not_in_cazy_seqs, output_path, "fasta")
 
-    if len(in_cazy) != 0:
+    if len(acc_in_cazy) != 0:
+        # compile data to write the tab delimited lists
         fam_genome_data = ""
         fam_genome_protein_data = ""
         
-        for prot_acc in tqdm(in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
+        for prot_acc in tqdm(acc_in_cazy, desc="Retrieving CAZy family annotaions from the local CAZyme database"):
             with Session(bind=connection) as session:
                 fam_query = session.query(Genbank, CazyFamily).\
                     join(CazyFamily, Genbank.families).\
@@ -202,6 +166,7 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
                     fam_genome_data += f"{fam}\t{genomic_accession}\n"
                     fam_genome_protein_data += f"{fam}\t{genomic_accession}\t{prot_acc}\n"
 
+        # write out data
         with open(args.fam_genome_list, "a") as fh:
             fh.write(fam_genome_data)
         

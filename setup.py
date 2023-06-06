@@ -52,7 +52,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 setuptools.setup(
     name="cazomevolve",
-    version="0.0.2",
+    version="0.1.0",
     # Metadata
     author="Emma E. M. Hobbs",
     author_email="eemh1@st-andrews.ac.uk",
@@ -70,10 +70,7 @@ setuptools.setup(
     platforms="Posix, MacOS X",
     entry_points={
         "console_scripts": [
-            "cevolve_download_genomes = cazomevolve.genomes.download_genomes:main",
-            "cevolve_invoke_dbcan = cazomevolve.cazome.dbcan.invoke_dbcan:main",
-            "cevolve_get_dbcan_cazymes = cazomevolve.cazome.dbcan.get_dbcan_cazymes:main",
-            "cevolve_get_cazy_cazymes = cazomevolve.cazome.cazy.get_cazy_cazymes:main",
+            "cazomevolve = cazomevolve.scripts.cazomevolve_script:main",
         ]
     },
     scripts=[
@@ -81,16 +78,33 @@ setuptools.setup(
         'cazomevolve/seq_diversity/get_fam_seqs.sh',
         'cazomevolve/seq_diversity/run_blastp.sh',
         'cazomevolve/seq_diversity/run_diamond.sh',
+        'cazomevolve/cazome/cazy/build_db.sh',
+        'cazomevolve/scripts/tree/phylo/align_scos.sh',
+        'cazomevolve/scripts/tree/phylo/annotate_genomes.sh',
+        'cazomevolve/scripts/tree/phylo/backtranslates.sh',
+        'cazomevolve/scripts/tree/phylo/concatenate_cds.py',
+        'cazomevolve/scripts/tree/phylo/extract_cds.py',
+        'cazomevolve/scripts/tree/phylo/find_orthologues.sh',
+        'cazomevolve/scripts/tree/phylo/raxml_ng_build_tree.sh',
+        'cazomevolve/scripts/tree/ani/run_anim.sh',
+        'cazomevolve/scripts/tree/ani/build_anim_tree.R',
     ],
     install_requires=[
+        "adjustText",
         "cazy_webscraper",
         "biopython",
         "pandas",
         "tqdm",
+        "sklearn",
+        "scikit-learn",
         "saintbioutils",
         "numpy",
         "seaborn",
         "sqlalchemy",
+        "upsetplot",
+        "scipy",
+        "jupyter",
+        "ncbi-genome-download",
     ],
     packages=setuptools.find_packages(),
     package_data={

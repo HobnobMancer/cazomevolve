@@ -40,9 +40,13 @@
 
 
 import argparse
+import sys
 
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
+
+from cazomevolve.genomes import download_genomes
 
 
 class ValidateFormats(argparse.Action):
@@ -79,13 +83,13 @@ class ValidateLevels(argparse.Action):
         setattr(args, self.dest, values)
 
 
-def build_parser(argv: Optional[List] = None):
+def build_parser(
+    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
+) -> None:
     """Return ArgumentParser parser for script."""
     # Create parser object
-    parser = argparse.ArgumentParser(
-        prog="download_genomes",
-        description="Download all genomic assemblies associated with a given term in NCBI Assembly database",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    parser = subps.add_parser(
+        "download_genomes", formatter_class=ArgumentDefaultsHelpFormatter
     )
     # Add positional arguments to parser
     parser.add_argument(
@@ -184,9 +188,4 @@ def build_parser(argv: Optional[List] = None):
         help="Set logger level to 'INFO'",
     )
 
-    if argv is None:
-        # parse command-line
-        return parser
-    else:
-        # return namespace
-        return parser.parse_args(argv)
+    parser.set_defaults(func=download_genomes.main)

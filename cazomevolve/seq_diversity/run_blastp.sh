@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#!/usr/bin/ bash
 #
 # (c) University of St Andrews 2020-2021
 # (c) University of Strathclyde 2020-2021
@@ -44,8 +45,15 @@
 # $1 input FASTA file
 # $2 output file
 
+FILE_NAME=${2##*/}
+mkdir -p "${2%$FILE_NAME}"
+
+echo "Running BLASTP"
+
 blastp \
   -query $1 \
   -subject $1 \
   -out $2 \
   -outfmt "6 qseqid sseqid qlen slen length pident qcov scov evalue bitscore"
+
+echo "Done"

@@ -42,20 +42,18 @@
 
 import re
 import subprocess
+import logging
 
 from tqdm import tqdm
+from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
 from saintBioutils.utilities.file_io import get_paths
 
 from cazomevolve import closing_message
-from cazomevolve.utilities.parsers.invoke_dbcan_parser import build_parser
 
 
-def main():
-    parser = build_parser()
-    args = parser.parse_args()
-
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
     # get the path to every FASTA to be parsed by dbCAN
@@ -67,13 +65,16 @@ def main():
         # define path to output dir that will house output for this specific input FASTA file
         # extract genomic accession from the file name, and name output dir after the accession
         try:
-            genomic_accession = re.findall(r"GCa_\d+\.\d+", fasta_path.name)[0]
+            genomic_accession = re.findall(r"GCF_\d+\.\d{1,5}", fasta_path.name)[0]
         except IndexError:
             try:
-                genomic_accession = re.findall(r"GCF_\d+\.\d+", fasta_path.name)[0]
+                genomic_accession = re.findall(r"GCA_\d+\.\d{1,5}", fasta_path.name)[0]
             except IndexError:
-                print(f"Could not get find genomic accession in {fasta_path.name}\nSkipping assembly\n")
-                continue
+                logger.warning(
+                    f"Could not retrieve genomic accession from\n{fasta_path}\n"
+                    "Skipping FASTA file"
+                )
+                return
         
         output_dir = args.output_dir / genomic_accession
 
@@ -83,7 +84,7 @@ def main():
 
         invoke_dbcan(fasta_path, output_dir, args)
 
-    closing_message('Invoke dbCAN')
+    closing_message('Invoke dbCAN', args)
 
 
 def invoke_dbcan(input_path, out_dir, args):

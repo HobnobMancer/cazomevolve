@@ -43,10 +43,12 @@
 import logging
 
 
-__version__ = "0.0.2"
+__version__ = "0.1.0"
+
+__citation__ = "???"
 
 
-def closing_message(job):
+def closing_message(job, args):
     """Write closing messsage to terminal
     
     :param job: str, name of module run
@@ -57,7 +59,7 @@ def closing_message(job):
 
     message = f"""
     =====================cazomevolve: {job}=====================
-    Version: {VERSION_INFO}
+    Version: {__version__}
     """
 
     if args.verbose:

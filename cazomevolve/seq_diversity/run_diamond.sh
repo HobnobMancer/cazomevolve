@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#!/usr/bin/ bash
 #
 # (c) University of St Andrews 2020-2021
 # (c) University of Strathclyde 2020-2021
@@ -45,8 +46,15 @@
 # $2 diamond db to be created
 # $3 output file
 
-FILE_NAME=${4##*/}
-mkdir -p "${4%$FILE_NAME}"
+echo "$1**$2***$3"
+
+FILE_NAME=${3##*/}
+mkdir -p "${3%$FILE_NAME}"
+echo "***********$FILE_NAME"
+FILE_NAME=${2##*/}
+mkdir -p "${2%$FILE_NAME}"
+echo "**************************$FILE_NAME"
+
 
 # build db
 echo 'Building database'
@@ -64,3 +72,4 @@ diamond blastp \
     --evalue 10 \
     --max-target-seqs 0
 
+echo "Done"

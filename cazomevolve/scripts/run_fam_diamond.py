@@ -36,20 +36,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Run all-vs-all seq comparison using BLAST"""
+"""Run all-vs-all seq comparison using DIAMOND"""
 
 
 import argparse
 import subprocess
 
+from inspect import getsourcefile
+from os.path import abspath
+
 
 def main(args: argparse.Namespace) -> int:
-    theproc = subprocess.Popen([
-        "./seq_diversity/run_diamond.sh",
-        args.fasta,
-        args.diamond_db,
-        args.outfile,
-    ], shell=True)
-    theproc.communicate()
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/run_fam_diamond.py","seq_diversity/run_diamond.sh"))
 
+    cmd = [
+            cazevolve_path,
+            args.fasta,
+            args.diamond_db,
+            args.outfile,
+        ]
+    print(f"Running command: {' '.join(cmd)}")
+
+    theproc = subprocess.call(args=cmd)
+    
     return 0

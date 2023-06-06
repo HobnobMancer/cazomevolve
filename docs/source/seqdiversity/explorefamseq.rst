@@ -1,3 +1,4 @@
+.. _Explore sequence diversity in CAZy families:
 ===========================================
 Explore sequence diversity in CAZy families
 ===========================================

@@ -9,6 +9,7 @@ PL20.
 
     All output directories are created by ``cazomevolve``.
 
+
 --------------------------------
 1. Build a local CAZyme database
 --------------------------------
@@ -63,7 +64,7 @@ Run an all-versus-all sequence comparison analysis using BLASTP from NCBI+.
 Alternatively, run an all-versus-all sequence comparison analysis using DIAMOND, which is practically a significantly 
 faster version of BLAST and is recommended for data sets (e.g. +1000 seqs).
 
-> Buchfink B, Xie C, Huson DH. Fast and sensitive protein alignment using DIAMOND. Nat Methods. 2015 Jan;12(1):59-60. doi: 10.1038/nmeth.3176. Epub 2014 Nov 17. PMID: 25402007.
+    Buchfink B, Xie C, Huson DH. Fast and sensitive protein alignment using DIAMOND. Nat Methods. 2015 Jan;12(1):59-60. doi: 10.1038/nmeth.3176. Epub 2014 Nov 17. PMID: 25402007.
 
 Use the ``run_fam_diamond`` subcommand, using three inputs:
 1. Path to the FASTA file of protein sequences
@@ -86,4 +87,10 @@ Use the ``run_fam_diamond`` subcommand, using three inputs:
 Visualise sequence diversity
 ----------------------------
 
-??
+Use the functions from the ``cazomevolve.seq_diversity.explore`` submodule in a Python script 
+or jupyter notebook to visualise and interrogate the sequence diversity data.
+
+More inforamtion can be found on the `Explore sequence diversity in CAZy families`_. page
+
+An example jupyter notebook can be found `here <www.google.co.uk>`_ and which can be used as a template.
+

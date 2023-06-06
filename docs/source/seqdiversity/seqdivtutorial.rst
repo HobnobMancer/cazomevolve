@@ -44,9 +44,9 @@ format for ``<FAM IN CAZY FORMAT>.seqs.fasta``, e.g. ``PL20.seqs.fasta``.
         -f
 
 
--------------
+--------------
 3.A Run BLASTP
--------------
+--------------
 
 Run an all-versus-all sequence comparison analysis using BLASTP from NCBI+.
 

@@ -1,4 +1,5 @@
-.. _Explore sequence diversity in CAZy families:
+.. _explore sequence diversity in CAZy families:
+
 ===========================================
 Explore sequence diversity in CAZy families
 ===========================================
@@ -23,6 +24,7 @@ The BSR is the bitscore normalised for protein length, and enables us to compare
 Import from ``cazomevolve.seq_diversity.explore.data``.
 
 .. code-block:: python
+
     def load_data(data_file, fam):
         """Load the output data from BLASTP+/diamond into a pandas dataframe, and calculate the BLAST score ratio.
         
@@ -50,6 +52,7 @@ Optionally, remove redundnant proteins using the function ``remove_redundant_pro
 structure and characterised table in CAZy, see the section "Get CAZy family data" below.
 
 .. code-block:: python
+
     def remove_redunant_prots(df, fam, candidates={}, structured_prots={}, characterised_prots={}):
         """Identify groups of identical proteins, and retaining only one member per group
 
@@ -169,6 +172,7 @@ Get CAZy family protein accessions
 Import from ``cazomevolve.seq_diversity.explore.cazy``.
 
 .. code-block:: python
+
     def get_cazy_proteins(fasta_file):
         """Retrieving NCBI protein accessions from FASTA file of CAZy proteins
 
@@ -193,6 +197,7 @@ Get a list of NCBI protein accessions for proteins listed on the CAZy family's '
 Import from ``cazomevolve.seq_diversity.explore.cazy``.
 
 .. code-block:: python
+
     def get_cazy__db_prots(cazy_family, characterised=False, structured=False):
         """Get the NCBI protein accessions for proteins in the structure or characterised tables
         from the CAZy website.
@@ -261,6 +266,7 @@ Clustermap
 Import from ``cazomevolve.seq_diversity.explore.plot``.
 
 .. code-block:: python
+
     def plot_clustermap(
         df,
         fam,
@@ -363,6 +369,7 @@ clustermap, using the function ``plot_heatmap_of_clustermap``.
 Import from ``cazomevolve.seq_diversity.explore.plot``.
 
 .. code-block:: python
+
     def plot_heatmap_of_clustermap(
         fig,
         df,
@@ -510,6 +517,7 @@ Import from ``cazomevolve.seq_diversity.explore.plot``.
 The default palette used to annotate, candidate, characterised and structurally characterised proteins is defined in PALETTE_DICT:
 
 .. code-block:: python
+
     # define the colour palettes for annotating proteins
     PALETTE = sns.color_palette(['#425df5', '#eb8913', '#19bfb4', '#db0d4e', '#15ab62', '#ffffff'])
     PALETTE_DICT = {

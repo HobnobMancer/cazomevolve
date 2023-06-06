@@ -88,7 +88,7 @@ Visualise sequence diversity
 Use the functions from the ``cazomevolve.seq_diversity.explore`` submodule in a Python script 
 or jupyter notebook to visualise and interrogate the sequence diversity data.
 
-More inforamtion can be found on the `Explore sequence diversity in CAZy families`_. page
+More inforamtion can be found on the :ref:`explore sequence diversity in CAZy families`_. page
 
 An example jupyter notebook can be found `here <www.google.co.uk>`_ and which can be used as a template.
 

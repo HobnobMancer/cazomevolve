@@ -12,6 +12,7 @@ One approach to identify always co-occurring families is to build a correlation 
 Import from ``cazomevolve.cazome.explore.cooccurring_families``.
 
 .. code-block:: python
+
     def identify_cooccurring_fams_corrM(df, all_families, core_cazome=[], corrM_path=None, fill_value=2):
         """Build a correlation matrix of the CAZy fam frequencies to identify co-occurring families
         i.e. CAZy families that are always present together
@@ -90,6 +91,7 @@ CAZy families that always co-occurr in a genome together.
 Import from ``cazomevolve.cazome.explore.cooccurring_families``.
 
 .. code-block:: python
+
     def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False):
         """Identify groups of CAZy families that are always present together, and count in 
         how many genomes the families are present together
@@ -159,6 +161,7 @@ All functions are imported from ``cazomevolve.cazome.explore.cooccurring_familie
 First build the upset plot membership:
 
 .. code-block:: python
+
     def add_to_upsetplot_membership(upsetplot_membership, cooccurring_fams_dict):
         """Add co-occurring families to upsetplot membership data
         
@@ -178,6 +181,7 @@ First build the upset plot membership:
 Then build the upset plot:
 
 .. code-block:: python
+
     def build_upsetplot(
         upsetplot_membership,
         file_path=None,
@@ -275,6 +279,7 @@ dataframe with this data. The dataframe can then be used in another tool to buil
 `RawGraphs <https://app.rawgraphs.io/>`_.
 
 .. code-block:: python
+
     def add_upsetplot_grp_freqs(
         upset_plt_groups,
         cooccurring_grp_freq_data,

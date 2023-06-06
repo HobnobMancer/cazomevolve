@@ -6,6 +6,7 @@ The following functions are for loading and parsing data aurgment by ``cazomevol
 Import from ``cazomevolve.cazome.explore.parse_data``.
 
 .. code-block:: python
+
     def load_fgp_data(fgp_file):
         """Load data from the fgp (fam - genome - protein) tab delimited file from cazomevolve.
 

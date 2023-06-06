@@ -12,6 +12,7 @@ Identify the core CAZome
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def identify_core_cazome(df):
         """Identify families that are present in every genome
         
@@ -32,6 +33,7 @@ Calculate and plot fam frequencies
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def plot_fam_boxplot(
         df,
         font_scale=1,

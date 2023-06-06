@@ -9,6 +9,7 @@ Calculate the size of the CAZome in each genome, as well as:
 Import from ``cazomevolve.cazome.explore.cazome_sizes``.
 
 .. code-block:: python
+
     def count_items_in_cazome(gfp_df, item, grp, round_by=None):
         """Count the number of unique items per genome and per specificed tax grouping
         

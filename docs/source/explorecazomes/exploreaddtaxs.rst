@@ -13,6 +13,7 @@ after searching the GTDB database via the GTDB website.
 Import from ``cazomevolve.cazome.explore.taxonomies``.
 
 .. code-block:: python
+
     def get_gtdb_search_tax_dict(gtdb_path):
         """Build a dict of {genomic acc: {species: str, genus:str}} from GTDB search results CSV file
         
@@ -49,6 +50,7 @@ To parse a GTDB database dump, downloaded from the GTDB website in TSV format, u
 Import from ``cazomevolve.cazome.explore.taxonomies``.
 
 .. code-block:: python
+
     # IN DEVELOPMENT...
     def get_gtdb_db_tax_dict(gtdb_path):
         """Build a dict of {genomic acc: {species: str, genus:str}} from GTDB db dump TSV file
@@ -87,6 +89,7 @@ Get group information
 Import from ``cazomevolve.cazome.explore.taxonomies``.
 
 .. code-block:: python
+
     # in development
     def get_group_sample_sizes(fam_freq_df, group_by, tax_dict):
         """Get the number of genomes per group (genus or species)

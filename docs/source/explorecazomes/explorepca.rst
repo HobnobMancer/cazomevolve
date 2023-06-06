@@ -13,6 +13,7 @@ Run PCA
 Import from ``cazomevolve.cazome.explore.pca``.
 
 .. code-block:: python
+
     def perform_pca(df, nComp):
         """Perform PCA on family freq df
         
@@ -41,6 +42,7 @@ Calculate how much of the variation in the original dataset is captured by the P
 Import from ``cazomevolve.cazome.explore.pca``.
 
 .. code-block:: python
+
     def plot_explained_variance(
         pca,
         nComp,
@@ -89,6 +91,7 @@ Import from ``cazomevolve.cazome.explore.pca``.
 Calculate the amount of variation captured by each PC, individually.
 
 .. code-block:: python
+
     def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300):
         """Generate scree plot for PCA, plotting the amount of variance captured by each pc, for the
         first nComp PCs
@@ -125,6 +128,7 @@ Project genomes onto user defined pairs of PCs.
 Import from ``cazomevolve.cazome.explore.pca``.
 
 .. code-block:: python
+
     def plot_pca(
         pca,
         X_scaled,
@@ -413,6 +417,7 @@ Import from ``cazomevolve.cazome.explore.pca``.
 To plot the loadings, i.e. the degree of correlation between each CAZy family and each of the user selected PCs:
 
 .. code-block:: python
+
     def plot_loadings(
         pca,
         fam_df,

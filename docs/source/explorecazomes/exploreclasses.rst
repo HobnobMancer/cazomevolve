@@ -9,6 +9,7 @@ CAZyme can be assinged to multiple CAZy classes.
 Import from ``cazomevolve.cazome.explore.cazy_classes``.
 
 .. code-block:: python
+
     CAZY_CLASSES = ['GH', 'GT', 'PL', 'CE', 'AA', 'CBM']
 
     def calculate_class_sizes(fgp_df, grp, round_by=None):

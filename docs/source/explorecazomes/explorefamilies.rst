@@ -15,6 +15,7 @@ a single CAZyme can be assigned to multiple CAZy families.
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def build_fam_freq_df(gfp_df, tax_ranks):
         """Build matrix of fam freq per genome
         
@@ -77,6 +78,7 @@ To add row-colour annotations, using the ``build_row_colours()`` function to bui
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def build_row_colours(df, grp, palette):
         """Build map of colour to member of grp (e.g. genus)
 
@@ -108,6 +110,7 @@ Then a clustermap of CAZy family frequencies can be generated.
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def build_family_clustermap(
         df,
         row_colours=None,
@@ -302,6 +305,7 @@ CAZy families found in only specific groups, e.g. genus or species, can be ident
 Import from ``cazomevolve.cazome.explore.cazy_families``.
 
 .. code-block:: python
+
     def get_group_specific_fams(fam_freq_df, group_by, all_families):
         """Identify families that are present in only one group
         

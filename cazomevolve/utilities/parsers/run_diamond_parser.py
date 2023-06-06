@@ -62,7 +62,7 @@ def build_parser(
         help="Path to fasta file of protein seqs",
     )
     parser.add_argument(
-        "fasta",
+        "diamond_db",
         type=str,
         help="Path to create diamond DB",
     )

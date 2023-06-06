@@ -45,6 +45,7 @@ import time
 
 import mechanicalsoup
 
+from tqdm import tqdm
 from requests.exceptions import ConnectionError, MissingSchema
 from urllib3.exceptions import HTTPError, RequestError
 
@@ -76,9 +77,9 @@ def get_cazy_db_prots(cazy_family, characterised=False, structured=False):
     """
     urls = []  # [ [url, data type, col index for cazy website] ]
     if characterised:
-        urls.append([f"www.cazy.org/{cazy_family}_characterized.html", 'characterised', 3])
+        urls.append([f"http://www.cazy.org/{cazy_family}_characterized.html", 'characterised', 4])
     if structured:
-        urls.append([f"www.cazy.org/{cazy_family}_structure.html", "structured", 4])
+        urls.append([f"http://www.cazy.org/{cazy_family}_structure.html", "structured", 3])
 
     all_proteins = []
 
@@ -96,7 +97,7 @@ def get_cazy_db_prots(cazy_family, characterised=False, structured=False):
 
         gbk_bs_elements = []
 
-        for row in cazyme_table.select("tr"):
+        for row in tqdm(cazyme_table.select("tr"), desc=f"Parsing {url[1]} table for {cazy_family}"):
             try:
                 if (row.attrs["class"] == ['royaume']) and (row.text.strip() != 'Top'):
                     continue

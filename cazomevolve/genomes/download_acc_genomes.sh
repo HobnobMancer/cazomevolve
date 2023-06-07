@@ -50,12 +50,12 @@
 # $4 refseq or genbank
 # $5 assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']
 
-ARG5=${5: 'all'}
-
 ncbi-genome-download \
     all \
     --section $4 \
     --formats $3 \
     --assembly-levels $5 \
     --assembly-accessions $1 \
-    --output-folder $2
+    --output-folder $2 \
+    --verbose \
+    --flat-output

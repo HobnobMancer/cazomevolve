@@ -42,9 +42,14 @@
 import argparse
 import sys
 import subprocess
+import os
 
+from inspect import getsourcefile
+from os.path import abspath
 from pathlib import Path
 from typing import List, Optional
+
+from saintBioutils.utilities.file_io import make_output_directory
 
 
 # $1 path to file listing the accessions, with a unique genome accession per row
@@ -56,15 +61,32 @@ from typing import List, Optional
 
 
 def main(args: argparse.Namespace) -> int:
-    theproc = subprocess.Popen([
-        "./genomes/downooad_acc_genomes.sh",
-        args.accessions,
-        args.outdir,
-        args.file_opts,
-        args.database,
-        args.level
-    ], shell=True)
-    theproc.communicate()   
+    if str(Path(args.outdir).parent) != ".":
+        make_output_directory(Path(args.outdir), args.force, args.nodelete)
+
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/downooad_acc_genomes.py","genomes/downooad_acc_genomes.sh"))
+
+    cmd = [
+            cazevolve_path,
+            args.accessions,
+            args.outdir,
+            args.file_opts,
+            args.database,
+            args.level
+        ]
+
+    print(f"Running command: {' '.join(cmd)}")
+
+    theproc = subprocess.call(
+        [
+            cazevolve_path,
+            args.accessions,
+            args.outdir,
+            args.file_opts,
+            args.database,
+            args.level
+        ]
+    )  
 
     return 0
 

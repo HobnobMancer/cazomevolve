@@ -42,14 +42,14 @@
 import argparse
 import sys
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction, Action
 from pathlib import Path
 from typing import List, Optional
 
 from cazomevolve.genomes import download_genomes
 
 
-class ValidateFormats(argparse.Action):
+class ValidateFormats(Action):
     """Check the user has provided valid genome file formats."""
     def __call__(self, parser, args, values, option_string=None):
         valid_formats = {
@@ -69,7 +69,7 @@ class ValidateFormats(argparse.Action):
         setattr(args, self.dest, values)
 
 
-class ValidateLevels(argparse.Action):
+class ValidateLevels(Action):
     """Check the user has provided valid assembly levels."""
     def __call__(self, parser, args, values, option_string=None):
         valid_formats = ['all', 'complete', 'chromosome', 'scaffold', 'contig']
@@ -81,6 +81,19 @@ class ValidateLevels(argparse.Action):
         if invalid:
             sys.exit(1)
         setattr(args, self.dest, values)
+
+
+class ValidateDb(Action):
+    """Check the user has provided valid database options."""
+    def __call__(self, parser, args, values, option_string=None):
+        valid_formats = ['genbank', 'refseq']
+        invalid = False
+        if values[0] not in valid_formats:
+            invalid = True
+            raise ValueError(f'Invalid database "{values[0]}" provided. Accepted formats: {valid_formats}')
+        if invalid:
+            sys.exit(1)
+        setattr(args, self.dest, values[0])
 
 
 def build_parser(
@@ -99,9 +112,15 @@ def build_parser(
     )
 
     parser.add_argument(
+        "output_dir",
+        type=Path,
+        help="Path to directory to write out genomic assemblies",
+    )
+
+    parser.add_argument(
         "terms",
         type=str,
-        help="Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'",
+        help="Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'",
     )
 
     parser.add_argument(
@@ -110,13 +129,7 @@ def build_parser(
         action=ValidateFormats,
         choices=['genomic', 'protein'],
         type=str,
-        help="File formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]",
-    )
-
-    parser.add_argument(
-        "output_dir",
-        type=Path,
-        help="Path to directory to write out genomic assemblies",
+        help="Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]",
     )
 
     # Add optional arguments
@@ -135,12 +148,12 @@ def build_parser(
     )
 
     parser.add_argument(
-        "-G",
-        "--genbank",
-        dest="gbk",
-        action="store_true",
-        default=False,
-        help="Retrieve GenBank (GCA) instead of Refseq (GCF)",
+        "database",
+        action=ValidateDb,
+        choices=['genbank', 'refseq'],
+        nargs=1,
+        type=str,
+        help="Choose which NCBI db to get genomes from: refseq or genbank",
     )
 
     # Add option to force file over writting

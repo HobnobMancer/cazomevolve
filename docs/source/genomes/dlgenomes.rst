@@ -106,23 +106,23 @@ by - i.e. the lineages of interest.
 Then define the file format(s) to download:
 * ``genome`` (.fna)
 * ``protein`` (.faa)
-* ``protein,genomic`` (both .faa and .fna) or ``genomic,protein``
+* ``protein genomic`` (both .faa and .fna) or ``genomic protein``
 
 positional arguments:
   email                 User email address
-  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'
-  {genomic,protein}     File formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
   output_dir            Path to directory to write out genomic assemblies
+  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
 
 optional arguments:
   -h, --help            show this help message and exit
   -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
                         Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
-  -G, --genbank         Retrieve GenBank (GCA) instead of Refseq (GCF) (default: False)
   -f, --force           Force file over writting (default: False)
   -l log file name, --log log file name
                         Defines log file name and/or path (default: None)
-  -n, --nodelete        When called, cazomevolve will not delete files in existing output dir (default: False)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
   --timeout TIMEOUT     time in seconds before connection times out (default: 30)
   -v, --verbose         Set logger level to 'INFO' (default: False)
 

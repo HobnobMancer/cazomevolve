@@ -1,3 +1,5 @@
+.. _genome download:
+
 ======================================
 Download genomes using ``cazomevolve``
 ======================================

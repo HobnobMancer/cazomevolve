@@ -66,7 +66,7 @@ class ValidateFormats(Action):
                 raise ValueError(f'Invalid file format "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
         if invalid:
             sys.exit(1)
-        setattr(args, self.dest, values)
+        setattr(args, self.dest, accepted_values)
 
 
 class ValidateLevels(Action):

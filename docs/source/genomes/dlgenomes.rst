@@ -133,7 +133,20 @@ For exmple to download all proteome fasta files for all _Pectobacteriaceae_ geno
 
     cazomevolve download_genomes \
         dummyemail@domain.com \
-        Pectobacteriaceae \
-        protein \
         my_project/data/genomes \
-        -A complete,chromosome
+        'Pectobacterium wasabiae,Dickeya zeae' \
+        protein genomic \
+        genbank
+        
+To filter the genomes to only retrieve those with the assembly status of complete or chromosome, add the 
+``-A`` or ``--assembly_level`` flag:
+
+.. code-block:: bash
+
+    cazomevolve download_genomes \
+        dummyemail@domain.com \
+        my_project/data/genomes \
+        'Pectobacterium wasabiae,Dickeya zeae' \
+        protein genomic \
+        genbank \
+        --assembly_level complete,chromosome

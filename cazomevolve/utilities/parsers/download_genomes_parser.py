@@ -132,6 +132,15 @@ def build_parser(
         help="Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]",
     )
 
+    parser.add_argument(
+        "database",
+        action=ValidateDb,
+        choices=['genbank', 'refseq'],
+        nargs=1,
+        type=str,
+        help="Choose which NCBI db to get genomes from: refseq or genbank",
+    )
+
     # Add optional arguments
     parser.add_argument(
         "-A",
@@ -145,15 +154,6 @@ def build_parser(
             "Assembly levels of genomes to download. Default='all'. Can provide multiple levels.\n"
             "Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig']"
         ),
-    )
-
-    parser.add_argument(
-        "database",
-        action=ValidateDb,
-        choices=['genbank', 'refseq'],
-        nargs=1,
-        type=str,
-        help="Choose which NCBI db to get genomes from: refseq or genbank",
     )
 
     # Add option to force file over writting

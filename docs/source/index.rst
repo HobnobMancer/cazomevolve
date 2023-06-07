@@ -152,6 +152,23 @@ Import and implement functions available in the ``cazomevolve.cazome.explore`` m
 * Groups of CAZy families that always co-occur together
 * Perform Principal Component Analysis (PCA) to explore trends across the data set
 
+============
+Installation
+============
+
+The easiest way to install ``cazomevolve`` is via `PyPi <https://pypi.org/project/cazomevolve/>`_.
+
+.. code-block:: bash
+
+   pip install cazomevolve
+
+Alternatively, ``cazomevolve`` can be installed from source:
+
+.. code-block:: bash
+
+   git clone https://github.com/HobnobMancer/cazomevolve.git
+   pip install -e cazomevolve/.
+
 =============
 Documentation
 =============
@@ -160,9 +177,11 @@ Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    seqdiversity/seqdivusage
    seqdiversity/seqdivtutorial
    seqdiversity/explorefamseq
+   genomes/dlgenomes
    explorecazomes/exploredata
    explorecazomes/exploreaddtaxs
    explorecazomes/explorecazomesizes

@@ -74,6 +74,16 @@ An analysis using `cazomevolve` can be found [here](https://github.com/HobnobMan
 
 ## Installation
 
+### PyPi
+
+The easiest way to install `cazomeolve` is via PyPi
+
+```bash
+pip install cazomevolve
+```
+
+### From source
+
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
 ```bash
 conda create -n cazomevolve python=3.9
@@ -83,15 +93,8 @@ conda activate cazomevolve
 2. Clone the repository
 ```bash
 git clone https://github.com/HobnobMancer/cazomevolve.git
+pip install cazomevolve/.
 ```
-
-3. Install pyrewton
-```
-pip3 install -e <path to directory containing setup.py file>
-```
-Do not forget to use the **-e** option when install using pip3.  
-
-Pass the path to the **directory** containing the setup.py file not the path to the setup.py file; if you are currently in the root directory of the repoistory where the file is located, simply use '.' to indicate the current working directory.
 
 <p>&nbsp;</p>
 

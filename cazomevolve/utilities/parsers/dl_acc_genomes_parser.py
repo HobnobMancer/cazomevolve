@@ -40,11 +40,39 @@
 """Build args parser for get_cazy_cazymes.py"""
 
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction, Action
 from pathlib import Path
 from typing import List, Optional
 
 from cazomevolve.scripts import download_acc_genomes
+
+
+class ValidateFormats(Action):
+    """Check the user has provided valid file formats."""
+    def __call__(self, parser, args, values, option_string=None):
+        valid_formats = ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
+        invalid = False
+        for value in values:
+            if value not in valid_formats:
+                invalid = True
+                raise ValueError(f'Invalid file format "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+        if invalid:
+            sys.exit(1)
+        setattr(args, self.dest, values)
+
+
+class ValidateDb(Action):
+    """Check the user has provided valid database options."""
+    def __call__(self, parser, args, values, option_string=None):
+        valid_formats = ['genbank', 'refseq']
+        invalid = False
+        for value in values:
+            if value not in valid_formats:
+                invalid = True
+                raise ValueError(f'Invalid database "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+        if invalid:
+            sys.exit(1)
+        setattr(args, self.dest, values)
 
 
 def build_parser(
@@ -68,6 +96,9 @@ def build_parser(
     )
     parser.add_argument(
         "file_opts",
+        nargs='+',
+        action=ValidateFormats,
+        choices=['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all'],
         type=str,
         help=(
             "A comma-separated list of formats is also possible. For example: 'fasta,assembly-report'. Choose from:\n"
@@ -76,6 +107,7 @@ def build_parser(
     )
     parser.add_argument(
         "database",
+        action=ValidateDb,
         type=str,
         help="Choose which NCBI db to get genomes from: refseq or genbank",
     )
@@ -84,4 +116,22 @@ def build_parser(
         type=str,
         help="assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']",
     )
+
+    parser.add_argument(
+        "-f",
+        "--force",
+        dest="force",
+        action="store_true",
+        default=False,
+        help="Force file over writting",
+    )
+    parser.add_argument(
+        "-n",
+        "--nodelete",
+        dest="nodelete",
+        action="store_true",
+        default=False,
+        help="enable/disable deletion of exisiting files",
+    )
+
     parser.set_defaults(func=download_acc_genomes.main)

@@ -52,8 +52,6 @@
 
 ARG5=${5: 'all'}
 
-mkdir -p $2
-
 ncbi-genome-download \
     all \
     --section $4 \

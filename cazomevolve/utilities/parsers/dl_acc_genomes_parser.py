@@ -50,12 +50,12 @@ from cazomevolve.scripts import download_acc_genomes
 class ValidateFormats(Action):
     """Check the user has provided valid file formats."""
     def __call__(self, parser, args, values, option_string=None):
-        valid_formats = ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
+        valid_formats = ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cds-fasta', 'rnafna', 'rnafasta', 'assemblyreport', 'assemblystats', 'all']
         invalid = False
         for value in values:
             if value not in valid_formats:
                 invalid = True
-                raise ValueError(f'Invalid file format "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+                raise ValueError(f'Invalid file format "{value}" provided. Accepted formats: {valid_formats}')
         if invalid:
             sys.exit(1)
         setattr(args, self.dest, values)
@@ -63,16 +63,15 @@ class ValidateFormats(Action):
 
 class ValidateDb(Action):
     """Check the user has provided valid database options."""
-    def __call__(self, parser, args, values, option_string=None):
+    def __call__(self, parser, args, value, option_string=None):
         valid_formats = ['genbank', 'refseq']
         invalid = False
-        for value in values:
-            if value not in valid_formats:
-                invalid = True
-                raise ValueError(f'Invalid database "{value}" provided. Accepted formats: {list(valid_formats.keys())}')
+        if value not in valid_formats:
+            invalid = True
+            raise ValueError(f'Invalid database "{value}" provided. Accepted formats: {valid_formats}')
         if invalid:
             sys.exit(1)
-        setattr(args, self.dest, values)
+        setattr(args, self.dest, value)
 
 
 def build_parser(
@@ -98,11 +97,11 @@ def build_parser(
         "file_opts",
         nargs='+',
         action=ValidateFormats,
-        choices=['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all'],
+        choices=['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport', 'assemblystats', 'all'],
         type=str,
         help=(
-            "A comma-separated list of formats is also possible. For example: 'fasta,assembly-report'. Choose from:\n"
-            "['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']"
+            "A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from:\n"
+            "['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport', 'assemblystats', 'all']"
         ),
     )
     parser.add_argument(
@@ -114,7 +113,7 @@ def build_parser(
     parser.add_argument(
         "level",
         type=str,
-        help="assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']",
+        help="assembly level, ['all', 'complete', 'chromosome', 'scaffold', 'contig']",
     )
 
     parser.add_argument(

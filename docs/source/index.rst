@@ -22,6 +22,19 @@ Build Information
     :target: https://cazomevolve.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+--------
+``PyPI``
+--------
+
+.. image:: https://img.shields.io/pypi/v/cazomevolve.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/cazomevolve
+.. image:: https://img.shields.io/pypi/dm/cazomevolve?label=Pypi%20downloads
+   :target: https://pypi.org/project/cazomevolve/
+
+-----------
+cazomevolve
+-----------
+
 ``cazomevolve`` ("cazome-evolve") is a Python3 package for the automated annotation and exploratory 
 analysis of the CAZyme complements (CAZomes) for a set of species and/or genomes of interest.
 

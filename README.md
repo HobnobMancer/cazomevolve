@@ -267,42 +267,48 @@ The genomes to be download can be specified by [A] their genomic accessions, or 
 
 If you have a list of genomic version accessions in a plain text file, `cazomevolve` can use the Python package `ncbi-genome-download` to download the genomic assemblies genomic (`.fna`) and proteome (`.faa`) sequence files.
 
-Using the `download_acc_genomes` subcommand, which takes 4 positional arguments and 1 optional argument:
+Using the `download_acc_genomes` subcommand, which takes 5 positional arguments:
 
 **Positional arguments:**
-1. Path to file containing list of accessions (with a unique genome accession per row)
-2. Path to output directory (will be created by `cazevolve_download_acc_genomes`)
-3. File options - a comma-separated list, e.g. "fasta,assembly-report": Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
-4. Download Refseq ('refseq') or GenBank ('genbank') assemblies
+accessions            Path to file listing the accessions, with a unique genome accession per row
+outdir                output directory to write out the genomes to
+{genbank,fasta,rm,features,gff,protein,genpept,wgs,cdsfasta,rnafna,rnafasta,assemblyreport,assemblystats,all}
+                      A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna',
+                      'rnafasta', 'assemblyreport', 'assemblystats', 'all']
+{genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
 
 **Optional arguments:**
-1. Assembly level. Default 'all'. Comma separated list. Choose from: ['all', 'complete', 'chromosome', 'scaffold', 'contig']
+-h, --help            show this help message and exit
+-A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
+                      Space-separated list of assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: all)
+-f, --force           Force file over writting (default: False)
+-n, --nodelete        enable/disable deletion of exisiting files (default: False)
 
-**Downloads the genomes in `.fna` and `faa` format.**
+By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 
 ### [B] Taxa
 
 To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the subcommand `download_genomes`, which takes 4 arguments:
 
-1. User email address (required by NCBI)
-2. The terms of interest. Comma-separated list, e.g. 'Pectobacterium,Dickeya'
-3. The file formats to download the genomic assemblies in. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]"
-4. Path to an output directory (this will be built by `cazomevolve`).
+**Positional arguments:**
+  email                 User email address
+  output_dir            Path to directory to write out genomic assemblies
+  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+
+**Optional arguments:**
+  -h, --help            show this help message and exit
+  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
+                        Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
+  -f, --force           Force file over writting (default: False)
+  -l log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+  --timeout TIMEOUT     time in seconds before connection times out (default: 30)
+  -v, --verbose         Set logger level to 'INFO' (default: False)
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
-
-**Optional flags:**
-
-``--assembly_levels``, ``-A`` - Restrict the dataset to genomic assemblies of a specific assembly level(s). Space separated list, e.g. 'complete chromosome'. Choices: ['all', 'complete', 'chromosome', 'scaffold', 'contig']. Default 'all'.
-
-``--genbank``, ``-G`` - Retrieve GenBank not RefSeq data. By default ``cazomevolve`` downloads RefSeq assemblies. Add this flag to the command to download GenBank assemblies instead.
-
-``-f``, ``--force`` - Force file over writting (default: False)
-``-l - log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
-``--timeout`` TIMEOUT - time in seconds before connection times out (default: 30)
-``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
 
 ## Annotate CAZomes
 

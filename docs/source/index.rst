@@ -243,6 +243,10 @@ authors and developers have made, please also cite the following:
 
 For additional citations when using ``cazy_webscraper``, see the ``cazy_webscraper`` `documentation <https://cazy-webscraper.readthedocs.io/en/latest/citation.html>`_.
 
+**ncbi-genome-download:**
+
+   Blin et al. (2017) ncbi-genome-download, https://github.com/kblin/ncbi-genome-download
+
 **dbCAN:**
 
 dbCAN version 2:
@@ -258,6 +262,18 @@ If using dbCAN version 3, cite the publication for version 2 as well as eCAMI:
 dbCAN version 4:
 
    Zheng J, Ge Q, Yan Y, Zhang X, Huang L, Yin Y. dbCAN3: automated carbohydrate-active enzyme and substrate annotation. Nucleic Acids Res. 2023 May 1:gkad328. doi: 10.1093/nar/gkad328. Epub ahead of print. PMID: 37125649.
+
+**BLAST Score Ratio:**
+
+    Rasko DA, Myers GS, Ravel J. Visualization of comparative genomic analyses by BLAST score ratio. BMC Bioinformatics. 2005 Jan 5;6:2. doi: 10.1186/1471-2105-6-2. PMID: 15634352; PMCID: PMC545078.
+
+**DIAMOND**
+
+   Buchfink B, Xie C, Huson DH. Fast and sensitive protein alignment using DIAMOND. Nat Methods. 2015 Jan;12(1):59-60. doi: 10.1038/nmeth.3176. Epub 2014 Nov 17. PMID: 25402007.
+
+**BLAST**
+
+   Altschul SF, Gish W, Miller W, Myers EW, Lipman DJ. Basic local alignment search tool. Journal of molecular biology. 1990;215(3):403–10.
 
 **Explore CAZy family sequence diversity and CAZomes:**
 
@@ -309,7 +325,6 @@ dbCAN version 4:
       pages={2825--2830},
       year={2011}
    }
-
 
 ======================
 Development and issues

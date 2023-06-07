@@ -25,6 +25,10 @@ authors and developers have made, please also cite the following:
 
 For additional citations when using ``cazy_webscraper``, see the ``cazy_webscraper`` `documentation <https://cazy-webscraper.readthedocs.io/en/latest/citation.html>`_.
 
+**ncbi-genome-download:**
+
+   Blin et al. (2017) ncbi-genome-download, https://github.com/kblin/ncbi-genome-download
+
 **dbCAN:**
 
 dbCAN version 2:

@@ -50,6 +50,9 @@
 # $4 refseq or genbank
 # $5 assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']
 
+echo "Running ncbi-genome-download"
+echo "Citation: Blin et al. (2017) ncbi-genome-download, Follow link (ctrl + click)"
+
 ncbi-genome-download \
     all \
     --section $4 \

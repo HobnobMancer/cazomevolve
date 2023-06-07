@@ -24,6 +24,12 @@ linked to a CAZyme record in CAZy to a multi-sequence FASTA file per input genom
 then coordinate dbCAN to parse each of the multi-sequence protein FASTA files, to predict additional CAZymes 
 that may not yet be included in CAZy.
 
+.. note::
+
+    You can skip using CAZy annotations and use 
+    only dbCAN predicted CAZymes. We do not recommend this, as dbCAN will retrieve only 80-90% of the CAZome. A more 
+    comprehensive representation of the CAZome is retrieved by combining CAZy and dbCAN CAZy family classifications.
+
 ``cazomevolve`` writes out the genomic accessions, protein accessions and associated CAZy family annotations 
 to tab delimited lists.
 
@@ -54,7 +60,6 @@ of the CAZome, and contains:
     fam2    genome1 protein1
     fam1    genome2 protein2
     fam3    genome2 protein3
-
 
 .. note::
 
@@ -129,7 +134,9 @@ Get dbCAN annotations
 
 The subcommand ``run_dbcan`` invokes ``cazomevolve`` to coordinate dbCAN to parse all protein 
 FASTA files in an input directory. We recommend these are the multi-sequence FASTA files created by the 
-``cazomevolve`` subcommand ``get_cazy_cazymes``.
+``cazomevolve`` subcommand ``get_cazy_cazymes``. Although, you can skip using CAZy annotations and use 
+only dbCAN predicted CAZymes. We do not recommend this, as dbCAN will retrieve only 80-90% of the CAZome. A more 
+comprehensive representation of the CAZome is retrieved by combining CAZy and dbCAN CAZy family classifications.
 
 .. note::
 

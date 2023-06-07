@@ -12,6 +12,14 @@ This page summarises the subcommands (including required and optional arguments)
 
     All output directories are created by ``cazomevolve``.
 
+-------
+Example
+-------
+
+An example jupyter notebook demonstrated how to use ``cazomevolve`` to explore the sequence diversity in the 
+CAZy family PL20 can be found in the `GitHub repository<https://github.com/HobnobMancer/cazomevolve/blob/master/cazomevolve/seq_diversity/explore_seq_diversity.ipynb>`_ for ``cazomevolve``, and can be used as a template.
+
+The contents of the notebook can also be viewed in this :ref:`documentation <example seq div>`.
 
 --------------------------------
 1. Build a local CAZyme database

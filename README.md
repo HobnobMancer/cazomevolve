@@ -73,6 +73,28 @@ An analysis using `cazomevolve` can be found [here](https://github.com/HobnobMan
 1. [cazomevolve](#cazomevolve)
 2. [Documentation](#documentation)
 3. [Installation](#installation)
+4. [Requirements](#requirements)
+5. [Explore sequence diversity in CAZy families](#explore-sequence-diversity-in-cazy-families)
+  * [Construct a local CAZyme database](#construct-a-local-cazyme-database)
+  * [Get sequences](#get-protein-sequences)
+  * [Run all-versus-all analysis](#run-all-versus-all-analysis)
+  * [Visualise sequence diversity](#visualise-the-sequence-diversity)
+6. [Annotate the CAZome](#annotate-the-cazome)
+  * [Download genomes](#download-genomes)
+    * [Use genomic accessions](#genomic-accession)
+    * [Using taxonomies](#taxa)
+  * [Annotate](#annotate-cazomes)
+    * [Local CAZyme database](#build-a-local-cazyme-database-using-cazy-webscraper)
+    * [CAZy annotations](#retrieve-cazy-annotations)
+    * [dbCAN annotations](#invoke-dbcan)
+      * [Invoke dbCAN](#invoke-dbcan)
+      * [Get annotations](#retrieve-dbcan-annotations)
+7. [Explore the CAZome](#explore-the-cazome-composition)
+8. [Networks of co-evolving CAZymes](#identify-networkds-of-co-evolving-cazy-families)
+  * [Multi-gene phylogenetic tree reconstruction](#maximum-likelihood-multi-gene-tree)
+  * [ANI distance-based tree](#a-distanced-based-approach)
+  * [Networks of co-evolving CAZymes](#find-networks-of-co-evolving-cazy-families)
+9. [CAZome dendrograms](#build-dendrograms-based-upon-cazome-composition)
 
 ## Installation
 
@@ -159,7 +181,7 @@ Note: _`coinfinder` requires Python v3.6, we recommend installing and running `c
 
 <p>&nbsp;</p>
 
-# Method
+# Explore sequence diversity in CAZy families
 
 ## Construct a local CAZyme database
 
@@ -168,7 +190,7 @@ Download all CAZyme records from CAZy, and compile the records into a local SQLi
 cazy_webscraper <user-email-address> -o <desired-path-for-db>
 ```
 
-## Explore sequence diversity in CAZy families
+## Get protein sequences
 
 Presuming a local CAZyme database has already been generated using `cazy_webscraper`:
 

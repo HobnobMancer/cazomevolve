@@ -6,7 +6,7 @@
 ![Python](https://img.shields.io/badge/Python-v3.9.---orange)
 ![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
 [![Funding BBSCR](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)
-[![cazomevolve PyPi version](https://img.shields.io/pypi/v/cazy_webscraper "PyPI version")](https://pypi.python.org/pypi/cazomevolve)  
+[![cazomevolve PyPi version](https://img.shields.io/pypi/v/cazomevolve "PyPI version")](https://pypi.python.org/pypi/cazomevolve)  
 [![Downloads](https://pepy.tech/badge/cazomevolve)](https://pepy.tech/project/cazomevolve)
 
 `cazomevolve` ('cazome-evolve') is an application and Python3 package for the automated annotation and exploratory analysis of CAZyme complements (CAZomes) for a set of species and/or genomes of interest. Carbohydrate Active enZymes are a subset of proteins that generate, modify and/or degrade carbohydrates. CAZy (www.cazy.org) is the most comprehensive CAZyme database, grouping proteins by sequence similarity into CAZy families.

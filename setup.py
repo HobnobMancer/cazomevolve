@@ -81,7 +81,7 @@ setuptools.setup(
         'cazomevolve/cazome/cazy/build_db.sh',
         'cazomevolve/scripts/tree/phylo/align_scos.sh',
         'cazomevolve/scripts/tree/phylo/annotate_genomes.sh',
-        'cazomevolve/scripts/tree/phylo/backtranslates.sh',
+        'cazomevolve/scripts/tree/phylo/backtranslate.sh',
         'cazomevolve/scripts/tree/phylo/concatenate_cds.py',
         'cazomevolve/scripts/tree/phylo/extract_cds.py',
         'cazomevolve/scripts/tree/phylo/find_orthologues.sh',

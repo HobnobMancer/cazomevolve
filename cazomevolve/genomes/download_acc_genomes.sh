@@ -50,7 +50,8 @@
 # $4 refseq or genbank
 # $5 assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']
 
-ARG5=${5: 'all'}
+echo "Running ncbi-genome-download"
+echo "Citation: Blin et al. (2017) ncbi-genome-download, Follow link (ctrl + click)"
 
 ncbi-genome-download \
     all \
@@ -58,4 +59,6 @@ ncbi-genome-download \
     --formats $3 \
     --assembly-levels $5 \
     --assembly-accessions $1 \
-    --output-folder $2
+    --output-folder $2 \
+    --verbose \
+    --flat-output

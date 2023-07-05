@@ -64,7 +64,7 @@ def main(args: argparse.Namespace) -> int:
     if str(Path(args.outdir).parent) != ".":
         make_output_directory(Path(args.outdir), args.force, args.nodelete)
 
-    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/downooad_acc_genomes.py","genomes/downooad_acc_genomes.sh"))
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/download_acc_genomes.py","genomes/download_acc_genomes.sh"))
 
     cmd = [
             cazevolve_path,
@@ -72,10 +72,10 @@ def main(args: argparse.Namespace) -> int:
             args.outdir,
             args.file_opts,
             args.database,
-            args.level
+            args.assembly_levels,
         ]
 
-    print(f"Running command: {' '.join(cmd)}")
+    print(f"Running command: {' '.join(['download_acc_genomes.sh']+cmd[1:])}")
 
     theproc = subprocess.call(
         [
@@ -84,7 +84,7 @@ def main(args: argparse.Namespace) -> int:
             args.outdir,
             args.file_opts,
             args.database,
-            args.level
+            args.assembly_levels,
         ]
     )  
 

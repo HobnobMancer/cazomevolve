@@ -2,10 +2,12 @@
 
 [![DOI](https://zenodo.org/badge/367898306.svg)](https://zenodo.org/badge/latestdoi/367898306)
 [![Documentation Status](https://readthedocs.org/projects/cazomevolve/badge/?version=latest)](https://cazomevolve.readthedocs.io/en/latest/?badge=latest)
-[![Funding](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)
-[![PhD licence](https://img.shields.io/badge/Licence-MIT-green)](https://github.com/HobnobMancer/PhD_Project_Scripts/blob/master/LICENSE)
+[![licence](https://img.shields.io/badge/Licence-MIT-green)](https://github.com/HobnobMancer/cazomevolve/blob/master/LICENSE)  
 ![Python](https://img.shields.io/badge/Python-v3.9.---orange)
 ![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
+[![Funding BBSCR](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)
+[![cazomevolve PyPi version](https://img.shields.io/pypi/v/cazomevolve "PyPI version")](https://pypi.python.org/pypi/cazomevolve)  
+[![Downloads](https://pepy.tech/badge/cazomevolve)](https://pepy.tech/project/cazomevolve)
 
 `cazomevolve` ('cazome-evolve') is an application and Python3 package for the automated annotation and exploratory analysis of CAZyme complements (CAZomes) for a set of species and/or genomes of interest. Carbohydrate Active enZymes are a subset of proteins that generate, modify and/or degrade carbohydrates. CAZy (www.cazy.org) is the most comprehensive CAZyme database, grouping proteins by sequence similarity into CAZy families.
 
@@ -71,8 +73,40 @@ An analysis using `cazomevolve` can be found [here](https://github.com/HobnobMan
 1. [cazomevolve](#cazomevolve)
 2. [Documentation](#documentation)
 3. [Installation](#installation)
+4. [Requirements](#requirements)
+5. [Explore sequence diversity in CAZy families](#explore-sequence-diversity-in-cazy-families)
+  * [Construct a local CAZyme database](#construct-a-local-cazyme-database)
+  * [Get sequences](#get-protein-sequences)
+  * [Run all-versus-all analysis](#run-all-versus-all-analysis)
+  * [Visualise sequence diversity](#visualise-the-sequence-diversity)
+6. [Annotate the CAZome](#annotate-the-cazome)
+  * [Download genomes](#download-genomes)
+    * [Use genomic accessions](#genomic-accession)
+    * [Using taxonomies](#taxa)
+  * [Annotate](#annotate-cazomes)
+    * [Local CAZyme database](#build-a-local-cazyme-database-using-cazy-webscraper)
+    * [CAZy annotations](#retrieve-cazy-annotations)
+    * [dbCAN annotations](#invoke-dbcan)
+      * [Invoke dbCAN](#invoke-dbcan)
+      * [Get annotations](#retrieve-dbcan-annotations)
+7. [Explore the CAZome](#explore-the-cazome-composition)
+8. [Networks of co-evolving CAZymes](#identify-networkds-of-co-evolving-cazy-families)
+  * [Multi-gene phylogenetic tree reconstruction](#maximum-likelihood-multi-gene-tree)
+  * [ANI distance-based tree](#a-distanced-based-approach)
+  * [Networks of co-evolving CAZymes](#find-networks-of-co-evolving-cazy-families)
+9. [CAZome dendrograms](#build-dendrograms-based-upon-cazome-composition)
 
 ## Installation
+
+### PyPi
+
+The easiest way to install `cazomeolve` is via PyPi
+
+```bash
+pip install cazomevolve
+```
+
+### From source
 
 1. Create a virtual environment with dependencies, then activate the environment - _where venv_name is an chosen name for the virtual environment_
 ```bash
@@ -83,15 +117,8 @@ conda activate cazomevolve
 2. Clone the repository
 ```bash
 git clone https://github.com/HobnobMancer/cazomevolve.git
+pip install cazomevolve/.
 ```
-
-3. Install pyrewton
-```
-pip3 install -e <path to directory containing setup.py file>
-```
-Do not forget to use the **-e** option when install using pip3.  
-
-Pass the path to the **directory** containing the setup.py file not the path to the setup.py file; if you are currently in the root directory of the repoistory where the file is located, simply use '.' to indicate the current working directory.
 
 <p>&nbsp;</p>
 
@@ -154,7 +181,7 @@ Note: _`coinfinder` requires Python v3.6, we recommend installing and running `c
 
 <p>&nbsp;</p>
 
-# Method
+# Explore sequence diversity in CAZy families
 
 ## Construct a local CAZyme database
 
@@ -163,7 +190,7 @@ Download all CAZyme records from CAZy, and compile the records into a local SQLi
 cazy_webscraper <user-email-address> -o <desired-path-for-db>
 ```
 
-## Explore sequence diversity in CAZy families
+## Get protein sequences
 
 Presuming a local CAZyme database has already been generated using `cazy_webscraper`:
 
@@ -240,42 +267,48 @@ The genomes to be download can be specified by [A] their genomic accessions, or 
 
 If you have a list of genomic version accessions in a plain text file, `cazomevolve` can use the Python package `ncbi-genome-download` to download the genomic assemblies genomic (`.fna`) and proteome (`.faa`) sequence files.
 
-Using the `download_acc_genomes` subcommand, which takes 4 positional arguments and 1 optional argument:
+Using the `download_acc_genomes` subcommand, which takes 5 positional arguments:
 
 **Positional arguments:**
-1. Path to file containing list of accessions (with a unique genome accession per row)
-2. Path to output directory (will be created by `cazevolve_download_acc_genomes`)
-3. File options - a comma-separated list, e.g. "fasta,assembly-report": Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta', 'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
-4. Download Refseq ('refseq') or GenBank ('genbank') assemblies
+accessions            Path to file listing the accessions, with a unique genome accession per row
+outdir                output directory to write out the genomes to
+{genbank,fasta,rm,features,gff,protein,genpept,wgs,cdsfasta,rnafna,rnafasta,assemblyreport,assemblystats,all}
+                      A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna',
+                      'rnafasta', 'assemblyreport', 'assemblystats', 'all']
+{genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
 
 **Optional arguments:**
-1. Assembly level. Default 'all'. Comma separated list. Choose from: ['all', 'complete', 'chromosome', 'scaffold', 'contig']
+-h, --help            show this help message and exit
+-A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
+                      Space-separated list of assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: all)
+-f, --force           Force file over writting (default: False)
+-n, --nodelete        enable/disable deletion of exisiting files (default: False)
 
-**Downloads the genomes in `.fna` and `faa` format.**
+By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 
 ### [B] Taxa
 
 To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the subcommand `download_genomes`, which takes 4 arguments:
 
-1. User email address (required by NCBI)
-2. The terms of interest. Comma-separated list, e.g. 'Pectobacterium,Dickeya'
-3. The file formats to download the genomic assemblies in. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]"
-4. Path to an output directory (this will be built by `cazomevolve`).
+**Positional arguments:**
+  email                 User email address
+  output_dir            Path to directory to write out genomic assemblies
+  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+
+**Optional arguments:**
+  -h, --help            show this help message and exit
+  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
+                        Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
+  -f, --force           Force file over writting (default: False)
+  -l log file name, --log log file name
+                        Defines log file name and/or path (default: None)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+  --timeout TIMEOUT     time in seconds before connection times out (default: 30)
+  -v, --verbose         Set logger level to 'INFO' (default: False)
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
-
-**Optional flags:**
-
-``--assembly_levels``, ``-A`` - Restrict the dataset to genomic assemblies of a specific assembly level(s). Space separated list, e.g. 'complete chromosome'. Choices: ['all', 'complete', 'chromosome', 'scaffold', 'contig']. Default 'all'.
-
-``--genbank``, ``-G`` - Retrieve GenBank not RefSeq data. By default ``cazomevolve`` downloads RefSeq assemblies. Add this flag to the command to download GenBank assemblies instead.
-
-``-f``, ``--force`` - Force file over writting (default: False)
-``-l - log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
-``--timeout`` TIMEOUT - time in seconds before connection times out (default: 30)
-``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
 
 ## Annotate CAZomes
 

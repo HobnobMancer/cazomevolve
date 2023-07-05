@@ -1,3 +1,5 @@
+.. _genome download:
+
 ======================================
 Download genomes using ``cazomevolve``
 ======================================
@@ -50,20 +52,24 @@ Specifically, ``download_acc_genomes`` is a wrapper for `ncbi_genome_download <h
     * .fna format (genomic sequence) use file format fasta
     * Both .faa and .fna files use ``protein-fasta,fasta`` or ``fasta,protein-fasta``
 
+.. note::
+  Separate the file formats with single spaces. For example, ``genbank protein fasta`` will download 
+  the GenBank (.gbf), proteome (.faa) and genomic sequence (.fna) files for each genome.
+
 positional arguments:
   accessions            Path to file listing the accessions, with a unique genome accession per row
   outdir                output directory to write out the genomes to
-  file format           {genbank,fasta,rm,features,gff,protein-fasta,genpept,wgs,cds-fasta,rna-fna,rna-fasta,assembly-report,assembly-stats,all}
-                        A comma-separated list of formats is also possible. For example: 'fasta,assembly-report'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein-fasta', 'genpept', 'wgs', 'cds-fasta',
-                        'rna-fna', 'rna-fasta', 'assembly-report', 'assembly-stats', 'all']
-  database              Choose which NCBI db to get genomes from: 'refseq' or 'genbank'
-  level                 assembly level, default all, ['all', 'complete', 'chromosome', 'scaffold', 'contig']
+  {genbank,fasta,rm,features,gff,protein,genpept,wgs,cdsfasta,rnafna,rnafasta,assemblyreport,assemblystats,all}
+                        A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport',
+                        'assemblystats', 'all']
+  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
 
 optional arguments:
   -h, --help            show this help message and exit
+  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
+                        Space-separated list of assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: all)
   -f, --force           Force file over writting (default: False)
   -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-
 
 For example, to download all proteome and genomic sequence FASTA files from the NCBI GenBank database for accessions listed in a file 
 at ``my_project/data/genomic-acc``, use the following:
@@ -73,9 +79,19 @@ at ``my_project/data/genomic-acc``, use the following:
     cazomevolve download_acc_genomes \
         my_project/data/genomic-acc \
         my_project/data/genomes \
-        protein-fasta,fasta \
+        protein fasta \
+        genbank
+
+To filter to download only assemblies with the assembly status of complete or chromosome add the ``-A``/``--assembly_level`` flag:
+
+.. code-block:: bash
+
+    cazomevolve download_acc_genomes \
+        my_project/data/genomic-acc \
+        my_project/data/genomes \
+        protein fasta \
         genbank \
-        all
+        -A complete chromosome
 
 ------------------------------------------
 Download genomes for a lineage of interest
@@ -92,23 +108,23 @@ by - i.e. the lineages of interest.
 Then define the file format(s) to download:
 * ``genome`` (.fna)
 * ``protein`` (.faa)
-* ``protein,genomic`` (both .faa and .fna) or ``genomic,protein``
+* ``protein genomic`` (both .faa and .fna) or ``genomic protein``
 
 positional arguments:
   email                 User email address
-  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'
-  {genomic,protein}     File formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
   output_dir            Path to directory to write out genomic assemblies
+  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
 
 optional arguments:
   -h, --help            show this help message and exit
   -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
                         Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
-  -G, --genbank         Retrieve GenBank (GCA) instead of Refseq (GCF) (default: False)
   -f, --force           Force file over writting (default: False)
   -l log file name, --log log file name
                         Defines log file name and/or path (default: None)
-  -n, --nodelete        When called, cazomevolve will not delete files in existing output dir (default: False)
+  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
   --timeout TIMEOUT     time in seconds before connection times out (default: 30)
   -v, --verbose         Set logger level to 'INFO' (default: False)
 
@@ -119,7 +135,20 @@ For exmple to download all proteome fasta files for all _Pectobacteriaceae_ geno
 
     cazomevolve download_genomes \
         dummyemail@domain.com \
-        Pectobacteriaceae \
-        protein \
         my_project/data/genomes \
-        -A complete,chromosome
+        'Pectobacterium wasabiae,Dickeya zeae' \
+        protein genomic \
+        genbank
+        
+To filter the genomes to only retrieve those with the assembly status of complete or chromosome, add the 
+``-A`` or ``--assembly_level`` flag:
+
+.. code-block:: bash
+
+    cazomevolve download_genomes \
+        dummyemail@domain.com \
+        my_project/data/genomes \
+        'Pectobacterium wasabiae,Dickeya zeae' \
+        protein genomic \
+        genbank \
+        --assembly_level complete,chromosome

@@ -43,6 +43,7 @@ import logging
 import re
 import time
 
+from pathlib import Path
 from typing import List, Optional
 
 from socket import timeout
@@ -177,7 +178,7 @@ def get_tax_ids(uid_list, term, args):
                 accession_data[accession_number_v] = batch_result['DocumentSummarySet']['DocumentSummary'][index]['AssemblyName']
 
     for accession in tqdm(accession_data, desc=f"Downloading genomes for {term}"):
-        for file_type in ((args.file_types).split(",")):
+        for file_type in args.file_types:
             download_file(
                 accession_number=accession,
                 assembly_name=accession_data[accession],
@@ -225,7 +226,7 @@ def entrez_retry(entrez_func, *func_args, **func_kwargs):
 
 
 def download_file(
-    accession_number, assembly_name, file_type, args, url_prefix="ftp://ftp.ncbi.nlm.nih.gov/genomes/all"
+    accession_number, assembly_name, file_type, args, url_prefix="https://ftp.ncbi.nlm.nih.gov/genomes/all"
 ):
     """Download file.
 
@@ -238,7 +239,7 @@ def download_file(
     """
     logger = logging.getLogger(__name__)
 
-    if args.genbank:   # retrieve GenBank not RefSeq
+    if args.database == 'genbank':   # retrieve GenBank not RefSeq
         gbk_accession = accession_number.replace("GCF_", "GCA_")
     else:  # retrieve RefSeq not GenBank
         gbk_accession = accession_number.replace("GCA_", "GCF_")
@@ -254,7 +255,7 @@ def download_file(
     if unzipped_path.exists():
         logger.warning(f"Output file {unzipped_path} exists, not downloading")
         return
-    
+
     escape_characters = re.compile(r"[\s/,#\(\)]")
     escape_name = re.sub(escape_characters, "_", assembly_name)
 
@@ -273,7 +274,7 @@ def download_file(
         response = urlopen(genbank_url, timeout=args.timeout)
     except (HTTPError, URLError, timeout) as e:
         logger.error(
-            f"Failed to download {file_type} for {accession_number}", exc_info=1,
+            f"Failed to download {file_type} for {accession_number}\nURL: {genbank_url}", exc_info=1,
         )
         return
     file_size = int(response.info().get("Content-length"))

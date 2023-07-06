@@ -58,20 +58,13 @@ def main(args: argparse.Namespace) -> int:
         args.db,
         ]
 
-    print(f"Running command: {' '.join(['build_cazy_db.sh']+cmd[1:])}")
+    print(f"Running command: {' '.join(["build_db.sh"]+cmd[1:])}")
 
-    try:
-        theproc = subprocess.Popen([
-            cazevolve_path,
-            args.email,
-            args.db,
-        ])
-    except PermissionError:
-        theproc = subprocess.Popen([
-            "bash",
-            cazevolve_path,
-            args.email,
-            args.db,
-        ])
+    theproc = subprocess.Popen([
+        "bash",
+        cazevolve_path,
+        args.email,
+        args.db,
+    ])
 
     return 0

@@ -1,5 +1,5 @@
-Perform Principal Component Analysis using ``cazomevolve.explore``
-------------------------------------------------------------------
+Perform Principal Component Analysis
+------------------------------------
 
 Principal Component Analysis (PCA) is a statistical a method of dimensional reduction that converts a highly dimensional dataset into 
 a low dimensional data set, while retaining as much information as possible from the original data.

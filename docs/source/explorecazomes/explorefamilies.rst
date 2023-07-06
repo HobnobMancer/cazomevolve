@@ -1,5 +1,5 @@
-Explore CAZy families using ``cazomevolve.explore``
----------------------------------------------------
+Explore CAZy families
+---------------------
 
 Build a CAZy family dataframe
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

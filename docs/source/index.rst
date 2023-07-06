@@ -57,15 +57,18 @@ Use ``cazomevolve`` to explore:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **CAZome sizes:**
+
 * Compare the number of CAZymes and CAZy families
 * Calculate the proportion of the proteome encompassed by the CAZome
 * Compute the CAZy family to CAZyme ratio
 
 **CAZy class frequencies:**
+
 * Calculate the number of CAZymes per CAZy class
 * Plot a proportional area plot of CAZy class frequency broken down by CAZy class and user defined group deliniations (e.g. by genus or species)
 
 **CAZy families:**
+
 * Explore **sequence diversity** within a set of CAZy families:
   * Run all-vs-all sequence comparison analyses
   * Cluster the sequences by degree of sequence similarity
@@ -80,12 +83,14 @@ Use ``cazomevolve`` to explore:
     * Construct tanglegrams to compare CAZy family dendrogram to a ANI-dendrogram or phylogenetic tree
 
 **Always co-occurring families:**
+
 * Identity CAZy families that are always present in the CAZome together
 * Find lineage or group specific groups of co-occurring families 
 * Construct an upset plot of co-occurring families
 * Calculate the number of genomes each group of co-occurring families appear in
 
 **Principal component analysis (PCA):**
+
 * Use PCA to idenify overal trends in the large and complex data set
 * Project genomes onto use selected principal components (PCs)
 * Construct loadings plots to explore correlation between CAZy families and PCs
@@ -93,6 +98,7 @@ Use ``cazomevolve`` to explore:
 * Explore associations between CAZy families and lineage, phenotype, and niche adaptation
 
 **Co-evolving CAZy families:**
+
 * Generate the input file tab delimited list of genomes and CAZy families required by [`coinfinder`]() (Whelan _et al._)
 * Optionally add taxonomic data to the tab delimited list, to include taxa in the `coinfinder` output
 * Reconstruct phylogenetic trees to be used as input by `coinfinder`:
@@ -158,6 +164,7 @@ Explore and compare CAZomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Import and implement functions available in the ``cazomevolve.cazome.explore`` module to explore and compare:
+
 * CAZome sizes
 * CAZy class distributions
 * CAZy family frequencies
@@ -278,52 +285,9 @@ dbCAN version 4:
 
 ``cazomevolve`` uses several packages to visualise and interrogate the dataset.
 
-   @article{Waskom2021,
-      doi={10.21105/joss.03021},
-      url={https://doi.org/10.21105/joss.03021},
-      year={2021},
-      publisher={The Open Journal},
-      volume={6},
-      number={60},
-      pages={3021},
-      author={Michael L. Waskom},
-      title={seaborn: statistical data visualization},
-      journal={Journal of Open Source Software}
-   }
-
-   @article{Virtanen2020,
-      author ={Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and
-                  Haberland, Matt and Reddy, Tyler and Cournapeau, David and
-                  Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and
-                  Bright, Jonathan and {van der Walt}, St{\'e}fan J. and
-                  Brett, Matthew and Wilson, Joshua and Millman, K. Jarrod and
-                  Mayorov, Nikolay and Nelson, Andrew R. J. and Jones, Eric and
-                  Kern, Robert and Larson, Eric and Carey, C J and
-                  Polat, {\.I}lhan and Feng, Yu and Moore, Eric W. and
-                  {VanderPlas}, Jake and Laxalde, Denis and Perktold, Josef and
-                  Cimrman, Robert and Henriksen, Ian and Quintero, E. A. and
-                  Harris, Charles R. and Archibald, Anne M. and
-                  Ribeiro, Ant{\^o}nio H. and Pedregosa, Fabian and
-                  {van Mulbregt}, Paul and {SciPy 1.0 Contributors}},
-      title  ={{{SciPy} 1.0: Fundamental Algorithms for Scientific
-                  Computing in Python}},
-      journal={Nature Methods},
-      year   ={2020},
-      volume ={17},
-      pages  ={261--272},
-   }
-
-   @article{scikit-learn,
-      title={Scikit-learn: Machine Learning in {P}ython},
-      author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-               and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-               and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-               Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
-      journal={Journal of Machine Learning Research},
-      volume={12},
-      pages={2825--2830},
-      year={2011}
-   }
+* Waskom, M. L. (2021) seaborn: statistical data visualization, Journal of Open Source Software, 6(60), pp. 3021
+* Virtanen et al. (2020), SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python, Nature Methods, 17, pp.261-272
+* Pedregosa et al., (2011), Scikit-learn: Machine Learning in Python, Journal of Machine Learning Research, 12, pp.2825-2830.
 
 ======================
 Development and issues

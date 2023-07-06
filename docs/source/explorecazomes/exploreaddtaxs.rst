@@ -1,5 +1,5 @@
-Add taxonomy data using ``cazomevolve.explore``
------------------------------------------------
+Add taxonomy data
+-----------------
 
 Parse GTDB data
 ^^^^^^^^^^^^^^^

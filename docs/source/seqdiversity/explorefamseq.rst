@@ -23,6 +23,9 @@ The BSR is the bitscore normalised for protein length, and enables us to compare
 
 Import from ``cazomevolve.seq_diversity.explore.data``.
 
+Load the data by passing the path (as a string) to the DIAMOND/BLAST output file and the name of the
+family/families of interest (as a string) to the function ``load_data()``.
+
 .. code-block:: python
 
     def load_data(data_file, fam):
@@ -33,22 +36,8 @@ Import from ``cazomevolve.seq_diversity.explore.data``.
         
         Return a pandas dataframe
         """
-        df = pd.read_csv(data_file, sep='\t', header=None)
-        
-        column_names = ['qseqid', 'sseqid', 'qlen', 'slen', 'length', 'pident', 'evalue', 'bitscore']
-        df.columns = column_names
-        
-        df['BSR'] = df['bitscore'] / df['qlen']
-        
-        df['qcov'] = df['length'] / df['qlen']
-        df['scov'] = df['length'] / df['slen']
-        
-        df = remove_redunant_prots(df, fam)
-        
-        return df
 
-
-Optionally, remove redundnant proteins using the function ``remove_redundant_prots``. To identify proteins listed in the 
+Optionally, remove redundnant proteins using the function ``remove_redundant_prots()``. To identify proteins listed in the 
 structure and characterised table in CAZy, see the section "Get CAZy family data" below.
 
 .. code-block:: python
@@ -69,100 +58,22 @@ structure and characterised table in CAZy, see the section "Get CAZy family data
         return df
         """
 
-        # redundant proteins have a qcov of 1 and a pi of 100
-        redundance_df = df.loc[ ( (df['pident'] == 100) & (df['qcov'] == 1) ) ]
-        # find  the groups of redundant proteins
-        redundant_grps = {}
+``remove_redundant_prots()`` takes two positional arguments:
 
-        grp_num = 0
+1. The dataframe of DIAMOND/BLAST data
+2. The names of the families/family of interest
 
-        parsed_prots = set()
+To retain all proteins of interest (i.e. candidates), and structurally and/or functionally characterised proteins, 
+provides these proteins to the respective key words ``candidates``, ``structured_prots`` (struturally characterised proteins), and ``characterised_prots`` 
+(characterised proteins, i.e. functionally characterised proteins).
 
-        # identify groups of redundant proteins
-        for ri in tqdm(range(len(redundance_df)), desc="Identifying IPGs"):
-            row = redundance_df.iloc[ri]
-
-            qseqid = row['qseqid']
-
-            if qseqid in parsed_prots:
-                continue  # has already been added
-
-            # get all rows with the same query seq id
-            qseqid_rows = redundance_df.loc[redundance_df['qseqid'] == qseqid]
-
-            if len(qseqid_rows) == 1:
-                continue  # aligned against self only
-
-            subject_ids_to_add = set()
-
-            # for each subject id
-            # check if the versus is true, the qseqid is the sseqid when the sseqid is the qseqid
-            for q_ri in range(len(qseqid_rows)):
-                q_row = qseqid_rows.iloc[q_ri]
-                sub_seqid = q_row['sseqid']
-
-                # retrieve the row where the qseqid is now the subject, and the subject id is now the query seq
-                # They are already in the redundancy df, therefore pident is 100 and qcov is 1
-                sseqid_rows = redundance_df.loc[(
-                    (redundance_df['qseqid'] ==  sub_seqid) &
-                    (redundance_df['sseqid'] ==  qseqid))
-                ]
-
-                if len(sseqid_rows) > 0:
-                    subject_ids_to_add.add(sub_seqid)
-
-            if len(subject_ids_to_add) > 0:
-                # found redunant pairs for qseqid
-                redundant_grps[grp_num] = {qseqid}
-
-                for sub_seqid in subject_ids_to_add:
-                    redundant_grps[grp_num].add(sub_seqid)
-                    parsed_prots.add(sub_seqid)
-
-                grp_num += 1
-
-            parsed_prots.add(qseqid)
-
-        # from each group select a representative protein
-        # and identify members of the group that will be dropped
-        removing = set()
-        
-        print(f"Identified {len(list(redundant_grps.keys()))} groups of identical proteins")
-
-        for grp in redundant_grps:
-            prots_to_keep = set()
-            
-            for prot in redundant_grps[grp]:
-                try:
-                    # retain proteins marked as candidates, functionally characitersed or structurally characterised
-                    if prot in candidates[fam]:
-                        prots_to_keep.add(prot)
-                    elif prot in structured_prots[fam]:
-                        prots_to_keep.add(prot)
-                    elif prot in characterised_prots[fam]:
-                        prots_to_keep.add(prot)
-                    elif len(prots_to_keep) == 0: # ensure at least one protein from the group is retained
-                        prots_to_keep.add(prot)
-                    else:  # already have members from the group so drop the protein
-                        removing.add(prot)
-                except KeyError:
-                    if len(prots_to_keep) == 0:
-                        prots_to_keep.add(prot)
-                    else:  # already have members from the group so drop the protein
-                        removing.add(prot)
-
-        df = df[~df['qseqid'].isin(removing)]
-        df = df[~df['sseqid'].isin(removing)]
-        
-        return df
-
-
+To automate identifying functionally and structurally characterised proteins, see the section 'Get CAZy family data' below.
 
 --------------------
 Get CAZy family data
 --------------------
 
-The functions for retrieving data about the CAZy family are imported from the ``cazomevolve.seq_diversity.explore.cazy`` module.
+Use the following functions for retrieving data about the CAZy family are imported from the ``cazomevolve.seq_diversity.explore.cazy`` module.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -170,6 +81,8 @@ Get CAZy family protein accessions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Import from ``cazomevolve.seq_diversity.explore.cazy``.
+
+The function ``get_cazy_proteins`` retrieves the protein IDs from a FASTA file of protein sequences.
 
 .. code-block:: python
 
@@ -192,13 +105,45 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
 Get CAZy characterised proteins
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get a list of NCBI protein accessions for proteins listed on the CAZy family's 'characterised' and/or 'structure' tables.
+Get a list of NCBI protein accessions for proteins listed on the CAZy family's 'characterised' and/or 'structure' tables using the function 
+``get_cazy_db_prots()``, and chose whether to retrieved proteins from the 'Characterised' and/or 'Structure' table.
+
+Call ``get_cazy_db_prots()``, and provide it the name of the family of interst. 
+
+.. note::
+    ``get_cazy_db_prots()`` must be called individually for each CAZy family of interest, because the CAZy 
+    family of interest is used to compile the correct URL to scrape data from CAZy
+
+.. warning::
+    Provide the family name in the standard CAZy family format, therefore all letters must be capitalised. 
+    E.g. 'GH1' not 'Gh1' or 'gh1'
+
+To retrieve protein IDs from the 'characterised' table for the CAZy family on the CAZy website, set ``characterised`` to true.
+
+.. code-block:: python
+
+    # retrieve data from the characterised table for family PL1
+    get_cazy_db_proteins("PL1", characterised=True)
+
+To retrieve protein IDs from the 'structure' table for the CAZy family on the CAZy website, set ``structured`` to true.
+
+.. code-block:: python
+
+    # retrieve data from the structured table for family PL3
+    get_cazy_db_proteins("PL3", structured=True)
+
+You can retrieve data from the structured and characterised tables at the same time by setting both keywords to true:
+
+.. code-block:: python
+
+    # retrieve data from the characterised and structured tables for family CE5
+    get_cazy_db_proteins("CE5", characterised=True, structured=True)
 
 Import from ``cazomevolve.seq_diversity.explore.cazy``.
 
 .. code-block:: python
 
-    def get_cazy__db_prots(cazy_family, characterised=False, structured=False):
+    def get_cazy_db_prots(cazy_family, characterised=False, structured=False):
         """Get the NCBI protein accessions for proteins in the structure or characterised tables
         from the CAZy website.
         
@@ -208,62 +153,47 @@ Import from ``cazomevolve.seq_diversity.explore.cazy``.
         
         Return list of NCBI protein accessions or None if fails
         """
-        urls = []  # [ [url, data type, col index for cazy website] ]
-        if characterised:
-            urls.append([f"http://www.cazy.org/{cazy_family}_characterized.html", 'characterised', 4])  # url, type, col index in cazy with ncbi acc
-        if structured:
-            urls.append([f"http://www.cazy.org/{cazy_family}_structure.html", "structured", 3])
 
-        all_proteins = []
+Add the returned lists to a dictionary keyed by CAZy family names and valued by list of associated protein IDs.
 
-        for url in urls:
-            page, error_mss = get_page(
-                url[0],
-                max_tries=100
-            )
-            if page is None:
-                print(f'Did not retrieve page for {cazy_family}: {url[1]}')
-                print(error_mss)
-                continue
-        
-            cazyme_table = page.select('table')[1]
+.. code-block:: python
 
-            gbk_bs_elements = []
-
-            for row in tqdm(cazyme_table.select("tr"), desc=f"Parsing {url[1]} table for {cazy_family}"):
-                try:
-                    if (row.attrs["class"] == ['royaume']) and (row.text.strip() != 'Top'):
-                        continue
-                except KeyError:
-                    pass
-
-                try:
-                    if (row.attrs["id"] == 'line_titre'):
-                        continue
-                except KeyError:
-                    pass
-
-                try:
-                    gbk_bs_elements += [_ for _ in row.select("td")[url[2]].contents if getattr(_, "name", None) != "br"]
-                except IndexError:
-                    pass
-
-            ncbi_accessions = get_all_accessions(gbk_bs_elements)
-        
-            all_proteins += list(set(ncbi_accessions))
-        
-        return all_proteins
-
+    struc_prots = {}
+    struc_prots['PL1'] = get_cazy_db_proteins("PL1", structured=True)
 
 -----------
 Build plots
 -----------
 
+You can use ``cazomevolve`` to assist in building plots to explore the sequence diversity across 
+a CAZy family of interest.
+
 ^^^^^^^^^^
 Clustermap
 ^^^^^^^^^^
 
+Clustermaps are a species type of heatmap, blocks in the heatmap that have a similar score to one another 
+are clustered together. This can help indicate clusters of proteins with similar proteins sequences to one 
+another.
+
+``cazomevolve`` using the Python package Seaborn to build clustermaps, which uses  the Python package Scipy
+(version 1.10.0) hierarchical cluster method for clustering the data.
+
+We recommend using the clustermap for the BLAST Score Ratios.
+
 Import from ``cazomevolve.seq_diversity.explore.plot``.
+
+Use the function ``plot_clustermap()`` to build clustermaps. The function takes 3 positional arguments:
+
+1. Dataframe of BLAST/DIAMOND output
+2. Name of the CAZy family/families
+3. Name of the column in the dataframe containing the data to be plotted, e.g. 'BSR'
+
+To add additional row colours, added dictionaries of candidate proteins, structurally characterised proteins,
+and functionally characterised proteins to the ``candidates={}``, ``structured_prots={}``, and ``characterised_prots={}`` 
+key words respectively. 
+
+These dictionaries are keyed by the name of the CAZy family and valued by a list of protein IDs.
 
 .. code-block:: python
 
@@ -301,70 +231,13 @@ Import from ``cazomevolve.seq_diversity.explore.plot``.
         
         Return seaborn plot
         """
-        df = df[['qseqid', 'sseqid', varaible]]
-        
-        if char_only:  # plot only proteins that are candidates and functionally/structurally characteirsed proteins
-            charactised_prots = characterised_prots[fam] + structured_prots[fam] + candidates[fam]
-            df = df[df['qseqid'].isin(charactised_prots)]
-            df = df[df['sseqid'].isin(charactised_prots)]
-        
-        heatmap_data = pd.pivot_table(df, index='qseqid', columns='sseqid', values=varaible)
-        heatmap_data.columns = list(heatmap_data.columns)
-        heatmap_data.index = list(heatmap_data.columns)
-        heatmap_data = heatmap_data.fillna(0)
-        
-        if annotate:
-            # add extra info on structural and functional characterisation of the family
-            extra_data = []
 
-            for prot in list(heatmap_data.columns):
-                if prot in candidates[fam]:
-                    if prot in characterised_prots[fam]:
-                        extra_data.append(palette_dict['funcCand'])
-                    elif prot in structured_prots[fam]:
-                        extra_data.append(palette_dict['structCand'])
-                    else:
-                        extra_data.append(palette_dict['cand'])
+^^^^^^^
+Heatmap
+^^^^^^^
 
-                elif prot in structured_prots[fam]:
-                    extra_data.append(palette_dict['struct'])
-
-                elif prot in characterised_prots[fam]:
-                    extra_data.append(palette_dict['func'])
-
-                else:
-                    extra_data.append(palette_dict['nothing'])
-
-            fig = sns.clustermap(
-                heatmap_data,
-                cmap=colour_scheme,
-                figsize=fig_size,
-                row_colors=extra_data,
-                col_colors=extra_data,
-            );
-
-            # extra data legend
-            for label in list(palette_dict.keys()):
-                fig.ax_row_dendrogram.bar(0, 0, color=palette_dict[label], label=label, linewidth=0)
-
-            l3 = fig.ax_row_dendrogram.legend(title='Characterisation', loc='upper right', ncol=1)
-        
-        else:
-            fig = sns.clustermap(
-                heatmap_data,
-                cmap=colour_scheme,
-                figsize=fig_size,
-            );
-        
-        if save_fig is not None:
-            fig.savefig(save_fig, dpi=dpi);
-        
-        return fig
-
-
-To generate a heatmap with proteins plotted in the same order as the clustermap generated by ``plot_clustermap`` but plotting a different variable, 
-e.g. plotting the query coverage or percentage identity while listing the proteins in the same order as they appear in BLAST Score Ratio 
-clustermap, using the function ``plot_heatmap_of_clustermap``.
+To generate a heatmap with proteins plotted in the same order as the clustermap generated by ``plot_clustermap`` but plotting a different variable (e.g. plotting the query coverage or percentage identity while listing the proteins in the same order as they appear in BLAST Score Ratio 
+clustermap) use the function ``plot_heatmap_of_clustermap``.
 
 Import from ``cazomevolve.seq_diversity.explore.plot``.
 
@@ -407,112 +280,6 @@ Import from ``cazomevolve.seq_diversity.explore.plot``.
         
         Return nothing
         """
-        column_order = list(fig.__dict__['data2d'].keys())
-        row_order = list(fig.__dict__['data2d'].index)
-        
-        df = df[['qseqid', 'sseqid', varaible]]
-        
-        if char_only:  # plot only proteins that are candidates and functionally/structurally characteirsed proteins
-            charactised_prots = characterised_prots[fam] + structured_prots[fam] + candidates[fam]
-            df = df[df['qseqid'].isin(charactised_prots)]
-            df = df[df['sseqid'].isin(charactised_prots)]
-        
-        heatmap_data = pd.pivot_table(df, index='qseqid', columns='sseqid', values=varaible)
-        heatmap_data.columns = list(heatmap_data.columns)
-        heatmap_data.index = list(heatmap_data.columns)
-        heatmap_data = heatmap_data.fillna(0)
-        
-        heatmap_data = heatmap_data.to_dict()  # {col: {row: value}}
-
-        heatmap_df_data = {}
-
-        for _prot in column_order:
-            column_data = heatmap_data[_prot] # dict of {row: value} for the column
-            
-            for __prot in row_order:
-                row_value = column_data[__prot]
-
-                try:
-                    heatmap_df_data[_prot]  # column
-                except KeyError:
-                    heatmap_df_data[_prot] = {}
-
-                heatmap_df_data[_prot][__prot] = row_value
-                
-        if annotate:
-            # add extra info on structural and functional characterisation of the family
-            extra_data_col = []
-
-            for prot in column_order:
-                # candidate 1, funct candidate 0.75, structured 0.5, functional 0.25, nothing 0
-                if prot in candidates[fam]:
-                    if prot in characterised_prots[fam]:
-                        extra_data_col.append(palette_dict['funcCand'])
-                    elif prot in structured_prots[fam]:
-                        extra_data_col.append(palette_dict['structCand'])
-                    else:
-                        extra_data_col.append(palette_dict['cand'])
-
-                elif prot in structured_prots[fam]:
-                    extra_data_col.append(palette_dict['struct'])
-
-                elif prot in characterised_prots[fam]:
-                    extra_data_col.append(palette_dict['func'])
-
-                else:
-                    extra_data_col.append(palette_dict['nothing'])
-
-            extra_data_row = []
-
-            for prot in row_order:
-                # candidate 1, funct candidate 0.75, structured 0.5, functional 0.25, nothing 0
-                if prot in candidates[fam]:
-                    if prot in characterised_prots[fam]:
-                        extra_data_row.append(palette_dict['funcCand'])
-                    elif prot in structured_prots[fam]:
-                        extra_data_row.append(palette_dict['structCand'])
-                    else:
-                        extra_data_row.append(palette_dict['cand'])
-
-                elif prot in structured_prots[fam]:
-                    extra_data_row.append(palette_dict['struct'])
-
-                elif prot in characterised_prots[fam]:
-                    extra_data_row.append(palette_dict['func'])
-
-                else:
-                    extra_data_row.append(palette_dict['nothing'])
-
-            fig = sns.clustermap(
-                heatmap_df_data,
-                cmap=colour_scheme,
-                figsize=fig_size,
-                row_cluster=False,
-                col_cluster=False,
-                row_colors=extra_data_row,
-                col_colors=extra_data_col,
-            );            
-
-            # extra data legend
-            for label in list(palette_dict.keys()):
-                fig.ax_row_dendrogram.bar(0, 0, color=palette_dict[label], label=label, linewidth=0)
-
-            l3 = fig.ax_row_dendrogram.legend(title='Info', loc='upper right', ncol=1)
-        
-        else:
-            fig = sns.clustermap(
-                heatmap_df_data,
-                cmap=colour_scheme,
-                figsize=fig_size,
-                row_cluster=False,
-                col_cluster=False,
-            );
-
-        if save_fig is not None:
-            fig.savefig(save_fig, dpi=dpi);
-        
-        fig
-
 
 The default palette used to annotate, candidate, characterised and structurally characterised proteins is defined in PALETTE_DICT:
 

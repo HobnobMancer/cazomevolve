@@ -1,5 +1,5 @@
-Parse data using ``cazome.explore``
------------------------------------
+Parse data
+----------
 
 The following functions are for loading and parsing data aurgment by ``cazomevolve``:
 

@@ -1,5 +1,5 @@
-Explore the core CAZome using ``cazomevolve.explore``
------------------------------------------------------
+Explore the core CAZome
+-----------------------
 
 The core CAZome is defined as the CAZy families that are present in all genomes in a dataset.
 

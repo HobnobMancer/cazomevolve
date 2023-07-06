@@ -1,5 +1,5 @@
-Explore CAZy classes using ``cazomevolve.explore``
---------------------------------------------------
+Explore CAZy classes
+--------------------
 
 The CAZy class frequency is defined as the number of unique protein accessions associated with each CAZy class.
  

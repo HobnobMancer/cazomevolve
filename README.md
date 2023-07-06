@@ -305,8 +305,8 @@ By default if the output directory exists, `cazomevolve` will crash. To write to
 To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the subcommand `download_genomes`, which takes 4 arguments:
 
 **Positional arguments:**
-* email- User email address
-* output_dir- Path to directory to write out genomic assemblies
+* email - User email address
+* output_dir - Path to directory to write out genomic assemblies
 * terms - Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
 * file format: {genomic,protein}- Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
 * NCBI database: {genbank,refseq} - Choose which NCBI db to get genomes from: refseq or genbank
@@ -341,12 +341,13 @@ To include 'canonical' CAZy family classifications from CAZy, download all data 
 Emma E. M. Hobbs, Tracey M. Gloster, Leighton Pritchard
 bioRxiv 2022.12.02.518825; doi: https://doi.org/10.1101/2022.12.02.518825
 
-The `cazomevolve` subcommand `build_cazy_db` to coordinate uisng `cazy_webscraper`:
+Use the `cazomevolve` subcommand `build_cazy_db` to coordinate uisng `cazy_webscraper`:
 ```bash
 cazomevolve build_cazy_db \
   <email> \
-  <desired db path>
+  <desired path for db FILE>
 ```
+Note the path needs to point to the target FILE path not DIR path. `cazy_webscraper` will build all necessary parent directories.
 
 Or you can use `cazy_webscraper` directly
 ```bash
@@ -405,8 +406,11 @@ _`eCAMI` is memory intensive. We recommend using the maximum availalbe RAM._
 ```bash
 cazomevolve run_dbcan \
     <path to dir containing FASTA files> \
-    <path to output directory> 
+    <path to output directory> \
+    <dbcan major version number, 2, 3 or 4>
 ```
+
+``cazomevolve`` will which ever version of dbCAN is installed, but the commands and arguments between dbCAN version 2, 3 and 4 are different, so ``cazomevolve`` must be told which version to of dbCAN to communicate with.
 
 The ouput directory will be created by `run_dbcan`. 
 
@@ -416,7 +420,7 @@ Optional args:
 ```bash
 options:
   -h, --help            show this help message and exit
-  -V2--version_2        Use dbCAN version 2 NOT 3/4 (default: False)
+  --cpu CPU             Number of CPU cores to use. Default all available cores (default: all avilable cores)
   -f, --force           Force file over writting (default: False)
   -l log file name, --log log file name
                         Defines log file name and/or path (default: None)
@@ -460,9 +464,7 @@ options:
   -l log file name, --log log file name
                         Defines log file name and/or path (default: None)
   -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  --sql_echo            Set verbose SQLite3 logging (default: False)
   -v, --verbose         Set logger level to 'INFO' (default: False)
-  -v2, --version_2      Parse the data from dbCAN version 2 (default: False, parse data from dbCAN version 3)
 ```
 
 # Explore the CAZome composition

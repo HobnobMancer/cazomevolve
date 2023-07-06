@@ -166,6 +166,7 @@ def plot_pca(
     loc='upper left',
     marker_size=100,
     markers=True,
+    ax=None,
 ):
     """Project genomes onto the PCs
     
@@ -189,6 +190,7 @@ def plot_pca(
     :param marker_size: int, scale of markers
     :param markers: dict, pass dict to map each level style to a marker 
         defined in matplotlib
+    :param ax: axis - used to combining multiple scatter plots into a multiplot
     
     Return plot
     """
@@ -220,6 +222,7 @@ def plot_pca(
                     style=style,
                     style_order=style_order,
                     markers=markers,
+                    ax=ax,
                 )
                 
             else:
@@ -234,6 +237,7 @@ def plot_pca(
                     hue_order=hue_order,
                     style=style,
                     markers=markers,
+                    ax=ax,
                 )                
             
         else:
@@ -247,6 +251,7 @@ def plot_pca(
                 s=marker_size,
                 hue_order=hue_order,
                 markers=markers,
+                ax=ax,
             )  
         
     else:  # using default hue order - i.e. order data is presented in df
@@ -267,6 +272,7 @@ def plot_pca(
                     style=style,
                     style_order=style_order,
                     markers=markers,
+                    ax=ax,
                 )
                 
             else:
@@ -280,6 +286,7 @@ def plot_pca(
                     s=marker_size,
                     style=style,
                     markers=markers,
+                    ax=ax,
                 )
         
         else:
@@ -293,6 +300,7 @@ def plot_pca(
                 hue=group_by,
                 s=marker_size,
                 markers=markers,
+                ax=ax,
             )
     
     if xlim is not None:
@@ -332,6 +340,7 @@ def plot_loadings(
     fig_size=(16,16),
     file_path=None,
     marker_size=100,
+    ax=None,
 ):
     """Build loadings plot
     
@@ -348,6 +357,7 @@ def plot_loadings(
     :param fig_size: tuple (width, height) of final plot
     :param file_path: str, path to write out a figure.
         If None, no figure is saved
+    :param ax: axis, used to define axis in multiple plot to place figure
     
     Return nothing"""
     sns.set(font_scale=font_scale)
@@ -391,9 +401,24 @@ def plot_loadings(
 
     plt.figure(figsize=fig_size)
     if style:
-        g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size, style=cazy_class);
+        g = sns.scatterplot(
+            x=loadings_x,
+            y=loadings_y,
+            data=loadings_df,
+            hue=cazy_class,
+            s=marker_size,
+            style=cazy_class,
+            ax=ax,
+        );
     else:
-        g = sns.scatterplot(x=loadings_x, y=loadings_y, data=loadings_df, hue=cazy_class, s=marker_size);
+        g = sns.scatterplot(
+            x=loadings_x,
+            y=loadings_y,
+            data=loadings_df,
+            hue=cazy_class,
+            s=marker_size,
+            ax=ax,
+        );
     g.axhline(0, linestyle='--', color='grey', linewidth=1.25);
     g.axvline(0, linestyle='--', color='grey', linewidth=1.25);
     g.set(xlim=(-1,1),ylim=(-1,1));

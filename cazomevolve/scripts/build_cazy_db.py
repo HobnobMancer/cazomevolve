@@ -50,7 +50,7 @@ from pathlib import Path
 
 def main(args: argparse.Namespace) -> int:
 
-    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","cazome/cazy/build_db.sh"))
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","scripts/bash/build_cazy_db.sh"))
 
     cmd = [
         cazevolve_path,

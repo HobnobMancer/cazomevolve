@@ -1,6 +1,6 @@
-======================
-Annotate CAZomes usage
-======================
+================
+Annotate CAZomes
+================
 
 The CAZy database is the most authorative and comprehensive CAZyme database.
 
@@ -85,14 +85,15 @@ be discussed here.
 Use the ``cazomevolve`` subcommand ``build_cazy_db`` to compile a local CAZyme database containing all 
 CAZyme records listed in CAZy.
 
-positional arguments:
+Positional arguments:
+
 * email- User email address (Required by NCBI)
 * db- Path to build the local CAZyme db - this is the FILE path not the DIR path
 
 .. note::
   ``cazy_webscraper`` will build all necessary parent directories.
 
-optional arguments:
+Optional arguments:
 
 * ``-h``, ``--help`` - show this help message and exit
 * ``-f``, ``--force``- Force file over writting (default: False)
@@ -122,6 +123,7 @@ Proteins retrieved from the proteome FASTA files that are not catalogued in the 
 written to a multi-sequence FASTA file per genome. These are recommended to be used as input by dbCAN.
 
 Positional arguments:
+
 1. input_dir - Path to dir containing fasta files to retrieve CAZy annotations from
 2. database - Path to local CAZyme database (SQLite3) compiled by cazy_webscraper
 3. output_dir - Directory to write out fasta files for parsing by dbCAN
@@ -129,6 +131,7 @@ Positional arguments:
 5. fam_genome_protein_list - Path to write out tab deliminated list of fam, genome and protein annocations
 
 Optional arguments:
+
 * ``-f``, ``--force`` -  Force file over writting (default: False)
 * ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
 * ``-l`, ``--log`` - path to write out log file
@@ -155,6 +158,7 @@ Run dbCAN
 ^^^^^^^^^
 
 Positional arguments:
+
 * input_dir - Path to directory containing FASTAs to be parsed by dbCAN
 * output_dir - Path to directory to write out genomic assemblies
 * dbcan version - 2, 3 or 4
@@ -165,6 +169,7 @@ Positional arguments:
   to of dbCAN to communicate with.
 
 Optional arguments:
+
 * ``-f``, ``--force`` -  Force file over writting (default: False)
 * ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
 * ``-l`, ``--log`` - path to write out log file
@@ -184,11 +189,13 @@ data to a pair of new tab delimited lists or add the data to the existing tab de
 ``get_cazy_cazymes`` subcommand.
 
 Positional arguments:
+
 * dbcan_dir - Path to dir containing output dirs from dbCAN
 * fam_genome_list - Path to write out tab deliminated list of fam and genome pairs
 * fam_genome_protein_list - Path to write out tab deliminated list of fam, genome and protein annocations
 
 Optional arguments:
+
 * ``-f``, ``--force`` -  Force file over writting (default: False)
 * ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
 * ``-l`, ``--log`` - path to write out log file

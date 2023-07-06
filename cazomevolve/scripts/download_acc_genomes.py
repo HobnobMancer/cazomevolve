@@ -64,7 +64,7 @@ def main(args: argparse.Namespace) -> int:
     if str(Path(args.outdir).parent) != ".":
         make_output_directory(Path(args.outdir), args.force, args.nodelete)
 
-    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/download_acc_genomes.py","genomes/download_acc_genomes.sh"))
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/download_acc_genomes.py","scripts/bash/download_acc_genomes.sh"))
 
     cmd = [
             cazevolve_path,

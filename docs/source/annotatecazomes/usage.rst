@@ -6,7 +6,7 @@ The CAZy database is the most authorative and comprehensive CAZyme database.
 
     Elodie Drula, Marie-Line Garron, Suzan Dogan, Vincent Lombard, Bernard Henrissat, Nicolas Terrapon (2022) The carbohydrate-active enzyme database: functions and literature Nucleic Acids Res 50: D571–D577.
 
-However, as discussed in `Hobbs et al 2022 <>`_, CAZy does not contain an exhausative list of CAZymes. 
+However, as discussed in `Hobbs et al 2022 <https://www.biorxiv.org/content/10.1101/2022.12.02.518825v1.full>`_, CAZy does not contain an exhausative list of CAZymes. 
 Therefore, it is recommended to combine the canoncical CAZy family annotations with the predicted CAZy 
 family annotations from a CAZyme classifier (a tool that predicts CAZy family annotations).
 
@@ -86,11 +86,21 @@ Use the ``cazomevolve`` subcommand ``build_cazy_db`` to compile a local CAZyme d
 CAZyme records listed in CAZy.
 
 positional arguments:
-  email       User email address (Required by NCBI)
-  db          Path to build the local CAZyme db
+* email- User email address (Required by NCBI)
+* db- Path to build the local CAZyme db - this is the FILE path not the DIR path
+
+.. note::
+  ``cazy_webscraper`` will build all necessary parent directories.
 
 optional arguments:
-  -h, --help  show this help message and exit
+
+* ``-h``, ``--help`` - show this help message and exit
+* ``-f``, ``--force``- Force file over writting (default: False)
+* ``-l``, ``--log`` - log file name
+                        Defines log file name and/or path (default: None)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``--sql_echo`` - Set verbose SQLite3 logging (default: False)
+* ``-v``, ``--verbose`` - Set logger level to 'INFO' (default: False)
 
 For example:
 
@@ -112,21 +122,18 @@ Proteins retrieved from the proteome FASTA files that are not catalogued in the 
 written to a multi-sequence FASTA file per genome. These are recommended to be used as input by dbCAN.
 
 Positional arguments:
-  input_dir             Path to dir containing fasta files to retrieve CAZy annotations from
-  database              Path to local CAZyme database (SQLite3) compiled by cazy_webscraper
-  output_dir            Directory to write out fasta files for parsing by dbCAN
-  fam_genome_list       Path to write out tab deliminated list of fam and genome pairs
-  fam_genome_protein_list
-                        Path to write out tab deliminated list of fam, genome and protein annocations
+1. input_dir - Path to dir containing fasta files to retrieve CAZy annotations from
+2. database - Path to local CAZyme database (SQLite3) compiled by cazy_webscraper
+3. output_dir - Directory to write out fasta files for parsing by dbCAN
+4. fam_genome_list - Path to write out tab deliminated list of fam and genome pairs
+5. fam_genome_protein_list - Path to write out tab deliminated list of fam, genome and protein annocations
 
 Optional arguments:
-  -h, --help            show this help message and exit
-  -f, --force           Force file over writting (default: False)
-  -l log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  --sql_echo            Set verbose SQLite3 logging (default: False)
-  -v, --verbose         Set logger level to 'INFO' (default: False)
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``-l`, ``--log`` - path to write out log file
+* ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
+* ``--sql_echo`` -  Set verbose SQLite3 logging (default: False)
 
 ---------------------
 Get dbCAN annotations
@@ -144,48 +151,49 @@ comprehensive representation of the CAZome is retrieved by combining CAZy and db
     output subdirectory will be created per input multi-sequence protein FASTA file, which will be named 
     after the genomic version accession of the respective genome.
 
-Positional arguments:
-  input_dir             Path to directory containing FASTAs to be parsed by dbCAN
-  output_dir            Path to directory to write out genomic assemblies
+Run dbCAN
+^^^^^^^^^
 
-Optional arguments:
-  -h, --help            show this help message and exit
-  -V2, --version_2      Use dbCAN version 2 NOT 3 or 4 (default: False)
-  -f, --force           Force file over writting (default: False)
-  -l log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  -v, --verbose         Set logger level to 'INFO' (default: False)
+Positional arguments:
+* input_dir - Path to directory containing FASTAs to be parsed by dbCAN
+* output_dir - Path to directory to write out genomic assemblies
+* dbcan version - 2, 3 or 4
 
 .. warning::
+  ``cazomevolve`` will which ever version of dbCAN is installed, but the commands and arguments 
+  between dbCAN version 2, 3 and 4 are different, so ``cazomevolve`` must be told which version 
+  to of dbCAN to communicate with.
 
-    If the flag ``-V2``/``--version_2`` is not called, dbCAN will use the version of dbCAN that is already installed. 
-    Therefore, a separate flag to specify using version 3 or version 4 is not required.
-
-    If version 2 is installed, ensure the ``-V2``/``--version_2`` flag is called!
+Optional arguments:
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``-l`, ``--log`` - path to write out log file
+* ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
+* ``-cpu`` - number of CPU cores to use, default all available cores.
 
 .. warning::
 
     dbCAN version 3 is very memory intensive, and can take a long time to run on very large data sets.
+
+
+Parse dbCAN output
+^^^^^^^^^^^^^^^^^^
 
 Once dbCAN is complete, ``cazomevovle`` can be used to parse the output from dbCAN and add the 
 data to a pair of new tab delimited lists or add the data to the existing tab delimited lists created by the 
 ``get_cazy_cazymes`` subcommand.
 
 Positional arguments:
-  dbcan_dir             Path to dir containing output dirs from dbCAN
-  fam_genome_list       Path to write out tab deliminated list of fam and genome pairs
-  fam_genome_protein_list
-                        Path to write out tab deliminated list of fam, genome and protein annocations
+* dbcan_dir - Path to dir containing output dirs from dbCAN
+* fam_genome_list - Path to write out tab deliminated list of fam and genome pairs
+* fam_genome_protein_list - Path to write out tab deliminated list of fam, genome and protein annocations
 
 Optional arguments:
-  -h, --help            show this help message and exit
-  -f, --force           Force file over writting (default: False)
-  -l log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  -v, --verbose         Set logger level to 'INFO' (default: False)
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``-l`, ``--log`` - path to write out log file
+* ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
 
 .. note::
 
-    It is **not** required to specify which version of dbCAN was used.
+    It is **not** required to specify which version of dbCAN was used when parsing the output from dbCAN.

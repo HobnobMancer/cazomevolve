@@ -128,17 +128,19 @@ def build_parser(
     )
     parser.add_argument(
         "file_opts",
+        metavar="File options",
         nargs='+',
         action=ValidateFormats,
         choices=['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport', 'assemblystats', 'all'],
         type=str,
         help=(
-            "A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from:\n"
+            "A space-separated list of file formats to download. For example: 'fasta assemblyreport'.\nChoose from:\n"
             "['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport', 'assemblystats', 'all']"
         ),
     )
     parser.add_argument(
         "database",
+        metavar='NCBI Database',
         action=ValidateDb,
         choices=['genbank', 'refseq'],
         nargs=1,

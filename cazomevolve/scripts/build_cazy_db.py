@@ -40,14 +40,33 @@
 
 
 import argparse
+import sys
 import subprocess
+import os
+
+from inspect import getsourcefile
+from os.path import abspath
+from pathlib import Path
+
 
 def main(args: argparse.Namespace) -> int:
-    theproc = subprocess.Popen([
-        "./cazome/cazy/build_db.sh",
+
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","scripts/bash/build_cazy_db.sh"))
+
+    cmd = [
+        cazevolve_path,
         args.email,
         args.db,
-    ], shell=True)
-    theproc.communicate()
+        ]
+    txt = ' '.join(["build_db.sh"]+cmd[1:])
+
+    print(f"Running command: {txt}")
+
+    theproc = subprocess.Popen([
+        "bash",
+        cazevolve_path,
+        args.email,
+        args.db,
+    ])
 
     return 0

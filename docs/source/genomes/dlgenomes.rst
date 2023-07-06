@@ -48,30 +48,53 @@ Specifically, ``download_acc_genomes`` is a wrapper for `ncbi_genome_download <h
 .. note::
 
     To download genomic assemblies in:
-    * .faa format (proteome fasta file) use file format protein-fasta
-    * .fna format (genomic sequence) use file format fasta
-    * Both .faa and .fna files use ``protein-fasta,fasta`` or ``fasta,protein-fasta``
+    * .faa format (proteome fasta file) use file format ``protein``
+    * .fna format (genomic sequence) use file format ``fasta``
+    * Both .faa and .fna files use ``protein fasta`` or ``fasta protein``
 
 .. note::
   Separate the file formats with single spaces. For example, ``genbank protein fasta`` will download 
   the GenBank (.gbf), proteome (.faa) and genomic sequence (.fna) files for each genome.
 
-positional arguments:
-  accessions            Path to file listing the accessions, with a unique genome accession per row
-  outdir                output directory to write out the genomes to
-  {genbank,fasta,rm,features,gff,protein,genpept,wgs,cdsfasta,rnafna,rnafasta,assemblyreport,assemblystats,all}
-                        A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna', 'rnafasta', 'assemblyreport',
-                        'assemblystats', 'all']
-  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+.. note::
+  Protein sequences are needed for annotating the CAZome. To download the protein sequences of all annotated protein sequences, download the  assembles in `protein` format.  
+  If you are going to annotate the genomes, download the genomes in `fasta` (genomic sequence) formate. 
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
-                        Space-separated list of assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: all)
-  -f, --force           Force file over writting (default: False)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
+Positional arguments:
+^^^^^^^^^^^^^^^^^^^^^
 
-For example, to download all proteome and genomic sequence FASTA files from the NCBI GenBank database for accessions listed in a file 
+* ``accessions`` - Path to file listing the accessions, with a unique genome accession per row
+* ``outdir`` - Output directory to write out the genomes to
+* ``file_opts``- File options - the file foramts to download the genomic assemblies in. Chose from:
+  * genbank
+  * **fasta**
+  * rm
+  * features 
+  * gff
+  * **protein**
+  * genpept
+  * wgs
+  * cdsfasta
+  * rnafna
+* ``database`` - NCBI database - the database to retrieve the assemblies from, GenBank or RefSeq: `refseq` or `genbank`
+
+Optional arguments
+^^^^^^^^^^^^^^^^^^
+
+* ``-A``, ``--assembly_levels`` - limit the download to assemblies with the assembly status provided. A space-separate lists of assembly levels. Can provide multiple levels: Accepted levels:
+  * complete
+  * chromosome
+  * scaffold
+  * contig 
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+
+By default if the output directory exists, ``cazomevolve`` will crash. To write to an existing output directory use the ``-f``/``--force`` flag. By default, ``cazomevolve`` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the ``-n``/``--nodelete`` flag.
+
+Examples
+^^^^^^^^
+
+To download all proteome and genomic sequence FASTA files from the NCBI GenBank database for accessions listed in a file 
 at ``my_project/data/genomic-acc``, use the following:
 
 .. code-block:: bash
@@ -110,23 +133,37 @@ Then define the file format(s) to download:
 * ``protein`` (.faa)
 * ``protein genomic`` (both .faa and .fna) or ``genomic protein``
 
-positional arguments:
-  email                 User email address
-  output_dir            Path to directory to write out genomic assemblies
-  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
-  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
-  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+.. note::
+  Protein sequences are needed for annotating the CAZome. To download the protein sequences of all annotated protein sequences, download the  assembles in `protein` format.  
+  If you are going to annotate the genomes, download the genomes in `genome` (genomic sequence) formate. 
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
-                        Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
-  -f, --force           Force file over writting (default: False)
-  -l log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  --timeout TIMEOUT     time in seconds before connection times out (default: 30)
-  -v, --verbose         Set logger level to 'INFO' (default: False)
+Positional arguments:
+^^^^^^^^^^^^^^^^^^^^^
+
+* email - User email address
+* output_dir - Path to directory to write out genomic assemblies
+* terms - Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+* file format: {genomic,protein}- Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+* NCBI database: {genbank,refseq} - Choose which NCBI db to get genomes from: refseq or genbank
+
+Optional arguments
+^^^^^^^^^^^^^^^^^^
+
+* ``-A``, ``--assembly_levels`` - limit the download to assemblies with the assembly status provided. A space-separate lists of assembly levels. Can provide multiple levels: Accepted levels:
+  * complete
+  * chromosome
+  * scaffold
+  * contig 
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``-l`, ``--log`` - path to write out log file
+* ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
+* ``--timeout`` - time in seconds before connection times out (default: 30)
+
+By default if the output directory exists, ``cazomevolve`` will crash. To write to an existing output directory use the ``-f``/``--force`` flag. By default, ``cazomevolve`` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the ``-n``/``--nodelete`` flag.
+
+Examples
+^^^^^^^^
 
 For exmple to download all proteome fasta files for all _Pectobacteriaceae_ genomes in the NCBI Refseq (reference / non-redudnant) database,
  with the assembly status of complete or chromosome, use the following command structure:

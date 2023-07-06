@@ -69,6 +69,8 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         else:
             make_output_directory(args.fam_genome_protein_list.parent, args.force, args.nodelete)
 
+    logger = logging.getLogger(__name__)
+
     # connect to the local CAZyme db
     connection = get_db_connection(args.database, args.sql_echo, False)
 
@@ -162,7 +164,7 @@ def get_cazy_annotations(fasta_path, gbk_table_dict, args, connection):
                     all()
 
                 for result in fam_query:
-                    fam = result[1].family
+                    fam = result[1].family.split("_")[0]  # make sure to remove subfamily classification
                     fam_genome_data += f"{fam}\t{genomic_accession}\n"
                     fam_genome_protein_data += f"{fam}\t{genomic_accession}\t{prot_acc}\n"
 

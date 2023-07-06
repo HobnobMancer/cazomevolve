@@ -1,6 +1,6 @@
-======================
-Annotate CAZomes usage
-======================
+================
+Annotate CAZomes
+================
 
 The CAZy database is the most authorative and comprehensive CAZyme database.
 

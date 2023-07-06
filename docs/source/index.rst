@@ -197,7 +197,6 @@ Documentation
    notebooks/seqdiversity/exploreseqdiversity
    genomes/dlgenomes
    annotatecazomes/usage
-   annotatecazomes/tutorial
    explorecazomes/summary
    explorecazomes/exploredata
    explorecazomes/exploreaddtaxs

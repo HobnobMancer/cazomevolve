@@ -99,7 +99,7 @@ def invoke_dbcan(input_path, out_dir, args):
     # make the output directory
     make_output_directory(out_dir, True, False)
 
-    if args.version_2:
+    if args.dbcan_version == 2:
         # create list of args to invoke run_dbCAN
         dbcan_args = [
             "run_dbcan.py",
@@ -107,6 +107,26 @@ def invoke_dbcan(input_path, out_dir, args):
             "protein",
             "--out_dir",
             str(out_dir),
+        ]
+
+    elif args.dbcan_version == 3:
+        # create list of args to invoke run_dbCAN
+        dbcan_args = [
+            "run_dbcan",
+            str(input_path),
+            "protein",
+            "--out_dir",
+            str(out_dir),
+            "--stp_cpu",
+            str(args.cpu),
+            "--tf_cpu",
+            str(args.cpu),
+            "--eCAMI_jobs",
+            str(args.cpu),
+            "--hmm_cpu",
+            str(args.cpu),
+            "--dia_cpu",
+            str(args.cpu),
         ]
 
     else:
@@ -118,15 +138,13 @@ def invoke_dbcan(input_path, out_dir, args):
             "--out_dir",
             str(out_dir),
             "--stp_cpu",
-            "8",
+            str(args.cpu),
             "--tf_cpu",
-            "8",
-            "--eCAMI_jobs",
-            "8",
+            str(args.cpu),
             "--hmm_cpu",
-            "8",
+            str(args.cpu),
             "--dia_cpu",
-            "8",
+            str(args.cpu),
         ]
 
     with open(f"{out_dir}/dbcan.log", "w+") as fh:

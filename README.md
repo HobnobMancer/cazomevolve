@@ -270,19 +270,33 @@ If you have a list of genomic version accessions in a plain text file, `cazomevo
 Using the `download_acc_genomes` subcommand, which takes 5 positional arguments:
 
 **Positional arguments:**
-accessions            Path to file listing the accessions, with a unique genome accession per row
-outdir                output directory to write out the genomes to
-{genbank,fasta,rm,features,gff,protein,genpept,wgs,cdsfasta,rnafna,rnafasta,assemblyreport,assemblystats,all}
-                      A space-separated list of formats is also possible. For example: 'fasta assemblyreport'. Choose from: ['genbank', 'fasta', 'rm', 'features', 'gff', 'protein', 'genpept', 'wgs', 'cdsfasta', 'rnafna',
-                      'rnafasta', 'assemblyreport', 'assemblystats', 'all']
-{genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+* `accessions` - Path to file listing the accessions, with a unique genome accession per row
+* `outdir` - Output directory to write out the genomes to
+* `file_opts`- File options - the file foramts to download the genomic assemblies in. Chose from:
+  * genbank
+  * **fasta**
+  * rm
+  * features 
+  * gff
+  * **protein**
+  * genpept
+  * wgs
+  * cdsfasta
+  * rnafna
+* `database` - NCBI database - the database to retrieve the assemblies from, GenBank or RefSeq: `refseq` or `genbank`
+
+To download the protein sequences of all annotated protein sequences, download the  assembles in `protein` format.  
+
+If you are going to annotate the genomes, download the genomes in `fasta` (genomic sequence) formate.  
 
 **Optional arguments:**
--h, --help            show this help message and exit
--A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
-                      Space-separated list of assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: all)
--f, --force           Force file over writting (default: False)
--n, --nodelete        enable/disable deletion of exisiting files (default: False)
+* `-A`, `--assembly_levels` - limit the download to assemblies with the assembly status provided. A space-separate lists of assembly levels. Can provide multiple levels: Accepted levels:
+  * complete
+  * chromosome
+  * scaffold
+  * contig 
+* `-f`, `--force`           Force file over writting (default: False)
+* `-n`, `--nodelete`        enable/disable deletion of exisiting files (default: False)
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 
@@ -291,22 +305,23 @@ By default if the output directory exists, `cazomevolve` will crash. To write to
 To download load all genomic assemblies associated with a term of interest, such as `Pectobacteriaceae` (so as to download all Pectobacteriaceae assemblies), use the subcommand `download_genomes`, which takes 4 arguments:
 
 **Positional arguments:**
-  email                 User email address
-  output_dir            Path to directory to write out genomic assemblies
-  terms                 Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
-  {genomic,protein}     Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
-  {genbank,refseq}      Choose which NCBI db to get genomes from: refseq or genbank
+* email- User email address
+* output_dir- Path to directory to write out genomic assemblies
+* terms - Terms to search NCBI. Comma-separated listed, e.g, 'Pectobacterium,Dickeya'. To include spaces in terms, encapsulate the all terms in quotation marks, e.g. 'Pectobacterium wasabiae'
+* file format: {genomic,protein}- Space-separated list of file formats to dowload. ['genomic' - downloads genomic.fna seq files, 'protein' - downloads protein.faa seq files]
+* NCBI database: {genbank,refseq} - Choose which NCBI db to get genomes from: refseq or genbank
 
 **Optional arguments:**
-  -h, --help            show this help message and exit
-  -A {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...], --assembly_levels {all,complete,chromosome,scaffold,contig} [{all,complete,chromosome,scaffold,contig} ...]
-                        Assembly levels of genomes to download. Default='all'. Can provide multiple levels. Accepted = ['all', 'complete', 'chromosome', 'scaffold', 'contig'] (default: ['all'])
-  -f, --force           Force file over writting (default: False)
-  -l log file name, --log log file name
-                        Defines log file name and/or path (default: None)
-  -n, --nodelete        enable/disable deletion of exisiting files (default: False)
-  --timeout TIMEOUT     time in seconds before connection times out (default: 30)
-  -v, --verbose         Set logger level to 'INFO' (default: False)
+* `-A`, `--assembly_levels` - limit the download to assemblies with the assembly status provided. A space-separate lists of assembly levels. Can provide multiple levels: Accepted levels:
+  * complete
+  * chromosome
+  * scaffold
+  * contig 
+* `-f`, `--force` - Force file over writting (default: False)
+* `-n`, `--nodelete` - enable/disable deletion of exisiting files (default: False)
+* `-l`, `--log` - path to write out log file
+* `-v`, `--verbose` - Set logger level to 'INFO' (default: False)
+* `--timeout` - time in seconds before connection times out (default: 30)
 
 By default if the output directory exists, `cazomevolve` will crash. To write to an existing output directory use the `-f`/`--force` flag. By default, `cazomevolve` will delete all existing data in the existing output directory. To retain the data available in the existing output directory use the `-n`/`--nodelete` flag.
 

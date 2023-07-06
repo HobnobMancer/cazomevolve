@@ -50,13 +50,28 @@ from pathlib import Path
 
 def main(args: argparse.Namespace) -> int:
 
-    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","cazome/build_cazy_db.sh"))
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","cazome/cazy/build_db.sh"))
 
-    theproc = subprocess.Popen([
+    cmd = [
         cazevolve_path,
         args.email,
         args.db,
-    ], shell=True)
-    theproc.communicate()
+        ]
+
+    print(f"Running command: {' '.join(['build_cazy_db.sh']+cmd[1:])}")
+
+    try:
+        theproc = subprocess.Popen([
+            cazevolve_path,
+            args.email,
+            args.db,
+        ])
+    except PermissionError:
+        theproc = subprocess.Popen([
+            "bash",
+            cazevolve_path,
+            args.email,
+            args.db,
+        ])
 
     return 0

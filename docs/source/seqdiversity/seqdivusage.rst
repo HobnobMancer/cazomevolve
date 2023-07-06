@@ -1,6 +1,6 @@
-====================================
-CAZy family sequence diversity usage
-====================================
+================================================
+Calculate CAZy family sequence diversity (Usage)
+================================================
 
 ``cazomevolve`` can be used to explore the sequence diversity across an individual CAZy family, or 
 a group of families.

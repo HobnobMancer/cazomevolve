@@ -1,8 +1,8 @@
 .. _explore sequence diversity in CAZy families:
 
-===========================================
-Explore sequence diversity in CAZy families
-===========================================
+===================================================
+Explore sequence diversity in CAZy families (Usage)
+===================================================
 
 To visualise the data generated from an all-versus-all sequence alignemnt analysis (from DIAMOND or BLAST), 
 ``cazomevolve`` includes several functions that can be imported into a Python script of jupyter notebook.
@@ -10,6 +10,7 @@ To visualise the data generated from an all-versus-all sequence alignemnt analys
 These functions, including their imports and use, are described below.
 http://www.cazy.org/PL1_characterized.html
 
+**You can find a tutorial for exploring sequence diversity in CAZy families on the next page.**
 
 ---------------------------------------
 Load and parse DIAMOND and BLAST output

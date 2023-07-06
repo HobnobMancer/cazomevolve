@@ -1,6 +1,6 @@
-=======================================
-CAZy family sequence diversity tutorial
-=======================================
+===================================================
+Calculate CAZy family sequence diversity (Tutorial)
+===================================================
 
 This page includes a tutorial or example walkthrough to explore the sequence diversity in the CAZy family 
 PL20.

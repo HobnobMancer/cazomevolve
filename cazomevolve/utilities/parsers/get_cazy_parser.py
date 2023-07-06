@@ -44,7 +44,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersA
 from pathlib import Path
 from typing import List, Optional
 
-from cazomevolve.scripts import build_cazy_db
+from cazomevolve.cazome.cazy import get_cazy_cazymes
 
 
 def build_parser(
@@ -134,4 +134,4 @@ def build_parser(
         default=False,
         help="Set logger level to 'INFO'",
     )
-    parser.set_defaults(func=build_cazy_db.main)
+    parser.set_defaults(func=get_cazy_cazymes.main)

@@ -40,6 +40,8 @@
 """Build CLI for invoke_dbcan.py"""
 
 
+import multiprocessing
+
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
@@ -71,12 +73,16 @@ def build_parser(
     )
 
     parser.add_argument(
-        "-V2",
-        "--version_2",
-        dest="version_2",
-        action="store_true",
-        default=False,
-        help="Use dbCAN version 2 NOT 3",
+        "dbcan_version",
+        type=int,
+        help="Major version number of dbCAN being used (e.g. 2, 3, or 4)",
+    )
+
+    parser.add_argument(
+        "--cpu",
+        type=int,
+        default=multiprocessing.cpu_count(),
+        help="Number of CPU cores to use. Default all available cores",
     )
 
     # Add option to force file over writting

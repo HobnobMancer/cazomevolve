@@ -43,8 +43,11 @@ import argparse
 import subprocess
 
 def main(args: argparse.Namespace) -> int:
+
+    cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","cazome/build_cazy_db.sh"))
+
     theproc = subprocess.Popen([
-        "./cazome/cazy/build_db.sh",
+        cazevolve_path,
         args.email,
         args.db,
     ], shell=True)

@@ -48,6 +48,7 @@ from inspect import getsourcefile
 from os.path import abspath
 from pathlib import Path
 
+
 def main(args: argparse.Namespace) -> int:
 
     cazevolve_path = abspath(getsourcefile(lambda:0).replace("scripts/build_cazy_db.py","scripts/bash/build_cazy_db.sh"))
@@ -57,8 +58,9 @@ def main(args: argparse.Namespace) -> int:
         args.email,
         args.db,
         ]
+    txt = ' '.join(["build_db.sh"]+cmd[1:])
 
-    print(f"Running command: {' '.join(["build_db.sh"]+cmd[1:])}")
+    print(f"Running command: {txt}")
 
     theproc = subprocess.Popen([
         "bash",

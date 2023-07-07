@@ -186,7 +186,7 @@ Parse dbCAN output
 
 Once dbCAN is complete, ``cazomevovle`` can be used to parse the output from dbCAN and add the 
 data to a pair of new tab delimited lists or add the data to the existing tab delimited lists created by the 
-``get_cazy_cazymes`` subcommand.
+``get_dbcan_cazymes`` subcommand.
 
 Positional arguments:
 

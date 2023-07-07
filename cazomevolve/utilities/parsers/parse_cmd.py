@@ -61,6 +61,7 @@ from cazomevolve.utilities.parsers import (
     invoke_dbcan_parser,
     get_dbcan_parser,
     common_parser,
+    add_taxs_parser,
 )
 
 
@@ -132,6 +133,7 @@ def build_parser(argv: Optional[List] = None) -> Namespace:
     get_cazy_parser.build_parser(subparsers)
     invoke_dbcan_parser.build_parser(subparsers)
     get_dbcan_parser.build_parser(subparsers)
+    add_taxs_parser.build_parser(subparsers)
 
     # Parse arguments
     # The list comprehension is to allow PosixPaths to be defined and passed in testing

@@ -45,6 +45,7 @@ from typing import List, Optional
 
 from cazomevolve.taxs import add_taxs
 
+
 def build_parser(
     subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
 ) -> None:

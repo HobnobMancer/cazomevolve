@@ -52,7 +52,7 @@ with Path("README.md").open("r") as long_description_handle:
 
 setuptools.setup(
     name="cazomevolve",
-    version="0.1.0",
+    version="0.1.1",
     # Metadata
     author="Emma E. M. Hobbs",
     author_email="eemh1@st-andrews.ac.uk",
@@ -74,11 +74,11 @@ setuptools.setup(
         ]
     },
     scripts=[
-        'cazomevolve/genomes/download_acc_genomes.sh',
+        'cazomevolve/scripts/bash/download_acc_genomes.sh',
         'cazomevolve/seq_diversity/get_fam_seqs.sh',
         'cazomevolve/seq_diversity/run_blastp.sh',
         'cazomevolve/seq_diversity/run_diamond.sh',
-        'cazomevolve/cazome/cazy/build_db.sh',
+        'cazomevolve/scripts/bash/build_cazy_db.sh',
         'cazomevolve/scripts/tree/phylo/align_scos.sh',
         'cazomevolve/scripts/tree/phylo/annotate_genomes.sh',
         'cazomevolve/scripts/tree/phylo/backtranslate.sh',

@@ -174,7 +174,7 @@ Optional arguments:
 * ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
 * ``-l`, ``--log`` - path to write out log file
 * ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
-* ``-cpu`` - number of CPU cores to use, default all available cores.
+* ``--cpu`` - number of CPU cores to use, default all available cores.
 
 .. warning::
 
@@ -204,3 +204,161 @@ Optional arguments:
 .. note::
 
     It is **not** required to specify which version of dbCAN was used when parsing the output from dbCAN.
+
+------------------
+Add taxonomic data
+------------------
+
+In order to associate each genome with its taxonomic classification while explore 
+the composition of the CAZomes, the taxonomic information needs to be added 
+to the tab separated files of (i) CAZy families and genomic accessions, and (ii) CAZy families, 
+genomic accessions, and protein accessions.
+
+``cazomevolve`` retrieves taxonomic classifications from NCBI or GTDB (as specified by the user), and 
+adds the taxonomic information to the respective genomic accession in the tab separated files. 
+``cazomevolve`` separates the genomic accession and each rank of the taxonomic information with an underscore.
+For example, if genus and species inforamtion was retrieved from NCBI, the output tab separated files would 
+contain:
+
+.. code-block:: bash
+
+    CBM50	GCA_003382565.3	UEM40323.1
+    GT35	GCA_003382565.3	UEM39157.1
+    GH5	GCA_003382565.3	UEM41238.1
+    CBM3	GCA_003382565.3	UEM41238.1
+    CE12	GCA_003382565.3	UEM40541.1
+    GT2	GCA_003382565.3	UEM39295.1
+
+...and...
+
+.. code-block:: bash
+
+    CBM50	GCA_003382565.3_Pectobacterium_aquaticum	UEM40323.1
+    GT35	GCA_003382565.3_Pectobacterium_aquaticum	UEM39157.1
+    GH5	GCA_003382565.3_Pectobacterium_aquaticum	UEM41238.1
+    CBM3	GCA_003382565.3_Pectobacterium_aquaticum	UEM41238.1
+    CE12	GCA_003382565.3_Pectobacterium_aquaticum	UEM40541.1
+    GT2	GCA_003382565.3_Pectobacterium_aquaticum	UEM39295.1
+
+.. note::
+
+    To explore the composition of the CAZome using ``cazomevolve``, taxonomic information only 
+    needs to be added to the tab separated file listing CAZy families, genomic accessions, and 
+    protein accessions.
+
+    To include taxonomic information in the output from ``coinfinder`` to identify associating 
+    CAZy families, taxonomic information needs to be added to the tab separated file listing 
+    CAZy families and genomic accessions.
+
+**Output:**
+
+``cazomevolve add_taxs`` does **not** overwrite the existing tab separated lists. 
+``cazomevolve add_taxs`` extracts the data from the tab separated files, adds the taxonomic inforamtion 
+to the genomic accession in the files, and writes out the data to new files. These files are given the 
+same file path as the tab separated files, with the addition of ``_taxs`` on the end. 
+Therefore, the input file ``data/fams_genomes`` becomes ``data/fams_genomes_taxs``.
+
+A CSV file listing the taxonomic information is also generated. By default this is written to the 
+same directory as the tab separated files and called ``taxonomies.csv``. To specify a different file 
+path for the CSV file, use the ``--outpath`` flag followed by the desired file path.
+
+Required arguments
+^^^^^^^^^^^^^^^^^^
+
+**Positional argument:**
+
+Taxonomic information from NCBI or the Genome Taxonomy Database `(GTDB)<https://gtdb.ecogenomic.org/>`_, can be 
+added to the tab separated files using the subcommand ``add_taxs``.
+
+The only position argument is a user email address (which is required by NCBI).
+
+**Tab separated files:**
+
+Either the ``--FG_FILE`` and/or ``--FGP_FILE`` flags must be called:
+
+Use the ``--FG_FILE`` to provide a path to the tab separated file of **CAZy families and genomic accessions**, to add taxonomic data to this file.
+
+.. code-block:: bash
+
+    cazomevolve add_taxs dummy@domain.com \
+        --FG_FILE data/fams_genomes_file
+
+Use the ``--FGP_FILE`` to provide a path to the tab separated file of **CAZy families, genomic accessions and protein accessions**, to add taxonomic data to this file.
+
+.. code-block:: bash
+
+    cazomevolve add_taxs dummy@domain.com \
+        --FGP_FILE data/fams_genomes_proteins_file
+
+Taxonomic data can be added to both tab separated files by using the ``--FG_FILE`` and ``--FGP_FILE`` flags. For 
+example, if the tab separated files were stored in a directory called ``data/``.
+
+.. code-block:: bash
+
+    cazomevolve add_taxs dummy@domain.com \
+        --FG_FILE data/fams_genomes_file \
+        --FGP_FILE data/fams_genomes_proteins_file \
+
+**Specify lineage ranks of interst:**
+
+At least one rank or level of taxonomic lineage must be specified for inclusion in the tab separated files 
+of CAZy families and genomic accessions.
+
+To specify which ranks of lineage to retrieves and add to the tab separated files, add each respective 
+flag to the command:
+
+* ``--kingdom``
+* ``--phylum``
+* ``--tax_class``
+* ``--tax_order``
+* ``--tax_family``
+* ``--genus``
+* ``--species``
+
+For example, to retrieve family, genus and species information for genomes listed 
+in a tab separated file, use the ``--tax_family``, ``--genus``, and ``--species`` flags:
+
+.. code-block:: bash
+
+    cazomevolve add_taxs dummy@domain.com \
+        --FG_FILE data/fams_genomes_file \
+        --FGP_FILE data/fams_genomes_proteins_file \
+        --tax_family \
+        --genus \
+        --species
+
+.. note:: 
+
+    The order the lineage ranks are specified does not matter. ``cazomevolve add_taxs`` will 
+    always write out the lineage ranks in the true phylogenetic order: kingdom, phylum, class, order, 
+    family, genus, and species. 
+
+.. note::
+    'Species' taxonomic information includes the strain information.
+
+NCBI or GTDB
+^^^^^^^^^^^^
+
+By default ``cazomevolve add_taxs`` retrieves the latest taxonomic classification from NCBI for each genome 
+in each of the provided tab separated files.
+
+To instead use taxonomic classifications from the GTDB database (applicable for bacteria and archaea), 
+download a TSV database dump from the `GTDB release server <https://data.gtdb.ecogenomic.org/releases/>`_. Then 
+call ``cazomevolve add_taxs`` and include the ``--gtdb`` flag in the call, followed by the path to the TSV file 
+GTDB database dump. For example:
+
+.. code-block:: bash
+
+    cazomevolve add_taxs dummy@domain.com \
+        --FG_FILE data/fams_genomes_file \
+        --FGP_FILE data/fams_genomes_proteins_file \
+        --gtdb downloads/gtdb/bac120_taxonomy.tsv
+
+Operational arguments
+^^^^^^^^^^^^^^^^^^^^^
+
+* ``-f``, ``--force`` -  Force file over writting (default: False)
+* ``-n``, ``--nodelete`` - enable/disable deletion of exisiting files (default: False)
+* ``-l`, ``--log`` - path to write out log file
+* ``-v`, ``--verbose`` - Set logger level to 'INFO' (default: False)
+* ``--retries`` - number of times to retry connection to NCBI if connection fails

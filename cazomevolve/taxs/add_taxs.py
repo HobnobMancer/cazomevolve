@@ -54,7 +54,7 @@ from cazomevolve.taxs.ncbi import add_ncbi_taxs
 from cazomevolve import closing_message
 
 
-def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
+def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)

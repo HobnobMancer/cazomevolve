@@ -51,18 +51,10 @@ from saintBioutils.utilities.logger import config_logger
 from tqdm import tqdm
 
 from cazomevolve.taxs.ncbi import add_ncbi_taxs
-from cazomevolve.utilities.parsers.add_taxs_parser import build_parser
 from cazomevolve import closing_message
 
 
 def main(argv: Optional[List[str]] = None, logger: Optional[logging.Logger] = None):
-    if argv is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    else:
-        parser = build_parser(argv)
-        args = parser.parse_args()
-
     if logger is None:
         config_logger(args)
     logger = logging.getLogger(__name__)

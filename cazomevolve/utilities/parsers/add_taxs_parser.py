@@ -39,19 +39,19 @@
 # SOFTWARE.
 
 
-import argparse
-
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
 from pathlib import Path
 from typing import List, Optional
 
+from cazomevolve.taxs import add_taxs
 
-def build_parser(argv: Optional[List] = None):
+def build_parser(
+    subps: _SubParsersAction, parents: Optional[List[ArgumentParser]] = None
+) -> None:
     """Return ArgumentParser parser for script."""
     # Create parser object
-    parser = argparse.ArgumentParser(
-        prog="add_taxs",
-        description="Add taxonomic information to tab delimited files",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    parser = subps.add_parser(
+        "add_taxs", formatter_class=ArgumentDefaultsHelpFormatter
     )
 
     # Add positional arguments to parser
@@ -173,9 +173,4 @@ def build_parser(argv: Optional[List] = None):
         help="Set logger level to 'INFO'",
     )
 
-    if argv is None:
-        # parse command-line
-        return parser
-    else:
-        # return namespace
-        return parser.parse_args(argv)
+    parser.set_defaults(func=add_taxs.main)

@@ -74,7 +74,7 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
                     f"Could not retrieve genomic accession from\n{fasta_path}\n"
                     "Skipping FASTA file"
                 )
-                return
+                continue
         
         output_dir = args.output_dir / genomic_accession
 

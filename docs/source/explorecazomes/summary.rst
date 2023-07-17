@@ -41,7 +41,8 @@ exploratory analysis of CAZomes) is listed immediately below:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: The Explore Module:
+
    explorecazomes/exploredata
    explorecazomes/exploreaddtaxs
    explorecazomes/explorecazomesizes

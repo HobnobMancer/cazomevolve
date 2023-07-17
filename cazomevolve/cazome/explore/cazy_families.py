@@ -223,7 +223,7 @@ def build_family_clustermap_multi_legend(
     file_format='png',
     font_scale=1,
     dpi=300,
-    dendrogram_ratio=None,
+    dendrogram_ratio=0.2,
     title_fontsize=2,
     legend_fontsize=2,
     cmap=sns.cubehelix_palette(dark=1, light=0, reverse=True, as_cmap=True),

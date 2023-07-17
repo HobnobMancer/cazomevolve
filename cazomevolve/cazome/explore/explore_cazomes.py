@@ -129,6 +129,8 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     fgp_df = load_data(args)
 
+    compare_cazome_sizes(fgp_df, args)
+
 
 def load_data(args):
     """Load in all data required for the analysis
@@ -238,3 +240,27 @@ def compare_cazome_sizes(fgp_df, args):
         f"to: {outpath}"
     )
     all_df.to_csv(outpath)
+
+
+def compare_cazy_classes(fgp_df, args):
+    """Compare the composition of the CAZy classes.
+    
+    Compare the number of CAZymes (i.e. unique protein IDs) per CAZy class 
+    and the percentage of the CAZome encapsulated by each CAZy class.
+    
+    :param fgp_df: pandas df of cazy family, genome, protein id, and one col per tax rank
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "cazy_classes"
+    make_output_directory(outdir, force=True, nodelete=True)
+    outpath = outdir / "cazy_classes.csv"
+
+    class_df, class_size_dict = calculate_class_sizes(
+        fgp_df,
+        args.group_by,
+        round_by=args.round_by,
+    )
+
+    class_df.to_csv(outpath)
+

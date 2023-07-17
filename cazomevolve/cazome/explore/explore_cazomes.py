@@ -47,6 +47,7 @@ into a jupyter notebook.
 import json
 import logging
 import pandas as pd
+import sys
 
 from copy import copy
 from typing import List, Optional
@@ -106,6 +107,26 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     # make parent output directory
     if str(args.output_dir.parent) != ".":
         make_output_directory(args.output_dir, args.force, args.nodelete)
+
+    col_names = []
+    if args.kingdom:
+        col_names.append('Kingdom')
+    if args.phylum:
+        col_names.append('Phylum')
+    if args.tax_class:
+        col_names.append('Class')
+    if args.tax_order:
+        col_names.append('Order')
+    if args.tax_family:
+        col_names.append('Family')
+    if args.genus:
+        col_names.append('Genus')
+    if args.species:
+        col_names.append('Species')
+
+    if len(col_names) == 0:
+        logger.warning("Must specify at least one rank of lineage. These are the taxonomic ranks listed in the Taxonomy CSV file")
+        sys.exit(1)
 
     fgp_df = load_data(args)
 

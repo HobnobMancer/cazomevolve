@@ -422,3 +422,191 @@ def find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families,
     :param all_families: list of all CAZy families in the genomes
     :param args: CLI args parser
     """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "cooccurring_families"
+    make_output_directory(outdir, force=True, nodelete=True)
+    outpath_all = outdir / "cooccurring_families.txt"
+    outpath_grp = outdir / f"{args.group_by}_cooccurring_families.txt"
+
+    cooccurring_fams_dict = calc_cooccuring_fam_freqs(
+        fam_freq_df,
+        list(all_families),
+        exclude_core_cazome=False,
+    )
+    with open(outpath_all, "w") as fh:
+        fh.write(cooccurring_fams_dict)
+
+    grp_cooccuring_fams = {}  # {genus: cooccurring_fams_d
+    for grp in set(fam_freq_df[args.group_by]):
+        grp_fam_freq_df = fam_freq_df[fam_freq_df[args.group_by] == grp]
+        grp_cooccurring_fams_dict = calc_cooccuring_fam_freqs(
+            grp_fam_freq_df,
+            list(all_families),
+            exclude_core_cazome=False,
+        )
+        grp_cooccuring_fams[grp] = grp_cooccurring_fams_dict
+    with open(outpath_grp, "w") as fh:
+        fh.write(grp_cooccuring_fams)
+
+    upsetplot_membership = []
+    upsetplot_membership = add_to_upsetplot_membership(upsetplot_membership, cooccurring_fams_dict)
+
+    for genus in grp_cooccuring_fams:
+        upsetplot_membership = add_to_upsetplot_membership(
+            upsetplot_membership,
+            grp_cooccuring_fams[genus],
+        )
+    
+    for file_format in args.formats:
+        upset_path = outdir / f"cooccurring_fams_upsetplot.{file_format}"
+        logger.warning(
+            f"Writing out Upset plot of always co-occurring CAZy families in {file_format} format to:\n"
+            f"{upset_path}"
+        )
+        build_upsetplot(
+            upsetplot_membership,
+            file_path=upset_path,
+        )
+
+    # calculate frequencies
+    upset_plot_groups = get_upsetplot_grps(upsetplot_membership)
+
+    cooccurring_grp_freq_data = add_upsetplot_grp_freqs(
+        upset_plot_groups,
+        cooccurring_grp_freq_data,
+        grp_cooccuring_fams,
+        args.group_by,
+        grp_sep=True,
+        include_none=True,
+    )
+    output_path = outdir / "cooccurring_fam_freqs.csv"
+    logger.warning(f"Writing out frequencies of always co-occurring families to {output_path}")
+    cooccurring_fams_freq_df = build_upsetplot_matrix(
+        cooccurring_grp_freq_data,
+        args.group_by,
+        file_path=output_path,
+    )
+
+
+def run_pca(fam_freq_df, fam_freq_df_ggs, all_families, args):
+    """Run principal component analysis on CAZy family frequencies
+    
+    :param fam_freq_df: dataframe of CAZy fam freqs, genome per row, fam per column, and tax columns
+    :param fam_Freq_df_ggs: same as fam_freq_df by tax data and genome are the row index
+    :param all_families: list of all CAZy families in the genomes
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "pca"
+    make_output_directory(outdir, force=True, nodelete=True)
+    index = []
+    if args.kingdom:
+        index.append('Kingdom')
+    if args.phylum:
+        index.append('Phylum')
+    if args.tax_class:
+        index.append('Class')
+    if args.tax_order:
+        index.append('Order')
+    if args.tax_family_:
+        index.append('Family')
+    if args.genus:
+        index.append('Genus')
+    if args.species:
+        index.append('Species')
+
+    for col in index:
+        try:
+            fam_freq_df_ggs = fam_freq_df_ggs.drop(col, axis=1)
+        except KeyError:
+            pass
+    
+    num_of_components = len(fam_freq_df_ggs.columns)
+    try:
+        pca, X_scaled = perform_pca(fam_freq_df_ggs, num_of_components)
+    except Exception:
+        num_of_components = len(fam_freq_df_ggs)
+        pca, X_scaled = perform_pca(fam_freq_df_ggs, num_of_components)
+    
+    logger.warning(
+        f"{round(pca.explained_variance_ratio_.sum() * 100, 2)}% "
+        "of the variance in the data set was catpured by the PCA"
+    )
+
+    for file_format in args.formats:
+        out_cumvar = outdir / f"pca_explained_variance.{file_format}"
+        logger.warning(
+            f"Writing out plot of explained cumulative variance from the PCA in {file_format} to \n:"
+            f"{out_cumvar}"
+        ) 
+        cumExpVar = plot_explained_variance(
+            pca,
+            num_of_components,
+            file_path=out_cumvar,
+            file_format=file_format,
+        )
+
+        out_scree = outdir / f"pca_scree_plot.{file_format}"
+        logger.warning(
+            f"Writing out scree plot from the PCA in {file_format} to \n:"
+            f"{out_scree}"
+        )
+        plot_scree(
+            pca,
+            nComp=10,
+            file_format=file_format,
+            file_path=out_scree,
+        )
+
+    # plot PCS 1-4
+    plot_pcs((1,2), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+    plot_pcs((1,3), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+    plot_pcs((1,4), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+    plot_pcs((2,3), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+    plot_pcs((2,4), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+    plot_pcs((3,4), fam_freq_df_ggs, pca, X_scaled, outdir, args)
+
+
+def plot_pcs(pc_pair, fam_freq_df_ggs, pca, X_scaled, outdir, args):
+    """Project genomes onto PCS, plot loadings
+    
+    :param pc_pair: tuple, number of PCs to plot
+    :param outdir: path to output dir
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+
+    pc_outdir = outdir / f"PC{pc_pair[0]}-vs-PC{pc_pair[1]}"
+    make_output_directory(pc_outdir, force=True, nodelete=True)
+
+    logger.warning(f"PC{pc_pair[0]} vs PC{pc_pair[1]} - plotting scatter plot")
+
+    for file_format in args.formats:
+        out = pc_outdir / f'pca_pc{pc_pair[0]}_vs_pc{pc_pair[1]}-{args.group_by}.{file_format}'
+        g = plot_pca(
+            pca,
+            X_scaled,
+            fam_freq_df_ggs,
+            pc_pair[0],
+            pc_pair[1],
+            args.group_by,
+            style=args.group_by,
+            fig_size=(15,15),
+            file_path=out,
+            file_format=file_format,
+        );
+
+    logger.warning(f"PC{pc_pair[0]} vs PC{pc_pair[1]} - plotting loadings plot")
+    for file_format in args.formats:
+        out = pc_outdir / f'pca_pc{pc_pair[0]}_vs_pc{pc_pair[1]}-{args.group_by}-loadings.{file_format}'
+        g= plot_loadings(
+            pca,
+            fam_freq_df_ggs,
+            pc_pair[0],
+            pc_pair[1],
+            threshold=0.3,
+            fig_size=(10,10),
+            file_path=out,
+            font_size=11,
+            file_format=file_format,
+        );

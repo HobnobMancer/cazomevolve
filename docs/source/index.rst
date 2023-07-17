@@ -205,14 +205,6 @@ Documentation
    genomes/dlgenomes
    annotatecazomes/usage
    explorecazomes/summary
-   explorecazomes/exploredata
-   explorecazomes/exploreaddtaxs
-   explorecazomes/explorecazomesizes
-   explorecazomes/exploreclasses
-   explorecazomes/explorefamilies
-   explorecazomes/explorecorecazome
-   explorecazomes/explorecooccurring
-   explorecazomes/explorepca
    citations
    contributing
    license

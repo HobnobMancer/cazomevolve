@@ -62,7 +62,6 @@ from cazomevolve.utilities.parsers import (
     get_cazy_parser,
     invoke_dbcan_parser,
     get_dbcan_parser,
-    common_parser,
     add_taxs_parser,
     explore_cazomes_parser,
 )
@@ -118,6 +117,39 @@ def test_dl_acc_genomes_parser(monkeypatch):
     assert new_namespace.file_opts == 'genbank'
 
 
+def test_dl_acc_genomes_parser_invalid_format(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_acc_genomes', 'acc', 'outdir', 'ggggg', 'genbank'])
+    assert pytest_wrapped_e.type == SystemExit
+    
+
+def test_dl_acc_genomes_parser_invalid_db(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_acc_genomes', 'acc', 'outdir', 'fasta', 'database'])
+    assert pytest_wrapped_e.type == SystemExit
+
+
+def test_dl_acc_genomes_parser_invalid_level(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_acc_genomes', 'acc', 'outdir', 'fasta', 'genbank', 'levels'])
+    assert pytest_wrapped_e.type == SystemExit
+
+
 def test_download_genomes_parser(monkeypatch):
     def mock_run(*args, **kwards):
         return
@@ -128,6 +160,39 @@ def test_download_genomes_parser(monkeypatch):
     assert new_namespace.email == 'email'
     assert new_namespace.terms == 'pectobacteriaceae'
     assert new_namespace.database == 'genbank'
+
+
+def test_dl_genomes_parser_invalid_format(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_genomes', 'email', 'out', 'Aspergillus', 'ERROR', 'genbank'])
+    assert pytest_wrapped_e.type == SystemExit
+    
+
+def test_dl_genomes_parser_invalid_db(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_genomes', 'email', 'out', 'Aspergillus', 'genomic', 'ERROR'])
+    assert pytest_wrapped_e.type == SystemExit
+
+
+def test_dl_genomes_parser_invalid_level(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['download_genomes', 'email', 'out', 'Aspergillus', 'genomic', 'genbank', 'ERROR'])
+    assert pytest_wrapped_e.type == SystemExit
 
 
 def test_build_cazy_db_parser(monkeypatch):
@@ -189,3 +254,14 @@ def test_explore_cazomes_parser(monkeypatch):
     new_namespace = parse_cmd.build_parser(['explore_cazomes', 'fgp_file', 'tax_csv_path', 'out'])
     assert new_namespace.fgp_file == Path('fgp_file')
     assert new_namespace.tax_csv_path == Path('tax_csv_path')
+
+
+def test_explore_cazomes_parser_invalid_foramt(monkeypatch):
+    def mock_run(*args, **kwards):
+        return
+
+    monkeypatch.setattr(cazomevolve_script, "main", mock_run)
+
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        new_namespace = parse_cmd.build_parser(['explore_cazomes', 'fgp_file', 'tax_csv_path', 'out', 'prot', 'genus', 'ppp'])
+    assert pytest_wrapped_e.type == SystemExit

@@ -64,7 +64,7 @@ Use `cazomevolve` to explore:
 
 `cazomevolve` uses bash-script based workflow management. A summary of this workflow is provided in this README.
 
-Please see the [full documeentation including tutorials at ReadTheDocs]().
+Please see the [full documeentation including tutorials at ReadTheDocs](https://cazomevolve.readthedocs.io/en/latest/?badge=latest).
 
 An analysis using `cazomevolve` can be found [here](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto), which includes a README-walkthrough and all output files.
 

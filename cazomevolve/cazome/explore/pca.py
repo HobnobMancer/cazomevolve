@@ -155,6 +155,7 @@ def plot_pca(
     second_pc,
     group_by,
     file_path=None,
+    file_format='png',
     style=None,
     style_order=None,
     hue_order=None,
@@ -321,6 +322,7 @@ def plot_pca(
             file_path,
             bbox_inches='tight',
             dpi=dpi,
+            format=file_format,
         )
     plt.show();
     
@@ -339,6 +341,7 @@ def plot_loadings(
     dpi=300,
     fig_size=(16,16),
     file_path=None,
+    file_format='png',
     marker_size=100,
     ax=None,
 ):
@@ -442,7 +445,7 @@ def plot_loadings(
     sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
     
     if file_path is not None:
-        plt.savefig(file_path, dpi=dpi, bbox_inches='tight')
+        plt.savefig(file_path, dpi=dpi, bbox_inches='tight', format=file_format)
 
 
 def plot_ie_loadings(

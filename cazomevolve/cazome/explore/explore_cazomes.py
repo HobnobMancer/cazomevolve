@@ -46,28 +46,11 @@ into a jupyter notebook.
 
 import json
 import logging
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
-import statistics
-import re
-import time
 
 from copy import copy
-from matplotlib.patches import Patch
-from pathlib import Path
 from typing import List, Optional
-
-import adjustText
-import upsetplot
-
-from Bio import SeqIO
-from saintBioutils.utilities.file_io.get_paths import get_file_paths
 from saintBioutils.utilities.file_io import make_output_directory
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from tqdm import tqdm
 
 # loading and parsing data
 from cazomevolve.cazome.explore.parse_data import (
@@ -94,17 +77,13 @@ from cazomevolve.cazome.explore.cazy_families import (
     build_row_colours,
     build_family_clustermap,
     identify_core_cazome,
-    plot_fam_boxplot,
     build_fam_mean_freq_df,
     get_group_specific_fams,
-    build_family_clustermap_multi_legend,
 )
 
 # functions to identify and explore CAZy families that are always present together
 from cazomevolve.cazome.explore.cooccurring_families import (
-    identify_cooccurring_fams_corrM,
     calc_cooccuring_fam_freqs,
-    identify_cooccurring_fam_pairs,
     add_to_upsetplot_membership,
     build_upsetplot,
     get_upsetplot_grps,
@@ -139,6 +118,8 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, args)
 
     find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families, args)
+
+    closing_message('Explore CAZomes', args)
 
 
 def load_data(args):
@@ -599,7 +580,7 @@ def plot_pcs(pc_pair, fam_freq_df_ggs, pca, X_scaled, outdir, args):
     logger.warning(f"PC{pc_pair[0]} vs PC{pc_pair[1]} - plotting loadings plot")
     for file_format in args.formats:
         out = pc_outdir / f'pca_pc{pc_pair[0]}_vs_pc{pc_pair[1]}-{args.group_by}-loadings.{file_format}'
-        g= plot_loadings(
+        g = plot_loadings(
             pca,
             fam_freq_df_ggs,
             pc_pair[0],

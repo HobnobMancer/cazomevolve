@@ -43,9 +43,9 @@ exploratory analysis of CAZomes) is listed immediately below:
    :maxdepth: 2
    :caption: The Explore Module:
 
-   explorecazomes/exploredata
-   explorecazomes/exploreaddtaxs
-   explorecazomes/explorecazomesizes
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
    explorecazomes/exploreclasses
    explorecazomes/explorefamilies
    explorecazomes/explorecorecazome

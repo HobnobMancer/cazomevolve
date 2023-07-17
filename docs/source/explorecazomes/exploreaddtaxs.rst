@@ -9,7 +9,6 @@ data structures created by ``cazomevolve``. This pages covers the functions that
    :caption: The Explore Module:
 
    exploredata
-   exploreaddtaxs
    explorecazomesizes
    exploreclasses
    explorefamilies

@@ -12,7 +12,6 @@ Calculate the size of the CAZome in each genome, as well as:
 
    exploredata
    exploreaddtaxs
-   explorecazomesizes
    exploreclasses
    explorefamilies
    explorecorecazome

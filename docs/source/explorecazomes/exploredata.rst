@@ -8,7 +8,6 @@ augmented in to data structures that can be handled by ``cazomevolve``.
    :maxdepth: 2
    :caption: The Explore Module:
 
-   exploredata
    exploreaddtaxs
    explorecazomesizes
    exploreclasses

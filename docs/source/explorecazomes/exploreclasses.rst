@@ -13,7 +13,6 @@ CAZyme can be assinged to multiple CAZy classes.
    exploredata
    exploreaddtaxs
    explorecazomesizes
-   exploreclasses
    explorefamilies
    explorecorecazome
    explorecooccurring

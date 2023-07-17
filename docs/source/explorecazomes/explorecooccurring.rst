@@ -14,7 +14,6 @@ co-occurring families may not be present in every genome.
    exploreclasses
    explorefamilies
    explorecorecazome
-   explorecooccurring
    explorepca
 
 Correlation matrix

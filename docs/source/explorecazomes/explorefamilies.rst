@@ -15,7 +15,6 @@ between these data.
    exploreaddtaxs
    explorecazomesizes
    exploreclasses
-   explorefamilies
    explorecorecazome
    explorecooccurring
    explorepca

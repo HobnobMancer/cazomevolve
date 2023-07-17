@@ -18,7 +18,6 @@ These directions are called principal components or PCs.
    explorefamilies
    explorecorecazome
    explorecooccurring
-   explorepca
 
 Run PCA
 ^^^^^^^

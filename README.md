@@ -604,6 +604,58 @@ cazomevolve add_taxs dummy@domain.com \
 
 # Explore the CAZome composition
 
+The `cazomevolve` subcommand provides a method for exploring CAZome compositions, calculating:
+* The number of CAZymes per genome, and mean and SD calculated per user defined group (e.g. genus)
+* Number of CAZy families per genome, and mean and SD calculated per user defined group
+* Total number of proteins in each genome, per genome, and mean and SD calculated per user defined group
+* Percentage of the proteome that encapsulates or consistutes the CAZomes per genome, and mean and SD calculated per user defined group
+* Number of CAZymes per CAZy class, per genome, and mean and SD calculated per user defined group
+* Percentage of the CAZome represented by each CAZy class, per genome, and mean and SD calculated per user defined group
+* Number of CAZymes per CAZy family in each genome
+* Analyse CAZy family frequencies using heirarchical clustering and generate a clustermap
+* Identify the core CAZome - CAZy families present in all genomes and per user defined group
+* Identify CAZy families that always co-occur in the genome together, although each group of co-occurring CAZy families may not be present in all genomes
+* Run Principal Component Analysis identify associations between user defined groups of genomes (e.g. genera), and CAZome compositions
+  * Plots scatters plots projecting genomes onto all pairs of PCs from PC1-4, genomes are colour coded by user defined group (e.g. genus)
+  * Plots a corresponding loadings plot for each PCA scatter plot
+
+## Command line arguments
+
+### Required
+
+1. Path to tab delimited FGP file, listing CAZy families, genomic accessions, and protein IDs
+2. Path CSV file listing taxonomic data, containing a column called 'Genome', listing genomic accessions, and one column per taxonomic rank retrieved from NCBI and/or GTDB.
+3. Directory to write out all outputs
+
+Each of the taxonomic ranks included in the CSV file of taxonomic data must also be specified, by adding each of the relevant flags to command:
+* `--kingdom`
+* `--phylum`
+* `--tax_class`
+* `--tax_order`
+* `--tax_family`
+* `--genus`
+* `--species`
+
+### Optional
+
+* `--round_by` - ROUND_BY - Number of decimal places to round means and SDs to (default: 2)
+* `-f`, `--force` - Force file over writting (default: False)
+* `-l`, `--log`` log file name - Defines log file name and/or path (default: None)
+* `-n`, `--nodelete` - enable/disable deletion of exisiting files (default: False)
+* `-v`, `--verbose` - Set logger level to 'INFO' (default: False)
+
+## Full customisation of CAZome exploration
+
+For full customisation of the exploration import the `cazomevolve.cazome.explore` into a jupyter notebook. 
+
+**Full customisation includes:**
+  * Adhock define groups of interest
+  * Exclude specific groups of interest from specific analyses
+  * Alter figure sizes
+  * Add additional and custom annotations (e.g. colour code by genomes by plant host)
+
+You can find an example notebook presented as a [website here](https://hobnobmancer.github.io/SI_Hobbs_et_al_2023_Pecto/notebooks/explore_pectobact_cazomes.html) and the [raw notebook here](https://github.com/HobnobMancer/SI_Hobbs_et_al_2023_Pecto/tree/master/notebooks).
+
 The module `cazomevolve.cazome.explore` contains functions for exploring the CAZome annotated by `cazomevolve`. These are:
 
 ```python

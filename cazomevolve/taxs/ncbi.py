@@ -65,7 +65,7 @@ def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args):
     for genome in failed_genomes:
         genomes_tax_dict[genome] = f"{genome}_"
         for name in col_names[1:]:
-            genomes_tax_dict[genome] += f"{NaN}_"
+            genomes_tax_dict[genome] += f"NaN_"
         genomes_tax_dict[genome] = genomes_tax_dict[genome][:-1]
 
     return genomes_tax_dict

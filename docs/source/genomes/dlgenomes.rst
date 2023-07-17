@@ -1,8 +1,8 @@
 .. _genome download:
 
-======================================
-Download genomes using ``cazomevolve``
-======================================
+================
+Download genomes
+================
 
 To annotate the CAZomes for a set of species and/or genomes, ``cazomevolve`` requires a FASTA file 
 of all protein sequences encoded in each genome. 

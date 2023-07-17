@@ -44,6 +44,7 @@ into a jupyter notebook.
 """
 
 
+import json
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
@@ -294,10 +295,26 @@ def compare_cazy_families(fgp_df, args):
 
     # index the taxonomy data and genome (ggs=genome_genus_species)
     fam_freq_df_ggs = copy(fam_freq_df)  # so does not alter fam_freq_df
-    fam_freq_df_ggs = fam_freq_df_ggs.set_index(['Genome','Genus','Species'])
+    index = ['Genome']
+    if args.kingdom:
+        index.append('Kingdom')
+    if args.phylum:
+        index.append('Phylum')
+    if args.tax_class:
+        index.append('Class')
+    if args.tax_order:
+        index.append('Order')
+    if args.tax_family_:
+        index.append('Family')
+    if args.genus:
+        index.append('Genus')
+    if args.species:
+        index.append('Species')
+
+    fam_freq_df_ggs = fam_freq_df_ggs.set_index(index)
     # define a colour scheme to colour code rows by genus
-    fam_freq_df_ggs['Genus'] = list(fam_freq_df['Genus'])  # add column to use for colour scheme, is removed
-    fam_freq_genus_row_colours, fam_g_lut = build_row_colours(fam_freq_df_ggs, 'Genus', 'Set2')
+    fam_freq_df_ggs[args.group_by] = list(fam_freq_df[args.group_by])  # add column to use for colour scheme, is removed
+    fam_freq_genus_row_colours, fam_g_lut = build_row_colours(fam_freq_df_ggs, args.group_by, 'Set2')
 
     for file_format in args.formats:
         outpath_cm = outdir / f"cazy_family_clustermap.{args.file_format}"
@@ -318,5 +335,15 @@ def compare_cazy_families(fgp_df, args):
             legend_fontsize=24,
             cbar_pos=(0, 0.95, 0.05, 0.05),
         )
+
+    # find group specific families
+    outpath_dic = outdir / f"{args.group_by}_specific_cazy_families.json"
+    all_families = list(fam_freq_df.columns)[3:]
+    unique_grp_fams, group_fams = get_group_specific_fams(fam_freq_df, args.group_by, all_families)
+    for grp in unique_grp_fams:
+        unique_grp_fams[grp] = list(unique_grp_fams[grp])
+    logger.warning(f"Writing out {args.group_by} specific CAZy families to {outpath_dic}")
+    with open(outpath_dic, "w") as fh:
+        json.dump(unique_grp_fams, fh)
 
     return fam_freq_df, fam_freq_df_ggs

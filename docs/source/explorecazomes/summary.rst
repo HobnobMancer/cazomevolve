@@ -77,6 +77,7 @@ Each of the taxonomic ranks included in the CSV file of taxonomic data must also
 For example, if genus and species inforamtion was listed in the CSV of taxonomy data:
 
 .. code-block::
+  
     cazomevolve explore_cazomes\
     data/cazomes/gfp_file.txt \
     data/taxs/tax.csv \

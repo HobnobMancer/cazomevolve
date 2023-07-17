@@ -46,22 +46,11 @@ pytest -v
 
 
 import pytest
-import subprocess
 import pandas as pd
 
 from argparse import Namespace
 
-from saintBioutils.utilities import logger, file_io
-
-from cazomevolve.scripts import (
-    build_cazy_db,
-    cazomevolve_script,
-    download_acc_genomes,
-    get_fam_seqs,
-    run_fam_blast,
-    run_fam_diamond
-)
-from cazomevolve.utilities.parsers import parse_cmd
+from saintBioutils.utilities import logger
 
 from cazomevolve.taxs import add_taxs
 

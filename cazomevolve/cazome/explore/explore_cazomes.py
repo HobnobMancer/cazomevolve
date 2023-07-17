@@ -128,7 +128,7 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
         make_output_directory(args.output_dir, args.force, args.nodelete)
 
     fgp_df = load_data(args)
-    
+
 
 def load_data(args):
     """Load in all data required for the analysis
@@ -166,3 +166,75 @@ def load_data(args):
     )
 
     return fgp_df
+
+
+def compare_cazome_sizes(fgp_df, args):
+    """Explore and compare the sizes of CAZomes by calculating:
+    * The number of CAZymes per genome
+    * The mean number of CAZymes per genome per genus
+    * The proportion of the proteome represented by the CAZome
+    * The mean proportion of the proteome represented by the CAZome
+
+    The number of CAZymes is the number of unique protein IDs
+
+    :param fgp_df: pandas df of cazy family, genome, protein id, and one col per tax rank
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "cazome_size"
+    make_output_directory(outdir, force=True, nodelete=True)
+    outpath = outdir / "cazome_sizes.csv"
+
+    logger.warning(f"Examining {len(set(fgp_df['Genome']))} genomes")
+
+    # count number of CAZymes
+    cazome_sizes_dict, cazome_sizes_df = count_items_in_cazome(
+        fgp_df,
+        'Protein',
+        args.group_by,
+        round_by=args.round_by,
+    )
+
+    # Count number of CAZy families
+    cazome_fam_dict, cazome_fams_df = count_items_in_cazome(
+        fgp_df,
+        'Family',
+        args.group_by,
+        round_by=args.round_by,
+    )
+
+    # Calculate CAZyme to CAZy family ratio
+    cazome_ratio_dict, cazome_ratio_df = count_cazyme_fam_ratio(
+        fgp_df,
+        args.group_by,
+        round_by=args.round_by,
+    )
+
+    # Calculate proteome sizes
+    if args.proteome_dir is not None:
+        proteome_dict = get_proteome_sizes(args.proteome_dir, fgp_df, args.group_by)
+        total_proteins = 0
+        for genus in proteome_dict:
+            for genome in proteome_dict[genus]:
+                total_proteins += proteome_dict[genus][genome]['numOfProteins']
+        logger.warning(f"Total number of proteins across all genomes: {total_proteins}")
+
+        # calculate precentage of the proteome that is made up of the cazome
+        proteome_perc_df = calc_proteome_representation(
+            proteome_dict,
+            cazome_sizes_dict,
+            args.group_by,
+            round_by=args.round_by,
+        )
+
+        # combine into a single df
+        all_df = pd.concat([proteome_perc_df, cazome_sizes_df, cazome_fams_df, cazome_ratio_df], axis=1, join='inner')
+
+    else:
+        all_df = pd.concat([cazome_sizes_df, cazome_fams_df, cazome_ratio_df], axis=1, join='inner')
+
+    logger.warning(
+        f"Writing out dataframe summarising CAZome sizes (with means and SD per {args.group_by})\n"
+        f"to: {outpath}"
+    )
+    all_df.to_csv(outpath)

@@ -93,7 +93,6 @@ setuptools.setup(
         "adjustText",
         "biopython",
         "cazy_webscraper",
-        "jupyter",
         "matplotlib",
         "ncbi-genome-download",
         "numpy",

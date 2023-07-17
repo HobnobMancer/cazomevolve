@@ -120,8 +120,8 @@ def remove_redunant_prots(df, fam, candidates={}, structured_prots={}, character
             # retrieve the row where the qseqid is now the subject, and the subject id is now the query seq
             # They are already in the redundancy df, therefore pident is 100 and qcov is 1
             sseqid_rows = redundance_df.loc[(
-                (redundance_df['qseqid'] ==  sub_seqid) &
-                (redundance_df['sseqid'] ==  qseqid))
+                (redundance_df['qseqid'] == sub_seqid) &
+                (redundance_df['sseqid'] == qseqid))
             ]
 
             if len(sseqid_rows) > 0:

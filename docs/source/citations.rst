@@ -61,49 +61,8 @@ dbCAN version 4:
 
 ``cazomevolve`` uses several packages to visualise and interrogate the dataset.
 
-   @article{Waskom2021,
-      doi={10.21105/joss.03021},
-      url={https://doi.org/10.21105/joss.03021},
-      year={2021},
-      publisher={The Open Journal},
-      volume={6},
-      number={60},
-      pages={3021},
-      author={Michael L. Waskom},
-      title={seaborn: statistical data visualization},
-      journal={Journal of Open Source Software}
-   }
+   Waskom, M. L., (2021). seaborn: statistical data visualization. Journal of Open Source Software, 6(60), 3021, https://doi.org/10.21105/joss.03021
 
-   @article{Virtanen2020,
-      author ={Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and
-                  Haberland, Matt and Reddy, Tyler and Cournapeau, David and
-                  Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and
-                  Bright, Jonathan and {van der Walt}, St{\'e}fan J. and
-                  Brett, Matthew and Wilson, Joshua and Millman, K. Jarrod and
-                  Mayorov, Nikolay and Nelson, Andrew R. J. and Jones, Eric and
-                  Kern, Robert and Larson, Eric and Carey, C J and
-                  Polat, {\.I}lhan and Feng, Yu and Moore, Eric W. and
-                  {VanderPlas}, Jake and Laxalde, Denis and Perktold, Josef and
-                  Cimrman, Robert and Henriksen, Ian and Quintero, E. A. and
-                  Harris, Charles R. and Archibald, Anne M. and
-                  Ribeiro, Ant{\^o}nio H. and Pedregosa, Fabian and
-                  {van Mulbregt}, Paul and {SciPy 1.0 Contributors}},
-      title  ={{{SciPy} 1.0: Fundamental Algorithms for Scientific
-                  Computing in Python}},
-      journal={Nature Methods},
-      year   ={2020},
-      volume ={17},
-      pages  ={261--272},
-   }
+   Virtanen, P., Gommers, R., Oliphant, T.E. et al. SciPy 1.0: fundamental algorithms for scientific computing in Python. Nat Methods 17, 261–272 (2020). https://doi.org/10.1038/s41592-019-0686-2
 
-   @article{scikit-learn,
-      title={Scikit-learn: Machine Learning in {P}ython},
-      author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-               and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-               and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-               Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
-      journal={Journal of Machine Learning Research},
-      volume={12},
-      pages={2825--2830},
-      year={2011}
-   }
+   Fabian Pedregosa, Gaël Varoquaux, Alexandre Gramfort, Vincent Michel, Bertrand Thirion, Olivier Grisel, Mathieu Blondel, Peter Prettenhofer, Ron Weiss, Vincent Dubourg, Jake Vanderplas, Alexandre Passos, David Cournapeau, Matthieu Brucher, Matthieu Perrot, and Édouard Duchesnay. 2011. Scikit-learn: Machine Learning in Python. J. Mach. Learn. Res. 12, null (2/1/2011), 2825–2830.

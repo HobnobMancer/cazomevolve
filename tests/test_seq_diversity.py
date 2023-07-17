@@ -46,12 +46,18 @@ pytest -v
 
 
 import pytest
+import pandas as pd
 
 from argparse import Namespace
 from bs4 import BeautifulSoup
 from requests.exceptions import MissingSchema
 
 from cazomevolve.seq_diversity.explore import cazy, parse, plot
+
+
+#
+# CAZY
+#
 
 
 def test_get_proteins(test_input_dir):
@@ -93,3 +99,55 @@ def test_browser_decorator():
     args = {"args": Namespace(timeout=2)}
     result = cazy.get_page('www.caz!!!!!!!!y.org', max_tries=1)
     assert True == (result[0] is None) and (type(result[1]) is MissingSchema)
+
+
+#
+# PARSE
+#
+
+
+def test_load_data(test_input_dir, monkeypatch):
+    _path = test_input_dir / "seq_diversity/diamond_output"
+    
+    parse.load_data(_path, "PL4")
+
+
+def test_remove_redundant(test_input_dir):
+    _path = test_input_dir / "seq_diversity/diamond_output"
+
+    df = parse.load_data(_path, "PL4")
+    parse.remove_redunant_prots(df, 'PL4', structured_prots={'PL4': 'QHQ22566.1'}, candidates={'PL4': 'QHQ22566.1'}, characterised_prots={'PL4': 'BAC69819.1'})
+
+#
+# PLOT
+#
+
+
+def test_clustermap(test_input_dir):
+    _path = test_input_dir / "seq_diversity/parsed_data.csv"
+    df = pd.read_csv(_path, index_col="Unnamed: 0")
+
+    fig = plot.plot_clustermap(
+        df=df,
+        fam='PL4',
+        varaible='BSR',
+        title='Test',
+        annotate=True,
+        char_only=True,
+        structured_prots={'PL4': ['QHQ22566.1']},
+        candidates={'PL4': ['QHQ22566.1', 'ACD60718.1', 'BAE63118.1', 'AXQ10473.1', 'ATS40189.1', 'CAG7898885.1', 'UWI46514.1']},
+        characterised_prots={'PL4': ['BAC69819.1']},
+    )
+
+    plot.plot_heatmap_of_clustermap(
+        fig=fig,
+        df=df,
+        fam='PL4',
+        varaible='BSR',
+        title='Test',
+        annotate=True,
+        char_only=True,
+        structured_prots={'PL4': ['QHQ22566.1']},
+        candidates={'PL4': ['QHQ22566.1', 'ACD60718.1', 'BAE63118.1', 'AXQ10473.1', 'ATS40189.1', 'CAG7898885.1', 'UWI46514.1']},
+        characterised_prots={'PL4': ['BAC69819.1']},
+    )

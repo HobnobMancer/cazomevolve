@@ -131,6 +131,10 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     compare_cazome_sizes(fgp_df, args)
 
+    compare_cazy_classes(fgp_df, args)
+
+    fam_freq_df, fam_freq_df_ggs = compare_cazy_families(fgp_df, args)
+
 
 def load_data(args):
     """Load in all data required for the analysis
@@ -262,5 +266,57 @@ def compare_cazy_classes(fgp_df, args):
         round_by=args.round_by,
     )
 
+    logger.warning(f"Writing out dataframe of CAZy class frequencies to {outpath}")
     class_df.to_csv(outpath)
 
+
+def compare_cazy_families(fgp_df, args):
+    """Compare the composition of the Families classes.
+    
+    Compare the number of CAZymes (i.e. unique protein IDs) per CAZy families
+    
+    :param fgp_df: pandas df of cazy family, genome, protein id, and one col per tax rank
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "cazy_families"
+    make_output_directory(outdir, force=True, nodelete=True)
+    outpath = outdir / "cazy_family_frequencies.csv"
+
+    fam_freq_df = build_fam_freq_df(
+        fgp_df, [args.group_by]
+    )
+
+    logger.warning(f"Writing out dataframe of CAZy family frequencies per genome to {outpath}")
+    fam_freq_df.to_csv(outpath)
+
+    # build a clustermap
+
+    # index the taxonomy data and genome (ggs=genome_genus_species)
+    fam_freq_df_ggs = copy(fam_freq_df)  # so does not alter fam_freq_df
+    fam_freq_df_ggs = fam_freq_df_ggs.set_index(['Genome','Genus','Species'])
+    # define a colour scheme to colour code rows by genus
+    fam_freq_df_ggs['Genus'] = list(fam_freq_df['Genus'])  # add column to use for colour scheme, is removed
+    fam_freq_genus_row_colours, fam_g_lut = build_row_colours(fam_freq_df_ggs, 'Genus', 'Set2')
+
+    for file_format in args.formats:
+        outpath_cm = outdir / f"cazy_family_clustermap.{args.file_format}"
+        logger.warning(
+            f"Writing out clustermap of CAZy family frequencies in {file_format} format to:\n"
+            f"{outpath_cm}"
+        )
+        build_family_clustermap(
+            fam_freq_df_ggs,
+            row_colours=fam_freq_genus_row_colours,
+            fig_size=((len(fam_freq_df_ggs).columns)*0.4, len(fam_freq_df_ggs)*0.4),
+            file_path=outpath_cm,
+            file_format=format,
+            lut=fam_g_lut,
+            legend_title=args.group_by,
+            dendrogram_ratio=(0.2, 0.05),
+            title_fontsize=28,
+            legend_fontsize=24,
+            cbar_pos=(0, 0.95, 0.05, 0.05),
+        )
+
+    return fam_freq_df, fam_freq_df_ggs

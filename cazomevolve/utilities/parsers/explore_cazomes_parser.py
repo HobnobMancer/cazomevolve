@@ -40,7 +40,7 @@
 """Build args parser for get_cazy_cazymes.py"""
 
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, _SubParsersAction, Action
 from pathlib import Path
 from typing import List, Optional
 

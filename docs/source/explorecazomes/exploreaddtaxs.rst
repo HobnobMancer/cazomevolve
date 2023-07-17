@@ -4,18 +4,6 @@ Add taxonomy data
 To provide taxonomic context during the exploratory analysis, taxonomic information can be added to the 
 data structures created by ``cazomevolve``. This pages covers the functions that handle these operations.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Other opertaions in the Explore module:
-
-   exploredata
-   explorecazomesizes
-   exploreclasses
-   explorefamilies
-   explorecorecazome
-   explorecooccurring
-   explorepca
-
 Parse GTDB data
 ^^^^^^^^^^^^^^^
 

@@ -4,18 +4,6 @@ Parse data
 Prior to the exploratory analysis of CAZomes, all required data must be loaded into the memeory and 
 augmented in to data structures that can be handled by ``cazomevolve``.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Other opertaions in the Explore module:
-
-   exploreaddtaxs
-   explorecazomesizes
-   exploreclasses
-   explorefamilies
-   explorecorecazome
-   explorecooccurring
-   explorepca
-
 The following functions are for loading and parsing data aurgment by ``cazomevolve``:
 
 Import from ``cazomevolve.cazome.explore.parse_data``.

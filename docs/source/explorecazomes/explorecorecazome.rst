@@ -6,18 +6,6 @@ The core CAZome is defined as the CAZy families that are present in all genomes 
 Any set of subset of genomes can be screened to identify the core CAZome. For example, the core CAZome for 
 all genomes in the data set can be found, as well as per genus if the data set contains multiple genera.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Other opertaions in the Explore module:
-
-   exploredata
-   exploreaddtaxs
-   explorecazomesizes
-   exploreclasses
-   explorefamilies
-   explorecooccurring
-   explorepca
-
 Identify the core CAZome
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

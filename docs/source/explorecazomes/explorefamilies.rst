@@ -7,18 +7,6 @@ by using heirarchical clustering to generate clustermaps. Annotate these cluster
 and phenotypic information to map CAZome composition to taxonomy and phenotypes, and identify trends and associations 
 between these data.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Other opertaions in the Explore module:
-
-   exploredata
-   exploreaddtaxs
-   explorecazomesizes
-   exploreclasses
-   explorecorecazome
-   explorecooccurring
-   explorepca
-
 Build a CAZy family dataframe
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

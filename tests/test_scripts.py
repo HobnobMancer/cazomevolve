@@ -46,12 +46,20 @@ pytest -v
 
 
 import pytest
+import subprocess
 
 from argparse import Namespace
 
-from saintBioutils.utilities import logger
+from saintBioutils.utilities import logger, file_io
 
-from cazomevolve.scripts import cazomevolve_script, get_fam_seqs
+from cazomevolve.scripts import (
+    build_cazy_db,
+    cazomevolve_script,
+    download_acc_genomes,
+    get_fam_seqs,
+    run_fam_blast,
+    run_fam_diamond
+)
 from cazomevolve.utilities.parsers import parse_cmd
 
 
@@ -102,3 +110,85 @@ def test_main(monkeypatch):
     monkeypatch.setattr(get_fam_seqs, "main", mock_run)
 
     cazomevolve_script.main(argv=['get_fam_seqs', 'email', 'cazy', 'families', 'out'])
+
+
+def test_build_cazy_df(monkeypatch):
+    """Test the main entry point for build_cazy_db.py"""    
+    def mock_run(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(subprocess, "Popen", mock_run)
+
+    args = Namespace(email='email', db='db')
+
+    build_cazy_db.main(args)
+
+
+def test_download_acc_genomes(monkeypatch):
+    """Test the main entry point for download_acc_genomes.py"""    
+    def mock_run_1(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(subprocess, "call", mock_run_1)
+
+    args = Namespace(
+        accessions='acc',
+        outdir='outdir',
+        file_opts='fasta',
+        database='database',
+        assembly_levels='all',
+    )
+
+    download_acc_genomes.main(args)
+
+
+def test_get_fam_seqs(monkeypatch):
+    """Test the main entry point for get_fam_seqs.py"""    
+    def mock_run_1(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(subprocess, "run", mock_run_1)
+    monkeypatch.setattr(get_fam_seqs, "make_output_directory", mock_run_1)
+    monkeypatch.setattr(file_io, "make_output_directory", mock_run_1)
+
+    args = Namespace(
+        cazy='cazy',
+        outdir='outdir',
+        email='email',
+        families='GH1,GH2',
+        force=False,
+        nodelete=False,
+    )
+
+    get_fam_seqs.main(args)
+
+
+def test_run_fam_blast(monkeypatch):
+    """Test the main entry point for run_fam_blast.py"""    
+    def mock_run_1(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(subprocess, "call", mock_run_1)
+
+    args = Namespace(
+        fasta='fasta',
+        outfile='outfile',
+    )
+
+    run_fam_blast.main(args)
+
+
+def test_run_fam_diamond(monkeypatch):
+    """Test the main entry point for run_fam_diamond.py"""    
+    def mock_run_1(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(subprocess, "call", mock_run_1)
+
+    args = Namespace(
+        fasta='fasta',
+        diamond_db='diamond_db',
+        outfile='outfile',
+    )
+
+    run_fam_diamond.main(args)

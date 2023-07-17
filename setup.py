@@ -91,6 +91,7 @@ setuptools.setup(
     ],
     install_requires=[
         "adjustText",
+        "bs4",
         "biopython",
         "cazy_webscraper",
         "matplotlib",

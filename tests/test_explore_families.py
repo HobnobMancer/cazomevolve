@@ -79,5 +79,7 @@ def test_build_family_clustermap_multi_legend(built_fam_freq_df):
         row_colours=[row_colours],
         fig_size=(10,10),
         luts=[lut],
+        legend_titles=['test1', 'test2'],
+        bbox_to_anchors=[(0,0), (1,1)],
     )
 

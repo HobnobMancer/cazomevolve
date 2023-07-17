@@ -65,6 +65,7 @@ Required arguments
 3. Directory to write out all outputs
 
 Each of the taxonomic ranks included in the CSV file of taxonomic data must also be specified, by adding each of the relevant flags to command:
+
 * ``--kingdom``
 * ``--phylum``
 * ``--tax_class``

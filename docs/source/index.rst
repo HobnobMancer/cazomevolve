@@ -78,9 +78,9 @@ Use ``cazomevolve`` to explore:
   * Identify **lineage or group specific families** - e.g. genus or species specific families
   * Identify **core CAZomes** - families that appear in all genomes
   * Cluster genomes by CAZy family frequencies using **hierarchical clustering:**
-    * Generate annotated clustermaps of CAZy family frequencies
-    * Build a dendogram using distances calculated from the CAZome composition
-    * Construct tanglegrams to compare CAZy family dendrogram to a ANI-dendrogram or phylogenetic tree
+  * Generate annotated clustermaps of CAZy family frequencies
+  * Build a dendogram using distances calculated from the CAZome composition
+  * Construct tanglegrams to compare CAZy family dendrogram to a ANI-dendrogram or phylogenetic tree
 
 **Always co-occurring families:**
 

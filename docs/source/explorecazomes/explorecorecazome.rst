@@ -8,7 +8,7 @@ all genomes in the data set can be found, as well as per genus if the data set c
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploredata
    exploreaddtaxs

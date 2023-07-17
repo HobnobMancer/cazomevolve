@@ -6,7 +6,7 @@ augmented in to data structures that can be handled by ``cazomevolve``.
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploreaddtaxs
    explorecazomesizes

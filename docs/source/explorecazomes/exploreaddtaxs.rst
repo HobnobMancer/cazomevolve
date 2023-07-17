@@ -6,7 +6,7 @@ data structures created by ``cazomevolve``. This pages covers the functions that
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploredata
    explorecazomesizes

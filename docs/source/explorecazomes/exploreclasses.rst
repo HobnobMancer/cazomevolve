@@ -8,7 +8,7 @@ CAZyme can be assinged to multiple CAZy classes.
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploredata
    exploreaddtaxs

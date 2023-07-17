@@ -8,7 +8,7 @@ Calculate the size of the CAZome in each genome, as well as:
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploredata
    exploreaddtaxs

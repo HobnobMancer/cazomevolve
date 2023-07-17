@@ -6,7 +6,7 @@ co-occurring families may not be present in every genome.
 
 .. toctree::
    :maxdepth: 2
-   :caption: The Explore Module:
+   :caption: Other opertaions in the Explore module:
 
    exploredata
    exploreaddtaxs

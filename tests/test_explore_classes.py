@@ -53,4 +53,5 @@ from cazomevolve.cazome.explore import cazy_classes
 
 
 def test_cazy_classes(fam_freq_df_with_tax):
-    assert len(cazy_classes.calculate_class_sizes(fam_freq_df_with_tax, 'Genus', 2)) == 1
+    df, var = cazy_classes.calculate_class_sizes(fam_freq_df_with_tax, 'Genus', 2)
+    assert len(df) == 1

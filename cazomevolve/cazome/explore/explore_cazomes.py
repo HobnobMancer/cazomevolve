@@ -136,7 +136,7 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     fam_freq_df, fam_freq_df_ggs, all_families = compare_cazy_families(fgp_df, args)
 
-    compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, args)
+    compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, all_families, args)
 
     find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families, args)
 

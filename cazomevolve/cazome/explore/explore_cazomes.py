@@ -134,7 +134,11 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
 
     compare_cazy_classes(fgp_df, args)
 
-    fam_freq_df, fam_freq_df_ggs = compare_cazy_families(fgp_df, args)
+    fam_freq_df, fam_freq_df_ggs, all_families = compare_cazy_families(fgp_df, args)
+
+    compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, args)
+
+    find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families, args)
 
 
 def load_data(args):
@@ -346,4 +350,75 @@ def compare_cazy_families(fgp_df, args):
     with open(outpath_dic, "w") as fh:
         json.dump(unique_grp_fams, fh)
 
-    return fam_freq_df, fam_freq_df_ggs
+    return fam_freq_df, fam_freq_df_ggs, all_families
+
+
+def compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, all_families, args):
+    """Comprae core CAZome across the entire data set and per group
+    
+    :param fam_freq_df: dataframe of CAZy fam freqs, genome per row, fam per column, and tax columns
+    :param fam_Freq_df_ggs: same as fam_freq_df by tax data and genome are the row index
+    :param all_families: list of all CAZy families in the genomes
+    :param args: CLI args parser
+    """
+    logger = logging.getLogger(__name__)
+    outdir = args.output_dir / "core_cazome"
+    make_output_directory(outdir, force=True, nodelete=True)
+    outpath = outdir / "core_cazome.txt"
+
+    index = ['Genome']
+    if args.kingdom:
+        index.append('Kingdom')
+    if args.phylum:
+        index.append('Phylum')
+    if args.tax_class:
+        index.append('Class')
+    if args.tax_order:
+        index.append('Order')
+    if args.tax_family_:
+        index.append('Family')
+    if args.genus:
+        index.append('Genus')
+    if args.species:
+        index.append('Species')
+
+    try:
+        fam_freq_df_ggs = fam_freq_df_ggs.set_index(index)
+    except KeyError:
+        pass
+    
+    core_cazome = identify_core_cazome(fam_freq_df_ggs)
+    with open(outpath, "w") as fh:
+        fh.write(
+            f"Total families across all genomes: {len(all_families)}\nThe core CAZyme families are:"
+        )
+        for fam in core_cazome:
+            fh.write(f"{fam}\n")
+    
+    logger.warning(f"The core CAZome: {core_cazome}")
+    logger.warning(f"The core CAZome was written to {outpath}")
+
+    # get fam freqs by group
+    core_cazome_df = fam_freq_df_ggs[core_cazome]
+    core_cazome_df_grped = add_tax_column_from_row_index(core_cazome_df, args.group_by, 1)
+    core_cazome_fggf_df, core_cazome_mean_freq_df = build_fam_mean_freq_df(
+        core_cazome_df_grped,
+        args.group_by,
+        round_by=args.round_by,
+    )
+    outpath_df = outdir / "core_cazome_freqs.csv"
+    logger.warning(
+        "Writing the mean (and SD) frequency per family in the core "
+        f"CAZome per {args.group_by} to {outpath_df}"
+    )
+    core_cazome_mean_freq_df.to_csv(outpath_df)
+
+
+def find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families, args):
+    """Comprae core CAZome across the entire data set and per group
+    
+    :param fam_freq_df: dataframe of CAZy fam freqs, genome per row, fam per column, and tax columns
+    :param fam_Freq_df_ggs: same as fam_freq_df by tax data and genome are the row index
+    :param all_families: list of all CAZy families in the genomes
+    :param args: CLI args parser
+    """

@@ -1,6 +1,6 @@
-===========================
-Exploring CAZomes - Summary
-===========================
+=================
+Exploring CAZomes
+=================
 
 ``cazomevolve`` provides a standardised and reproducible method for exploring the CAZomes of a custom 
 data set of genomic sequences. This includes calculating:

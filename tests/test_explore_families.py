@@ -3,12 +3,13 @@
 # (c) University of St Andrews 2022
 # (c) University of Strathclyde 2022
 # (c) James Hutton Institute 2022
+#
 # Author:
 # Emma E. M. Hobbs
-
+#
 # Contact
 # eemh1@st-andrews.ac.uk
-
+#
 # Emma E. M. Hobbs,
 # Biomolecular Sciences Building,
 # University of St Andrews,
@@ -17,7 +18,7 @@
 # KY16 9ST
 # Scotland,
 # UK
-
+#
 # The MIT License
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,10 +27,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,57 +38,46 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Configuration file for pytest files.
-Contains fixtures used by multiple test files.
+"""Tests scazome.explore.cazome_sizes.py
+
+These test are intened to be run from the root of the repository using:
+pytest -v
 """
 
 
 import pytest
-import pandas as pd
 
-from pathlib import Path
+from argparse import Namespace
 
-
-@pytest.fixture
-def test_dir():
-    return Path("tests/")
+from cazomevolve.cazome.explore import cazy_families
 
 
-@pytest.fixture
-def test_input_dir(test_dir):
-    dir_path = test_dir / "test_inputs"
-    return dir_path
+def test_build_fam_freq_df(fam_freq_df_with_tax):
+    assert len(cazy_families.build_fam_freq_df(fam_freq_df_with_tax, ['Genus', 'Species'])) == 1
 
 
-@pytest.fixture
-def test_output_dir(test_dir):
-    dir_path = test_dir / "test_outputs"
-    return dir_path
+def test_build_fam_fbuild_row_coloursreq_df(built_fam_freq_df):
+    cazy_families.build_row_colours(built_fam_freq_df, 'Genus', 'Set1')
 
 
-@pytest.fixture
-def fam_freq_df(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/fam_freq_df.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
+def test_build_clustermap(built_fam_freq_df):
+    row_colours, lut = cazy_families.build_row_colours(built_fam_freq_df, 'Genus', 'Set1')
+    built_fam_freq_df = built_fam_freq_df.set_index(['Genome', 'Species'])
+    cazy_families.build_family_clustermap(
+        built_fam_freq_df,
+        row_colours=row_colours,
+        fig_size=(10,10),
+        lut=lut,
+    )
 
 
-@pytest.fixture
-def fam_freq_df_with_tax(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/fam_freq_df_with_taxs.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
+def test_build_family_clustermap_multi_legend(built_fam_freq_df):
+    row_colours, lut = cazy_families.build_row_colours(built_fam_freq_df, 'Genus', 'Set1')
+    built_fam_freq_df = built_fam_freq_df.set_index(['Genome', 'Species'])
+    cazy_families.build_family_clustermap(
+        built_fam_freq_df,
+        row_colours=row_colours,
+        fig_size=(10,10),
+        lut=lut,
+    )
 
-
-@pytest.fixture
-def tax_df(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/parsed_taxs.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
-
-
-@pytest.fixture
-def built_fam_freq_df(test_input_dir):
-    _path = test_input_dir / "cazome_explore/build_fam_freq_df.csv"
-    df = pd.read_csv(_path, index_col="Unnamed: 0")
-    return df

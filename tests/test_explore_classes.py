@@ -49,27 +49,8 @@ import pytest
 
 from argparse import Namespace
 
-from cazomevolve.cazome.explore import cazome_sizes
+from cazomevolve.cazome.explore import cazy_classes
 
 
-def test_count_items(fam_freq_df_with_tax):
-    size_dict, var = cazome_sizes.count_items_in_cazome(fam_freq_df_with_tax, 'Protein', 'Genus', round_by=2)
-    assert len(size_dict) == 1
-
-
-def test_get_proteome_sizes(test_input_dir, fam_freq_df_with_tax):
-    _path = test_input_dir / "cazome_explore"
-
-    assert len(cazome_sizes.get_proteome_sizes(_path, fam_freq_df_with_tax, 'Genus')) == 1
-
-
-def test_calc_proteome_represent(fam_freq_df_with_tax, test_input_dir):
-    _path = test_input_dir / "cazome_explore"
-    size_dict, var = cazome_sizes.count_items_in_cazome(fam_freq_df_with_tax, 'Protein', 'Genus', round_by=2)
-    prot_dict = cazome_sizes.get_proteome_sizes(_path, fam_freq_df_with_tax, 'Genus')
-
-    cazome_sizes.calc_proteome_representation(prot_dict, size_dict, 'Genus', 2)
-
-
-def test_fam_ratio(fam_freq_df_with_tax):
-    cazome_sizes.count_cazyme_fam_ratio(fam_freq_df_with_tax, 'Genus', 2)
+def test_cazy_classes(fam_freq_df_with_tax):
+    assert len(cazy_classes.calculate_class_sizes(fam_freq_df_with_tax, 'Genus', 2)) == 1

@@ -140,7 +140,7 @@ def build_family_clustermap(
     file_format='png',
     font_scale=1,
     dpi=300,
-    dendrogram_ratio=None,
+    dendrogram_ratio=0.2,
     lut=None,
     legend_title='',
     title_fontsize='2',
@@ -205,6 +205,7 @@ def build_family_clustermap(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
     return fam_clustermap
@@ -314,6 +315,7 @@ def build_family_clustermap_multi_legend(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
     return fam_clustermap

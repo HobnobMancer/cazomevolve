@@ -4,6 +4,19 @@ Identify CAZy families that always co-occurr together
 Identify CAZy families that always appear together in a set of genomes, although the group of always 
 co-occurring families may not be present in every genome.
 
+.. toctree::
+   :maxdepth: 2
+   :caption: The Explore Module:
+
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
+
 Correlation matrix
 ^^^^^^^^^^^^^^^^^^
 

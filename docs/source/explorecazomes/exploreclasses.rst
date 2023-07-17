@@ -6,6 +6,19 @@ The CAZy class frequency is defined as the number of unique protein accessions a
 Many CAZymes are multi-domain proteins. Owing to CAZy and dbCAN annotating CAZymes in a domain-wise manner, a single 
 CAZyme can be assinged to multiple CAZy classes.
 
+.. toctree::
+   :maxdepth: 2
+   :caption: The Explore Module:
+
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
+
 Import from ``cazomevolve.cazome.explore.cazy_classes``.
 
 .. code-block:: python

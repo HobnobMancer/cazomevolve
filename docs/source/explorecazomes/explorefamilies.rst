@@ -1,6 +1,25 @@
 Explore CAZy families
 ---------------------
 
+Calculate, explore and compare the number of CAZymes (i.e. the number of unique protein IDs) per CAZy family 
+in each genome in the data set. Represent and explore differences between the CAZyme family frequencies 
+by using heirarchical clustering to generate clustermaps. Annotate these clustermaps with additional taxonomic 
+and phenotypic information to map CAZome composition to taxonomy and phenotypes, and identify trends and associations 
+between these data.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: The Explore Module:
+
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
+
 Build a CAZy family dataframe
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

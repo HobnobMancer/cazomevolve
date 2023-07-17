@@ -7,6 +7,19 @@ a low dimensional data set, while retaining as much information as possible from
 Dimensional reduction is achieved by defining directions in the data long which variation is maximal.
 These directions are called principal components or PCs.
 
+.. toctree::
+   :maxdepth: 2
+   :caption: The Explore Module:
+
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
+
 Run PCA
 ^^^^^^^
 

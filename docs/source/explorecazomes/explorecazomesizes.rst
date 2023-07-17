@@ -6,6 +6,19 @@ Calculate the size of the CAZome in each genome, as well as:
 * Proportion of the proteome encapulsated by the CAZome
 * The CAZy family to CAZyme ratio
 
+.. toctree::
+   :maxdepth: 2
+   :caption: The Explore Module:
+
+   exploredata
+   exploreaddtaxs
+   explorecazomesizes
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
+
 Import from ``cazomevolve.cazome.explore.cazome_sizes``.
 
 .. code-block:: python

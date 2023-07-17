@@ -46,11 +46,11 @@ exploratory analysis of CAZomes) is listed immediately below:
    exploredata
    exploreaddtaxs
    explorecazomesizes
-   explorecazomes/exploreclasses
-   explorecazomes/explorefamilies
-   explorecazomes/explorecorecazome
-   explorecazomes/explorecooccurring
-   explorecazomes/explorepca
+   exploreclasses
+   explorefamilies
+   explorecorecazome
+   explorecooccurring
+   explorepca
 
 --------------------------
 explore_cazomes subcommand

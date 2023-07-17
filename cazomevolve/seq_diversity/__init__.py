@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# (c) University of St Andrews 2022
-# (c) University of Strathclyde 2022
-# (c) James Hutton Institute 2022
+# (c) University of St Andrews 2020-2021
+# (c) University of Strathclyde 2020-2021
 # Author:
 # Emma E. M. Hobbs
 
@@ -37,50 +36,4 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Configuration file for pytest files.
-Contains fixtures used by multiple test files.
-"""
-
-
-import pytest
-import pandas as pd
-
-from pathlib import Path
-
-
-@pytest.fixture
-def test_dir():
-    return Path("tests/")
-
-
-@pytest.fixture
-def test_input_dir(test_dir):
-    dir_path = test_dir / "test_inputs"
-    return dir_path
-
-
-@pytest.fixture
-def test_output_dir(test_dir):
-    dir_path = test_dir / "test_outputs"
-    return dir_path
-
-
-@pytest.fixture
-def fam_freq_df(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/fam_freq_df.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
-
-
-@pytest.fixture
-def fam_freq_df_with_tax(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/fam_freq_df_with_taxs.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
-
-
-@pytest.fixture
-def tax_df(test_input_dir):
-    df_path = test_input_dir / "cazome_explore/parsed_taxs.csv"
-    df = pd.read_csv(df_path, index_col="Unnamed: 0")
-    return df
+"""Functions to explore sequence diversity in BLAST or DIAMOND output"""

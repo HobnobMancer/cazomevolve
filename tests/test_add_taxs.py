@@ -47,6 +47,7 @@ pytest -v
 
 import pytest
 import subprocess
+import pandas as pd
 
 from argparse import Namespace
 
@@ -81,7 +82,19 @@ def argsdict(test_input_dir):
         tax_family=True,
         genus=True,
         species=True,
+        gtdb=None,
     )}
+
+
+@pytest.fixture
+def col_names():
+    return ['Genome', 'Kingdom', 'Genus', 'Species']
+
+
+@pytest.fixture
+def gtdb_path(test_input_dir):
+    _path = test_input_dir / "gtdb/gtdb_data.tsv"
+    return _path
 
 
 def test_no_files(monkeypatch):
@@ -152,3 +165,29 @@ def test_add_tax_main(argsdict, monkeypatch):
     monkeypatch.setattr(add_taxs, "closing_message", mock_return_none)
 
     add_taxs.main(args=argsdict['args'])
+
+
+def test_load_gtdb_none(argsdict, col_names):
+    """args.gtdb = None"""
+    data = {'Genome': [], 'Kingdom': [], 'Genus': [], 'Species': []}
+    df = pd.DataFrame(data)
+    new_df = add_taxs.load_gtdb_df(col_names, argsdict['args'])
+    assert list(new_df.columns) == list(df.columns)
+    assert len(new_df) == len(df)
+
+
+def test_load_gtdb(argsdict, col_names, gtdb_path):
+    """args.gtdb = None"""
+    data = {'Genome': [0]*249, 'Kingdom': [0]*249, 'Genus': [0]*249, 'Species': [0]*249}
+    df = pd.DataFrame(data)
+
+    argsdict['args'].gtdb = gtdb_path
+    argsdict['args'].phylum = False
+    argsdict['args'].tax_order = False
+    argsdict['args'].tax_class = False
+    argsdict['args'].tax_family = False
+
+    new_df = add_taxs.load_gtdb_df(col_names, argsdict['args'])
+    print(new_df)
+    assert list(new_df.columns) == list(df.columns)
+    assert len(new_df) == len(df)

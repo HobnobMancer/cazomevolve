@@ -636,6 +636,16 @@ Each of the taxonomic ranks included in the CSV file of taxonomic data must also
 * `--genus`
 * `--species`
 
+For example, if genus and species inforamtion was listed in the CSV of taxonomy data:
+```bash
+cazomevolve explore_cazomes\
+  data/cazomes/gfp_file.txt \
+  data/taxs/tax.csv \
+  results/ \
+  --genus \
+  --species
+```
+
 ### Optional
 
 * `--round_by` - ROUND_BY - Number of decimal places to round means and SDs to (default: 2)

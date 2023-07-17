@@ -208,11 +208,6 @@ Documentation
    citations
    contributing
    license
-   
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 ====================
 Citing and citations

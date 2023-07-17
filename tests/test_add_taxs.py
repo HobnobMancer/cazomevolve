@@ -188,6 +188,20 @@ def test_load_gtdb(argsdict, col_names, gtdb_path):
     argsdict['args'].tax_family = False
 
     new_df = add_taxs.load_gtdb_df(col_names, argsdict['args'])
-    print(new_df)
+    
     assert list(new_df.columns) == list(df.columns)
     assert len(new_df) == len(df)
+
+
+def test_add_taxs(argsdict, col_names, test_input_dir):
+    _path = test_input_dir / "gtdb/parsed_gtdb.csv"
+    df = pd.read_csv(_path, index_col="Unnamed: 0")
+
+    argsdict['args'].phylum = False
+    argsdict['args'].tax_order = False
+    argsdict['args'].tax_class = False
+    argsdict['args'].tax_family = False
+
+    out1, out2 = add_taxs.add_gtdb_taxs(df, col_names, argsdict['args'])
+    assert out1 == {}
+    assert out2 == {'GCA_003382565.3'}

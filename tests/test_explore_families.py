@@ -74,10 +74,10 @@ def test_build_clustermap(built_fam_freq_df):
 def test_build_family_clustermap_multi_legend(built_fam_freq_df):
     row_colours, lut = cazy_families.build_row_colours(built_fam_freq_df, 'Genus', 'Set1')
     built_fam_freq_df = built_fam_freq_df.set_index(['Genome', 'Species'])
-    cazy_families.build_family_clustermap(
+    cazy_families.build_family_clustermap_multi_legend(
         built_fam_freq_df,
-        row_colours=row_colours,
+        row_colours=[row_colours],
         fig_size=(10,10),
-        lut=lut,
+        luts=[lut],
     )
 

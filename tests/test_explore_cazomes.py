@@ -201,3 +201,22 @@ def test_compare_cazome_sizes_proteome(monkeypatch, fam_freq_df_with_tax, test_o
 
     assert explore_cazomes.compare_cazome_sizes(fam_freq_df_with_tax, args) is None
 
+
+def test_compare_classes(fam_freq_df_with_tax, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        proteome_dir=None,
+        output_dir=out,
+        group_by='Genus',
+        round_by=2,
+    )
+
+    explore_cazomes.compare_cazy_classes(fam_freq_df_with_tax, args)
+
+
+

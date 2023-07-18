@@ -1,0 +1,59 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1.5.0
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.10.2
+
+    working_directory: ~/cazomevolve
+    
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cazvolve-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}-{{ checksum "requirements-pip.txt" }}
+            - cazvolve-
+          
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r requirements-dev.txt
+            pip install -r requirements-pip.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: cazvolve-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements-dev.txt" }}-{{ checksum "requirements-pip.txt" }}
+
+      - run:
+          name: install package
+          command: |
+            . venv/bin/activate
+            pip install -e .
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            pytest -v --cov=cazomevolve --cov-report xml:.coverage.xml
+
+      - store_artifacts:
+          path: tests/test_output
+          destination: tests/test_output
+      - store_artifacts:
+          path: .coverage.xml
+          destination: .coverage.xml
+
+      # - codecov/upload:
+      #     file: .coverage.xml
+
+workflows:
+  main:
+    jobs:
+      - build-and-test

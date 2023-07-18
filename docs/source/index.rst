@@ -12,7 +12,7 @@ Welcome to cazomevolve's documentation!
 Build Information
 -----------------
 
-.. image:: https://img.shields.io/badge/Version-v0.1.0-yellowgreen
+.. image:: https://img.shields.io/badge/Version-v0.1.7-yellowgreen
    :target: https://github.com/HobnobMancer/cazomevolve
 .. image:: https://zenodo.org/badge/367898306.svg
    :target: https://zenodo.org/badge/latestdoi/367898306
@@ -21,6 +21,10 @@ Build Information
 .. image:: https://readthedocs.org/projects/cazomevolve/badge/?version=latest
     :target: https://cazomevolve.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. image:: https://circleci.com/gh/HobnobMancer/cazomevolve.svg?style=shield
+   :target: https://circleci.com/gh/HobnobMancer/cazomevolve
+.. image:: https://codecov.io/gh/HobnobMancer/cazomevolve/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/HobnobMancer/cazomevolve
 
 --------
 ``PyPI``

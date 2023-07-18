@@ -71,6 +71,13 @@ def test_output_dir(test_dir):
 
 
 @pytest.fixture
+def fgp_df(test_input_dir):
+    df_path = test_input_dir / "cazome_data_files/FGP_df"
+    df = pd.read_table(df_path)
+    return df
+
+
+@pytest.fixture
 def fam_freq_df(test_input_dir):
     df_path = test_input_dir / "cazome_explore/fam_freq_df.csv"
     df = pd.read_csv(df_path, index_col="Unnamed: 0")

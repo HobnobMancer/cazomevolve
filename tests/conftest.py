@@ -47,6 +47,11 @@ import pandas as pd
 
 from pathlib import Path
 
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
+
+Base = declarative_base()
+
 
 @pytest.fixture
 def test_dir():
@@ -91,3 +96,38 @@ def built_fam_freq_df(test_input_dir):
     _path = test_input_dir / "cazome_explore/build_fam_freq_df.csv"
     df = pd.read_csv(_path, index_col="Unnamed: 0")
     return df
+
+
+# Define fixtures for connection to db
+
+
+@pytest.fixture()
+def db_path():
+    return Path("tests/test_inputs/cazy_db/unit_test_23-05-22.db")
+
+
+@pytest.fixture(scope="function")
+def engine(db_path):
+    return create_engine(f"sqlite+pysqlite:///{db_path}", echo=False)
+
+
+@pytest.fixture(scope="function")
+def tables(engine):
+    Base.metadata.create_all(engine)
+    yield
+    Base.metadata.drop_all(engine)
+
+
+@pytest.fixture
+def db_connection(engine, tables):
+    """Returns an sqlalchemy session, and after the test tears down everything properly."""
+    connection = engine.connect()
+    # begin the nested transaction
+    transaction = connection.begin()
+
+    yield transaction
+
+    # roll back the broader transaction
+    transaction.rollback()
+    # put back the connection to the connection pool
+    connection.close()

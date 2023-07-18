@@ -57,8 +57,8 @@ from cazomevolve.taxs import add_taxs
 
 @pytest.fixture
 def argsdict(test_input_dir):
-    fgp_path = test_input_dir / "cazome_data_files/FGP_FILE"
-    fg_path = test_input_dir / "cazome_data_files/FG_FILE"
+    fgp_path = test_input_dir / "cazome_data_files/FGP_FILE-uneditable"
+    fg_path = test_input_dir / "cazome_data_files/FG_FILE-uneditable"
 
     return {'args': Namespace(
         email='email',

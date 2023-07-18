@@ -56,8 +56,8 @@ from cazomevolve.cazome.explore import parse_data
 
 
 def test_load_fgp_data(test_input_dir):
-    _path = test_input_dir / "cazome_data_files/FGP_FILE"
-    assert len(parse_data.load_fgp_data(_path)) == 51
+    _path = test_input_dir / "cazome_data_files/FGP_FILE-uneditable"
+    assert len(parse_data.load_fgp_data(_path)) == 60
 
 
 def test_load_tax_data(test_input_dir):

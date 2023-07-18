@@ -50,8 +50,8 @@ jobs:
           path: .coverage.xml
           destination: .coverage.xml
 
-      - codecov/upload:
-          file: .coverage.xml
+      # - codecov/upload:
+      #     file: .coverage.xml
 
 workflows:
   main:

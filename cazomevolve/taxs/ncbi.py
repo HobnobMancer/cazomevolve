@@ -45,7 +45,7 @@ import logging
 from Bio import Entrez
 
 from saintBioutils.genbank import entrez_retry
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 
 def add_ncbi_taxs(genomes_tax_dict, genomes_to_query, col_names, args):

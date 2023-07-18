@@ -41,7 +41,7 @@
 
 import pandas as pd
 
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 
 # Run this block before loading data

@@ -310,7 +310,7 @@ def compare_cazy_families(fgp_df, args):
         index.append('Class')
     if args.tax_order:
         index.append('Order')
-    if args.tax_family_:
+    if args.tax_family:
         index.append('Family')
     if args.genus:
         index.append('Genus')
@@ -323,7 +323,7 @@ def compare_cazy_families(fgp_df, args):
     fam_freq_genus_row_colours, fam_g_lut = build_row_colours(fam_freq_df_ggs, args.group_by, 'Set2')
 
     for file_format in args.formats:
-        outpath_cm = outdir / f"cazy_family_clustermap.{args.file_format}"
+        outpath_cm = outdir / f"cazy_family_clustermap.{file_format}"
         logger.warning(
             f"Writing out clustermap of CAZy family frequencies in {file_format} format to:\n"
             f"{outpath_cm}"
@@ -331,7 +331,7 @@ def compare_cazy_families(fgp_df, args):
         build_family_clustermap(
             fam_freq_df_ggs,
             row_colours=fam_freq_genus_row_colours,
-            fig_size=((len(fam_freq_df_ggs).columns)*0.4, len(fam_freq_df_ggs)*0.4),
+            fig_size=(len(fam_freq_df_ggs.columns)*0.4, len(fam_freq_df_ggs)*0.4),
             file_path=outpath_cm,
             file_format=format,
             lut=fam_g_lut,
@@ -378,7 +378,7 @@ def compare_core_cazomes(fam_freq_df, fam_freq_df_ggs, all_families, args):
         index.append('Class')
     if args.tax_order:
         index.append('Order')
-    if args.tax_family_:
+    if args.tax_family:
         index.append('Family')
     if args.genus:
         index.append('Genus')
@@ -437,7 +437,7 @@ def find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families,
         exclude_core_cazome=False,
     )
     with open(outpath_all, "w") as fh:
-        fh.write(cooccurring_fams_dict)
+        fh.write(str(cooccurring_fams_dict))
 
     grp_cooccuring_fams = {}  # {genus: cooccurring_fams_d
     for grp in set(fam_freq_df[args.group_by]):
@@ -449,7 +449,7 @@ def find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families,
         )
         grp_cooccuring_fams[grp] = grp_cooccurring_fams_dict
     with open(outpath_grp, "w") as fh:
-        fh.write(grp_cooccuring_fams)
+        fh.write(str(grp_cooccuring_fams))
 
     upsetplot_membership = []
     upsetplot_membership = add_to_upsetplot_membership(upsetplot_membership, cooccurring_fams_dict)
@@ -473,7 +473,7 @@ def find_always_cooccurring_families(fam_freq_df, fam_freq_df_ggs, all_families,
 
     # calculate frequencies
     upset_plot_groups = get_upsetplot_grps(upsetplot_membership)
-
+    cooccurring_grp_freq_data = []
     cooccurring_grp_freq_data = add_upsetplot_grp_freqs(
         upset_plot_groups,
         cooccurring_grp_freq_data,
@@ -511,7 +511,7 @@ def run_pca(fam_freq_df, fam_freq_df_ggs, all_families, args):
         index.append('Class')
     if args.tax_order:
         index.append('Order')
-    if args.tax_family_:
+    if args.tax_family:
         index.append('Family')
     if args.genus:
         index.append('Genus')

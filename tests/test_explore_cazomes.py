@@ -219,4 +219,157 @@ def test_compare_classes(fam_freq_df_with_tax, test_output_dir, monkeypatch):
     explore_cazomes.compare_cazy_classes(fam_freq_df_with_tax, args)
 
 
+def test_compare_families(fam_freq_df_with_tax, built_fam_freq_df, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    def mock_built_df(*args, **kwards):
+        return built_fam_freq_df
+
+    def mock_row_colours(*args, **kwards):
+        return built_fam_freq_df, built_fam_freq_df
+
+    def mock_get_group_specific_fams(*args, **kwards):
+        return {'grp': [1, 2, 3]}, []
+
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+    monkeypatch.setattr(explore_cazomes, "build_fam_freq_df", mock_built_df)
+    monkeypatch.setattr(explore_cazomes, "build_family_clustermap", mock_none)
+    monkeypatch.setattr(explore_cazomes, "build_row_colours", mock_row_colours)
+    monkeypatch.setattr(explore_cazomes, "get_group_specific_fams", mock_get_group_specific_fams)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        proteome_dir=None,
+        output_dir=out,
+        group_by='Genus',
+        round_by=2,
+        kingdom=False,
+        phylum=False,
+        tax_class=False,
+        tax_order=False,
+        tax_family=False,
+        genus=True,
+        species=True,
+        formats=['pdf'],
+        show_plots=False,
+    )
+
+    explore_cazomes.compare_cazy_families(fam_freq_df_with_tax, args)
+
+
+def test_core_cazome(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    def mock_core_cazome(*args, **kwards):
+        return ['GH1', 'PL1']
+    
+    def mock_df(*args, **kwards):
+        return built_fam_freq_df
+    
+    def mock_build_mean_df(*args, **kwards):
+        return built_fam_freq_df, built_fam_freq_df
+
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+    monkeypatch.setattr(explore_cazomes, "identify_core_cazome", mock_core_cazome)
+    monkeypatch.setattr(explore_cazomes, "add_tax_column_from_row_index", mock_df)
+    monkeypatch.setattr(explore_cazomes, "build_fam_mean_freq_df", mock_build_mean_df)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        output_dir=out,
+        fgp_file="tests",
+        tax_csv_path="tests",
+        kingdom=True,
+        phylum=True,
+        tax_class=True,
+        tax_order=True,
+        tax_family=True,
+        genus=True,
+        species=True,
+        group_by='Genus',
+        round_by=2,
+    )
+
+    explore_cazomes.compare_core_cazomes(
+        built_fam_freq_df,
+        built_fam_freq_df.set_index(['Genome','Genus','Species']),
+        all_families,
+        args,
+    )
+
+
+def test_cooccurring_fams(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    def mock_cooccurring(*args, **kwards):
+        return {
+            0: {'fams': {'CBM4', 'GH148'}, 'freqs': {8}},
+            1: {'fams': {'CBM5', 'CBM50', 'GH23', 'GH3', 'GT2', 'GT51', 'GT9'},
+            'freqs': {711}},
+            2: {'fams': {'GH121', 'GH146'}, 'freqs': {1}},
+            3: {'fams': {'GH127', 'GH15'}, 'freqs': {1}},
+            4: {'fams': {'GH94', 'GT84'}, 'freqs': {309}},
+        }
+
+    def mock_upsetplot_membership(*args, **kwards):
+        return []
+
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+    monkeypatch.setattr(explore_cazomes, "build_upsetplot", mock_none)
+    monkeypatch.setattr(explore_cazomes, "add_upsetplot_grp_freqs", mock_none)
+    monkeypatch.setattr(explore_cazomes, "get_upsetplot_grps", mock_none)
+    monkeypatch.setattr(explore_cazomes, "build_upsetplot_matrix", mock_none)
+    monkeypatch.setattr(explore_cazomes, "calc_cooccuring_fam_freqs", mock_cooccurring)
+    monkeypatch.setattr(explore_cazomes, "add_to_upsetplot_membership", mock_upsetplot_membership)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        output_dir=out,
+        fgp_file="tests",
+        tax_csv_path="tests",
+        kingdom=True,
+        phylum=True,
+        tax_class=True,
+        tax_order=True,
+        tax_family=True,
+        genus=True,
+        species=True,
+        group_by='Genus',
+        round_by=2,
+        formats=['pdf'],
+    )
+
+    explore_cazomes.find_always_cooccurring_families(
+        built_fam_freq_df,
+        built_fam_freq_df.set_index(['Genome', 'Genus', 'Species']),
+        all_families,
+        args,
+    )
+
+
+def test_pca(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        output_dir=out,
+        fgp_file="tests",
+        tax_csv_path="tests",
+        kingdom=True,
+        phylum=True,
+        tax_class=True,
+        tax_order=True,
+        tax_family=True,
+        genus=True,
+        species=True,
+        group_by='Genus',
+        round_by=2,
+        formats=['pdf'],
+    )
 

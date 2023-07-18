@@ -130,7 +130,7 @@ def identify_cooccurring_fams_corrM(df, all_families, core_cazome=[], corrM_path
 # including the number of genomes containing each group of CAZy families - needed for an upset plot
 #
 
-def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False):
+def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False, core_cazome=[]):
     """Identify groups of CAZy families that are always present together, and count in 
     how many genomes the families are present together
     
@@ -147,6 +147,7 @@ def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False):
     :param all_families: set of all CAZy families to be analysed
     :param exclude_core_cazome: whether to exlude the core cazome, default: False - 
         include the core CAZome
+    :param core_cazome: list of core CAZome families if to be excluded
         
     Return dict {grp_num: {'fams': {co-occurring fams}, 'freqs': {num of genomes}}
     - returns set of frequencies in case different numbers are produced for each inital pair 
@@ -188,7 +189,7 @@ def calc_cooccuring_fam_freqs(df, all_families, exclude_core_cazome=False):
     return cooccurring_groups
     
     
-def identify_cooccurring_fam_pairs(df, all_families, exclude_core_cazome=False):
+def identify_cooccurring_fam_pairs(df, all_families, exclude_core_cazome=False, core_cazome=[]):
     """Identify pairs of CAZy families that are always present together in the same genome
     
     :param df: fam freq df, pandas df, columns are CAZy families, rows are genomes, cells 

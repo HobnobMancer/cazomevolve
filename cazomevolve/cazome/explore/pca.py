@@ -108,7 +108,7 @@ def plot_explained_variance(
     plt.xlabel( 'Number of PCs', fontsize=14);
     plt.ylabel('Cumulative explained variance', fontsize=14);
     if show:
-        plt.show;
+        plt.show()
 
     if file_path is not None:
         plt.savefig(
@@ -350,6 +350,7 @@ def plot_loadings(
     file_format='png',
     marker_size=100,
     ax=None,
+    show=False,
 ):
     """Build loadings plot
     
@@ -448,6 +449,9 @@ def plot_loadings(
 
     sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
     
+    if show:
+        plt.show();
+
     if file_path is not None:
         plt.savefig(file_path, dpi=dpi, bbox_inches='tight', format=file_format)
 

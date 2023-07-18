@@ -148,6 +148,7 @@ def build_family_clustermap(
     bbox_to_anchor=(1,1),
     cmap=sns.cubehelix_palette(dark=1, light=0, reverse=True, as_cmap=True),
     cbar_pos=(0.02, 0.8, 0.05, 0.18),
+    show=False,
 ):
     """Build a clustermap of the CAZy family frequencies per genome
     
@@ -199,7 +200,10 @@ def build_family_clustermap(
             title_fontsize=title_fontsize,
             fontsize=legend_fontsize,
         )
-        
+    
+    if show:
+        plt.show();
+
     if file_path is not None:
         fam_clustermap.savefig(
             file_path,

@@ -340,6 +340,7 @@ def compare_cazy_families(fgp_df, args):
             title_fontsize=28,
             legend_fontsize=24,
             cbar_pos=(0, 0.95, 0.05, 0.05),
+            show=args.show_plots,
         )
 
     # find group specific families
@@ -546,6 +547,7 @@ def run_pca(fam_freq_df, fam_freq_df_ggs, all_families, args):
             num_of_components,
             file_path=out_cumvar,
             file_format=file_format,
+            show=args.show_plots,
         )
 
         out_scree = outdir / f"pca_scree_plot.{file_format}"
@@ -558,6 +560,7 @@ def run_pca(fam_freq_df, fam_freq_df_ggs, all_families, args):
             nComp=10,
             file_format=file_format,
             file_path=out_scree,
+            show=args.show_plots,
         )
 
     # plot PCS 1-4
@@ -593,22 +596,24 @@ def plot_pcs(pc_pair, fam_freq_df_ggs, pca, X_scaled, outdir, args):
             pc_pair[1],
             args.group_by,
             style=args.group_by,
-            fig_size=(15,15),
+            figsize=(15,15),
             file_path=out,
             file_format=file_format,
+            show=args.show_plots,
         );
 
     logger.warning(f"PC{pc_pair[0]} vs PC{pc_pair[1]} - plotting loadings plot")
     for file_format in args.formats:
         out = pc_outdir / f'pca_pc{pc_pair[0]}_vs_pc{pc_pair[1]}-{args.group_by}-loadings.{file_format}'
-        g = plot_loadings(
+        plot_loadings(
             pca,
             fam_freq_df_ggs,
             pc_pair[0],
             pc_pair[1],
             threshold=0.3,
-            fig_size=(10,10),
+            figsize=(10,10),
             file_path=out,
             font_size=11,
             file_format=file_format,
+            show=args.show_plots,
         );

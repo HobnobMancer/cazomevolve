@@ -175,6 +175,14 @@ def build_parser(
     )
 
     parser.add_argument(
+        "--show_plots",
+        dest="show_plots",
+        action="store_true",
+        default=False,
+        help="Display generated plots during run",
+    )
+
+    parser.add_argument(
         "--round_by",
         type=int,
         default=2,

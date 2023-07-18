@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE eSearchResult PUBLIC "-//NLM//DTD esearch 20060628//EN" "https://eutils.ncbi.nlm.nih.gov/eutils/dtd/20060628/esearch.dtd">
+<eSearchResult><Count>1199</Count><RetMax>10</RetMax><RetStart>0</RetStart><IdList>
+<Id>17020241</Id>
+<Id>16863991</Id>
+<Id>16863981</Id>
+<Id>16863971</Id>
+<Id>16863961</Id>
+<Id>16863951</Id>
+<Id>16599221</Id>
+<Id>16585761</Id>
+<Id>16567171</Id>
+<Id>16567101</Id>
+</IdList><TranslationSet><Translation>     <From>aspergillus</From>     <To>"Aspergillus"[Organism] OR aspergillus[All Fields]</To>    </Translation></TranslationSet><TranslationStack>   <TermSet>    <Term>"Aspergillus"[Organism]</Term>    <Field>Organism</Field>    <Count>1199</Count>    <Explode>Y</Explode>   </TermSet>   <TermSet>    <Term>aspergillus[All Fields]</Term>    <Field>All Fields</Field>    <Count>24</Count>    <Explode>N</Explode>   </TermSet>   <OP>OR</OP>   <OP>GROUP</OP>  </TranslationStack><QueryTranslation>"Aspergillus"[Organism] OR aspergillus[All Fields]</QueryTranslation></eSearchResult>

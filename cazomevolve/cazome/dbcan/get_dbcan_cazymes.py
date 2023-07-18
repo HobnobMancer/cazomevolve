@@ -138,6 +138,7 @@ def get_tool_fams(tool_data):
     :param tool_data: str, output from prediction tool
     
     Return set of CAZy family predictions"""
+    print(tool_data, '***')
     if tool_data == "-":
         return set()
     
@@ -162,8 +163,9 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     :param hotpep_fams: set of CAZy family annotations
     :param diamond_fams: set of CAZy family annotations
     
-    Return set
+    Return LIST
     """
+    print(hmmer_fams, hotpep_fams, diamond_fams, 'RESULTS')
     hmmer_hotpep = hmmer_fams & hotpep_fams
     hmmer_diamond = hmmer_fams & diamond_fams
     hotpep_diamond = hotpep_fams & diamond_fams

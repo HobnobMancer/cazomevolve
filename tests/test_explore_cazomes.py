@@ -47,12 +47,10 @@ pytest -v
 
 import logging
 import pytest
-import subprocess
+import numpy as np
 
 from argparse import Namespace
 from pathlib import Path
-
-from saintBioutils.utilities import file_io
 
 from cazomevolve.cazome.explore import explore_cazomes
 
@@ -354,7 +352,15 @@ def test_pca(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
     def mock_none(*args, **kwards):
         return
     
+    def mock_pca(*args, **kwards):
+        return Namespace(explained_variance_ratio_=np.array([1,2,3,4,5])), 'pca'
+    
     monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+    monkeypatch.setattr(explore_cazomes, "plot_explained_variance", mock_none)
+    monkeypatch.setattr(explore_cazomes, "plot_scree", mock_none)
+    monkeypatch.setattr(explore_cazomes, "plot_pcs", mock_none)
+    monkeypatch.setattr(explore_cazomes, "perform_pca", mock_pca)
+
 
     out = test_output_dir / "explore_cazomes"
     args = Namespace(
@@ -371,5 +377,47 @@ def test_pca(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
         group_by='Genus',
         round_by=2,
         formats=['pdf'],
+        show_plots=False,
     )
 
+    explore_cazomes.run_pca(
+        built_fam_freq_df,
+        built_fam_freq_df.set_index(['Genome','Genus','Species']),
+        all_families,
+        args,
+    )
+
+def test_plot_pcs(built_fam_freq_df, all_families, test_output_dir, monkeypatch):
+    def mock_none(*args, **kwards):
+        return
+    
+    monkeypatch.setattr(explore_cazomes, "make_output_directory", mock_none)
+    monkeypatch.setattr(explore_cazomes, "plot_pca", mock_none)
+    monkeypatch.setattr(explore_cazomes, "plot_loadings", mock_none)
+
+    out = test_output_dir / "explore_cazomes"
+    args = Namespace(
+        output_dir=out,
+        fgp_file="tests",
+        tax_csv_path="tests",
+        kingdom=True,
+        phylum=True,
+        tax_class=True,
+        tax_order=True,
+        tax_family=True,
+        genus=True,
+        species=True,
+        group_by='Genus',
+        round_by=2,
+        formats=['pdf'],
+        show_plots=False,
+    )
+
+    explore_cazomes.plot_pcs(
+        (1,2),
+        built_fam_freq_df.set_index(['Genome', 'Genus', 'Species']),
+        'pca',
+        'xscaled',
+        out,
+        args,
+    )

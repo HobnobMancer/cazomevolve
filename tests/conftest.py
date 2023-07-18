@@ -105,6 +105,14 @@ def built_fam_freq_df(test_input_dir):
     return df
 
 
+@pytest.fixture
+def all_families(built_fam_freq_df):
+    built_fam_freq_df = built_fam_freq_df.drop('Species', axis=1)
+    built_fam_freq_df = built_fam_freq_df.set_index(['Genome'])
+    fams = list(built_fam_freq_df.columns)
+    return fams
+
+
 # Define fixtures for connection to db
 
 

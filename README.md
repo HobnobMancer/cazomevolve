@@ -3,6 +3,7 @@
 [![DOI](https://zenodo.org/badge/367898306.svg)](https://zenodo.org/badge/latestdoi/367898306)
 [![Documentation Status](https://readthedocs.org/projects/cazomevolve/badge/?version=latest)](https://cazomevolve.readthedocs.io/en/latest/?badge=latest)
 [![licence](https://img.shields.io/badge/Licence-MIT-green)](https://github.com/HobnobMancer/cazomevolve/blob/master/LICENSE)  
+[![CircleCI](https://circleci.com/gh/HobnobMancer/cazomevolve.svg?style=shield)](https://circleci.com/gh/HobnobMancer/cazomevolve)  
 ![Python](https://img.shields.io/badge/Python-v3.9.---orange)
 ![Research](https://img.shields.io/badge/Research-Bioinformatics-ff69b4)
 [![Funding BBSCR](https://img.shields.io/badge/Funding-EASTBio-blue)](http://www.eastscotbiodtp.ac.uk/)

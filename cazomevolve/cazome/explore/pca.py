@@ -81,6 +81,7 @@ def plot_explained_variance(
     file_path=None,
     file_format='png',
     dpi=300,
+    show=False,
 ):
     """Plot the cumlative explained variance.
     
@@ -106,7 +107,8 @@ def plot_explained_variance(
     plt.xticks(np.arange(0,nComp,5));
     plt.xlabel( 'Number of PCs', fontsize=14);
     plt.ylabel('Cumulative explained variance', fontsize=14);
-    plt.show;
+    if show:
+        plt.show()
 
     if file_path is not None:
         plt.savefig(
@@ -119,7 +121,7 @@ def plot_explained_variance(
     return cumExpVar
     
     
-def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300):
+def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300, show=False):
     """Generate scree plot for PCA, plotting the amount of variance captured by each pc, for the
     first nComp PCs
     
@@ -140,8 +142,10 @@ def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300):
             file_path,
             bbox_inches='tight',
             dpi=dpi,
+            format=file_format,
         )
-    plt.show();
+    if show:
+        plt.show();
 
     for i in range(nComp):
         print(f"Explained variance for {i+1}PC: {pca.explained_variance_ratio_[i]}")
@@ -168,6 +172,7 @@ def plot_pca(
     marker_size=100,
     markers=True,
     ax=None,
+    show=False,
 ):
     """Project genomes onto the PCs
     
@@ -324,7 +329,8 @@ def plot_pca(
             dpi=dpi,
             format=file_format,
         )
-    plt.show();
+    if show:
+        plt.show();
     
     return plt
 
@@ -344,6 +350,7 @@ def plot_loadings(
     file_format='png',
     marker_size=100,
     ax=None,
+    show=False,
 ):
     """Build loadings plot
     
@@ -369,14 +376,12 @@ def plot_loadings(
     loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
     # get labels of variables, i.e. cazy families
     loadings_labels = list(fam_df.columns)
-    try:
-        loadings_labels.remove('Species')
-    except (KeyError, ValueError):
-        pass
-    try:
-        loadings_labels.remove('Genus')
-    except (KeyError, ValueError):
-        pass
+
+    for col in ['Kingdom', 'Phylum', 'Class', 'Order', 'Tax_Family', 'Genus', 'Species', 'Genome', 'Genomes']:
+        try:
+            loadings_labels.remove(col)
+        except (KeyError, ValueError):
+            pass
 
     loadings_x = loadings[:,(first_pc-1)]
     loadings_y = loadings[:,(second_pc-1)]
@@ -444,6 +449,9 @@ def plot_loadings(
 
     sns.move_legend(g, "lower center", bbox_to_anchor=(.5, 1), ncol=3, title=None, frameon=False);
     
+    if show:
+        plt.show();
+
     if file_path is not None:
         plt.savefig(file_path, dpi=dpi, bbox_inches='tight', format=file_format)
 
@@ -486,15 +494,11 @@ def plot_ie_loadings(
     loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
     # get labels of variables, i.e. cazy families
     loadings_labels = list(fam_df.columns)
-    try:
-        loadings_labels.remove('Species')
-    except (KeyError, ValueError):
-        pass
-    try:
-        loadings_labels.remove('Genus')
-    except (KeyError, ValueError):
-        pass
-
+    for col in ['Kingdom', 'Phylum', 'Class', 'Order', 'Tax_Family', 'Genus', 'Species', 'Genome', 'Genomes']:
+        try:
+            loadings_labels.remove(col)
+        except (KeyError, ValueError):
+            pass
     loadings_x = loadings[:,(first_pc-1)]
     loadings_y = loadings[:,(second_pc-1)]
 

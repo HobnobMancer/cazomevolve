@@ -89,6 +89,7 @@ For example, if genus and species inforamtion was listed in the CSV of taxonomy 
 Optional arguments
 ^^^^^^^^^^^^^^^^^^
 
+* ``--show_plots`` - Display plots as they are generated during the program run (default: False)
 * ``--round_by`` - ROUND_BY - Number of decimal places to round means and SDs to (default: 2)
 * ``-f``, ``--force`` - Force file over writting (default: False)
 * ``-l``, ``--log`` log file name - Defines log file name and/or path (default: None)

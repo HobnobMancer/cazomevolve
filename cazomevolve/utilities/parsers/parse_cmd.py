@@ -60,7 +60,6 @@ from cazomevolve.utilities.parsers import (
     get_cazy_parser,
     invoke_dbcan_parser,
     get_dbcan_parser,
-    common_parser,
     add_taxs_parser,
     explore_cazomes_parser,
 )

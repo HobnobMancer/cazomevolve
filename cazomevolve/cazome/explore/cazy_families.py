@@ -140,7 +140,7 @@ def build_family_clustermap(
     file_format='png',
     font_scale=1,
     dpi=300,
-    dendrogram_ratio=None,
+    dendrogram_ratio=0.2,
     lut=None,
     legend_title='',
     title_fontsize='2',
@@ -148,6 +148,7 @@ def build_family_clustermap(
     bbox_to_anchor=(1,1),
     cmap=sns.cubehelix_palette(dark=1, light=0, reverse=True, as_cmap=True),
     cbar_pos=(0.02, 0.8, 0.05, 0.18),
+    show=False,
 ):
     """Build a clustermap of the CAZy family frequencies per genome
     
@@ -199,12 +200,16 @@ def build_family_clustermap(
             title_fontsize=title_fontsize,
             fontsize=legend_fontsize,
         )
-        
+    
+    if show:
+        plt.show();
+
     if file_path is not None:
         fam_clustermap.savefig(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
     return fam_clustermap
@@ -222,7 +227,7 @@ def build_family_clustermap_multi_legend(
     file_format='png',
     font_scale=1,
     dpi=300,
-    dendrogram_ratio=None,
+    dendrogram_ratio=0.2,
     title_fontsize=2,
     legend_fontsize=2,
     cmap=sns.cubehelix_palette(dark=1, light=0, reverse=True, as_cmap=True),
@@ -314,6 +319,7 @@ def build_family_clustermap_multi_legend(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
     return fam_clustermap
@@ -371,7 +377,7 @@ def plot_fam_boxplot(
             long_form_data.append(row_data)
     
     long_form_df = pd.DataFrame(long_form_data, columns=["Family", "Frequency"])
-    
+
     boxplot = sns.boxplot(x=long_form_df['Family'], y=long_form_df['Frequency'])
     
     if file_path is not None:
@@ -379,6 +385,7 @@ def plot_fam_boxplot(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
 
@@ -462,6 +469,8 @@ def get_group_specific_fams(fam_freq_df, group_by, all_families):
             group_fams[group] = set()
 
         for fam in all_families:
+            if fam in ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species', 'Genome', 'Genomes']:
+                continue
             if fam_freq_df.iloc[ri][fam] > 0:
                 group_fams[group].add(fam)
 

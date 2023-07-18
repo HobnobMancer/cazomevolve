@@ -8,7 +8,7 @@
 
 # Contact
 # eemh1@st-andrews.ac.uk
-
+#
 # Emma E. M. Hobbs,
 # Biomolecular Sciences Building,
 # University of St Andrews,
@@ -48,7 +48,7 @@ from tqdm import tqdm
 from typing import List, Optional
 
 from saintBioutils.utilities.file_io import make_output_directory
-from saintBioutils.utilities.file_io import get_paths
+from saintBioutils.utilities.file_io.get_paths import get_file_paths
 
 from cazomevolve import closing_message
 
@@ -57,7 +57,7 @@ def main(args: Optional[List[str]] = None, logger: Optional[logging.Logger] = No
     make_output_directory(args.output_dir, args.force, args.nodelete)
 
     # get the path to every FASTA to be parsed by dbCAN
-    fasta_files_paths = list(set(get_paths.get_file_paths(args.input_dir, suffixes=['fasta', 'faa'])))
+    fasta_files_paths = list(set(get_file_paths(args.input_dir, suffixes=['fasta', 'faa'])))
     fasta_files_paths.sort()
     print(f"Retrieved {len(fasta_files_paths)} fasta files from {args.input_dir}")
 

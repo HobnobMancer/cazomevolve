@@ -373,7 +373,7 @@ def plot_fam_boxplot(
             long_form_data.append(row_data)
     
     long_form_df = pd.DataFrame(long_form_data, columns=["Family", "Frequency"])
-    
+
     boxplot = sns.boxplot(x=long_form_df['Family'], y=long_form_df['Frequency'])
     
     if file_path is not None:
@@ -381,6 +381,7 @@ def plot_fam_boxplot(
             file_path,
             dpi=dpi,
             bbox_inches='tight',
+            format=file_format,
         )
 
 
@@ -464,6 +465,8 @@ def get_group_specific_fams(fam_freq_df, group_by, all_families):
             group_fams[group] = set()
 
         for fam in all_families:
+            if fam in ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species', 'Genome', 'Genomes']:
+                continue
             if fam_freq_df.iloc[ri][fam] > 0:
                 group_fams[group].add(fam)
 

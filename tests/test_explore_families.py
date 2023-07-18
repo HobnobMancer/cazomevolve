@@ -83,3 +83,24 @@ def test_build_family_clustermap_multi_legend(built_fam_freq_df):
         bbox_to_anchors=[(0,0), (1,1)],
     )
 
+
+def test_core_cazome(built_fam_freq_df):
+    assert len(cazy_families.identify_core_cazome(built_fam_freq_df)) == 20
+
+
+def test_boxplot(built_fam_freq_df):
+    df = built_fam_freq_df[['GH1', 'PL1']]
+    cazy_families.plot_fam_boxplot(df)
+
+
+def test_build_fam_mean_freq_df(built_fam_freq_df):
+    built_fam_freq_df = built_fam_freq_df.drop('Species', axis=1)
+    built_fam_freq_df = built_fam_freq_df.set_index(['Genome'])
+    cazy_families.build_fam_mean_freq_df(built_fam_freq_df, 'Genus', round_by=2)
+
+
+def test_get_group_specific_fams(built_fam_freq_df):
+    built_fam_freq_df = built_fam_freq_df.drop('Species', axis=1)
+    built_fam_freq_df = built_fam_freq_df.set_index(['Genome'])
+    fams = list(built_fam_freq_df.columns)
+    cazy_families.get_group_specific_fams(built_fam_freq_df, 'Genus', fams)

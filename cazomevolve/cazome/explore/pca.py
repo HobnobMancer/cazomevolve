@@ -95,6 +95,7 @@ def plot_explained_variance(
     
     Retrun numpy array with the explained variance per PC
     """
+    plt.clf()
     cumExpVar = np.cumsum(pca.explained_variance_ratio_)
 
     keepPC = [pc for pc in range(nComp) if cumExpVar[pc] >= threshold][0]
@@ -133,6 +134,8 @@ def plot_scree(pca, nComp=10, file_path=None, file_format='png', dpi=300, show=F
     
     Return nothing
     """
+    plt.clf()
+    
     PC_values = np.arange(nComp) + 1
     plt.plot(PC_values, pca.explained_variance_ratio_[0:nComp], 'o-', linewidth=2, color='blue')
     plt.xlabel('Principal Component')

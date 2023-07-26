@@ -43,7 +43,7 @@
 import logging
 
 
-__version__ = "0.1.7"
+__version__ = "0.1.7.1"
 
 __citation__ = "???"
 

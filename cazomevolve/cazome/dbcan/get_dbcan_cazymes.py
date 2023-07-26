@@ -102,9 +102,14 @@ def get_family_annotations(output_dir, args):
 
         protein_accession = row['Gene ID']
 
-        hmmer_fams = get_tool_fams(row[1])
-        hotpep_fams = get_tool_fams(row[2])
-        diamond_fams = get_tool_fams(row[3])
+        if list(df.columns())[1].startswith('EC#'):
+            hmmer_fams = get_tool_fams(row[2])
+            hotpep_fams = get_tool_fams(row[3])
+            diamond_fams = get_tool_fams(row[4])
+        else:
+            hmmer_fams = get_tool_fams(row[1])
+            hotpep_fams = get_tool_fams(row[2])
+            diamond_fams = get_tool_fams(row[3])
 
         # get the fams at least two tools agreed upon
         dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)

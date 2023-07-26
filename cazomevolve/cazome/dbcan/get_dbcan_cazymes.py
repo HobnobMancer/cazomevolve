@@ -102,7 +102,7 @@ def get_family_annotations(output_dir, args):
 
         protein_accession = row['Gene ID']
 
-        if list(df.columns())[1].startswith('EC#'):
+        if list(df.columns)[1].startswith('EC#'):
             hmmer_fams = get_tool_fams(row[2])
             hotpep_fams = get_tool_fams(row[3])
             diamond_fams = get_tool_fams(row[4])

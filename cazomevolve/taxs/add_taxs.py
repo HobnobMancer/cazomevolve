@@ -230,6 +230,8 @@ def add_gtdb_taxs(gtdb_df, col_names, args):
         tax = f"{genome}_"
         for col_name in col_names:
             tax_info = g_rows.iloc[0][col_name]
+            if tax_info == genome:
+                continue
             tax += f"{tax_info}_"
 
         genome_tax_dict[genome] = tax[:-1]  # drop terminal '_' underscore

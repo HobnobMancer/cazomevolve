@@ -43,9 +43,9 @@
 import logging
 
 
-__version__ = "0.1.7.2"
+__version__ = "0.1.7.3"
 
-__citation__ = "???"
+__citation__ = "Hobbs, E. E. M., Gloster, T. M., Pritchard, L. (2023) 'cazomevolve', GitHub, https://github.com/HobnobMancer/cazomevolve"
 
 
 def closing_message(job, args):

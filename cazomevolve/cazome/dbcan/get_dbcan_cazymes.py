@@ -94,8 +94,9 @@ def get_family_annotations(output_dir, args):
         logger.error(f"Could not find overview.txt file in {output_dir.name}\nSkipping output dir")
         return
 
-    # drop rows were #ofTools = 1
-    df = df[df['#ofTools'] != 1]
+    # drop rows were #ofTools = 1 if toolcount != 1
+    if args.toolcount != 1:
+        df = df[df['#ofTools'] != 1]
     
     for ri in tqdm(range(len(df)), desc=f"Parsing {output_dir.name}"):
         row = df.iloc[ri]
@@ -112,7 +113,12 @@ def get_family_annotations(output_dir, args):
             diamond_fams = get_tool_fams(row[3])
 
         # get the fams at least two tools agreed upon
-        dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
+        if args.toolcount == 1:
+            dbcan_fams = set(hmmer_fams + hotpep_fams + diamond_fams)
+        elif args.toolcount == 2:
+            dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
+        else:
+            dbcan_fams = get_all_tools_consensus(hmmer_fams, hotpep_fams, diamond_fams)
 
         if len(dbcan_fams) > 0:
             try:
@@ -177,6 +183,22 @@ def get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams):
     dbcan_consensus = list(all_tools.union(hmmer_hotpep, hmmer_diamond, hotpep_diamond))
     
     return dbcan_consensus
+
+
+def get_all_tools_consensus(hmmer_fams, hotpep_fams, diamond_fams):
+    """Get the fams that all three tools predicted
+
+    Hotpep == eCAMI - does not matter which verion of the dbCAN was used
+    
+    :param hmmer_fams: set of CAZy family annotations
+    :param hotpep_fams: set of CAZy family annotations
+    :param diamond_fams: set of CAZy family annotations
+    
+    Return LIST
+    """
+    all_tools = hmmer_fams & diamond_fams & hotpep_fams
+    
+    return list(all_tools)
 
 
 if __name__ == "__main__":

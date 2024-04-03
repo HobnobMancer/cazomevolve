@@ -114,7 +114,7 @@ def get_family_annotations(output_dir, args):
 
         # get the fams at least two tools agreed upon
         if args.toolcount == 1:
-            dbcan_fams = set(hmmer_fams + hotpep_fams + diamond_fams)
+            dbcan_fams = hmmer_fams.union(hotpep_fams,diamond_fams)
         elif args.toolcount == 2:
             dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
         else:

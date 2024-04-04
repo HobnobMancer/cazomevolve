@@ -105,7 +105,7 @@ def build_parser(
     )
 
     parser.add_argument(
-        "--toolcount",
+        "--tool_count",
         type=int,
         choices=[1,2,3],
         default=2,

@@ -94,10 +94,10 @@ def get_family_annotations(output_dir, args):
         logger.error(f"Could not find overview.txt file in {output_dir.name}\nSkipping output dir")
         return
 
-    # drop rows were #ofTools = 1 if toolcount != 1
-    if args.toolcount != 1:
+    # drop rows were #ofTools = 1 if tool_count != 1
+    if args.tool_count != 1:
         df = df[df['#ofTools'] != 1]
-    
+        
     for ri in tqdm(range(len(df)), desc=f"Parsing {output_dir.name}"):
         row = df.iloc[ri]
 
@@ -113,9 +113,9 @@ def get_family_annotations(output_dir, args):
             diamond_fams = get_tool_fams(row[3])
 
         # get the fams at least two tools agreed upon
-        if args.toolcount == 1:
+        if args.tool_count == 1:
             dbcan_fams = hmmer_fams.union(hotpep_fams,diamond_fams)
-        elif args.toolcount == 2:
+        elif args.tool_count == 2:
             dbcan_fams = get_dbcan_consensus(hmmer_fams, hotpep_fams, diamond_fams)
         else:
             dbcan_fams = get_all_tools_consensus(hmmer_fams, hotpep_fams, diamond_fams)

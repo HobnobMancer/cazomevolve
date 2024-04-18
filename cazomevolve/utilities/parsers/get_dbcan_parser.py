@@ -105,6 +105,14 @@ def build_parser(
     )
 
     parser.add_argument(
+        "--tool_count",
+        type=int,
+        choices=[1,2,3],
+        default=2,
+        help="Select the minimum number of tools for a consensus annotation",
+    )
+
+    parser.add_argument(
         "-v",
         "--verbose",
         dest="verbose",
